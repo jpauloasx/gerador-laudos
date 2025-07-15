@@ -4,44 +4,68 @@ from docx.shared import Mm
 from datetime import date
 import os
 
-
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+campos = [
+    ("Nº do Laudo", "numero_laudo"),
+    ("Número do Processo", "numero_processo"),
+    ("Nome", "nome"),
+    ("CPF", "cpf"),
+    ("Telefone", "telefone"),
+    ("Endereço (Rua, Quadra, Lote)", "endereco"),
+    ("Bairro", "bairro"),
+    ("Latitude", "latitude"),
+    ("Longitude", "longitude"),
+    ("Data da Vistoria", "data_vistoria"),
+]
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         try:
             doc = DocxTemplate("modelo_laudo_imagens.docx")
-
-            campos = ["numero_laudo", "numero_processo", "nome", "cpf", "telefone", "endereco",
-                      "bairro", "latitude", "longitude", "data_vistoria"]
-
-            contexto = {campo: request.form.get(campo) for campo in campos}
+            contexto = {campo[1]: request.form.get(campo[1]) for campo in campos}
             contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco")
-            contexto["patologias"] = ", ".join(request.form.getlist("patologias"))
 
+            # Solo - novos grupos
+            contexto["problemas_solo"] = ", ".join(request.form.getlist("problemas_solo"))
+            contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
+            contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
+            contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
+
+            imagens = []
             for i in range(1, 8):
-                contexto[f"descricao{i}"] = request.form.get(f"descricao{i}", "")
-                imagem = request.files.get(f"imagem{i}")
-                if imagem and imagem.filename:
+                arquivo = request.files.get(f"imagem{i}")
+                desc = request.form.get(f"descricao{i}", "")
+                contexto[f"descricao{i}"] = desc
+                if arquivo and arquivo.filename:
                     caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
-                    imagem.save(caminho)
+                    arquivo.save(caminho)
+                    imagens.append(caminho)
                     contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
                 else:
                     contexto[f"imagem{i}"] = ""
 
-            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']} - {contexto['nome']}.docx"
+            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
+            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
+
             doc.render(contexto)
-            doc.save(nome_arquivo)
+            doc.save(caminho_saida)
 
-            return send_file(nome_arquivo, as_attachment=True)
+            return send_file(caminho_saida, as_attachment=True)
         except Exception as e:
-            return f"Erro ao gerar laudo: {str(e)}", 500
+            return f"Erro interno: {e}", 500
 
-    return render_template("formulario.html")
+    return render_template("formulario.html", campos=campos)
+
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
 
 if __name__ == "__main__":
     import os
