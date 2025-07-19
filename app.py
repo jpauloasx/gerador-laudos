@@ -45,81 +45,78 @@ def gerar_mapa_estatico(lat, lon, caminho_destino):
     return False
 
 @app.route("/", methods=["GET", "POST"])
-def index():
-    if not session.get("logado"):
-        return redirect(url_for("login"))
-   if request.method == "POST":
-    try:
-        doc = DocxTemplate("modelo_laudo_imagens.docx")
-        contexto = {campo[1]: request.form.get(campo[1]) for campo in campos}
-        contexto["ano"] = date.today().year
-        contexto["grau_risco"] = request.form.get("grau_risco")
+def formulario():
+    if request.method == "POST":
+        try:
+            doc = DocxTemplate("modelo_laudo_imagens.docx")
+            contexto = {campo[1]: request.form.get(campo[1]) for campo in campos}
+            contexto["ano"] = date.today().year
+            contexto["grau_risco"] = request.form.get("grau_risco")
 
-        # Solo - novos grupos
-        problemas = request.form.getlist("problemas_solo")
-        outro = request.form.get("problemas_solo_outro", "").strip()
-        if outro:
-            problemas.append(outro)
-        contexto["problemas_solo"] = ", ".join(problemas)
+            # Solo - novos grupos
+            problemas = request.form.getlist("problemas_solo")
+            outro = request.form.get("problemas_solo_outro", "").strip()
+            if outro:
+                problemas.append(outro)
+            contexto["problemas_solo"] = ", ".join(problemas)
 
-        contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
-        contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
-        contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
+            contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
+            contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
+            contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
 
-        imagens = []
+            imagens = []
 
-        latitude = request.form.get("latitude")
-        longitude = request.form.get("longitude")
+            latitude = request.form.get("latitude")
+            longitude = request.form.get("longitude")
 
-        # === Se latitude e longitude estiverem presentes, gerar mapa automático ===
-        if latitude and longitude:
-            mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
-            if gerar_mapa_estatico(latitude, longitude, mapa_path):
-                contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
-                contexto["descricao1"] = "Localização Geográfica"
-                imagens.append(mapa_path)
+            # === Se latitude e longitude estiverem presentes, gerar mapa automático ===
+            if latitude and longitude:
+                mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
+                if gerar_mapa_estatico(latitude, longitude, mapa_path):
+                    contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
+                    contexto["descricao1"] = "Localização Geográfica"
+                    imagens.append(mapa_path)
+                else:
+                    contexto["imagem1"] = ""
+                    contexto["descricao1"] = ""
             else:
-                contexto["imagem1"] = ""
-                contexto["descricao1"] = ""
-        else:
-            # Se não tiver geolocalização, o usuário pode enviar a imagem 1 manualmente
-            arquivo1 = request.files.get("imagem1")
-            desc1 = request.form.get("descricao1", "")
-            contexto["descricao1"] = desc1
-            if arquivo1 and arquivo1.filename:
-                caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
-                arquivo1.save(caminho1)
-                imagens.append(caminho1)
-                contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
-            else:
-                contexto["imagem1"] = ""
+                # Upload manual da imagem 1
+                arquivo1 = request.files.get("imagem1")
+                desc1 = request.form.get("descricao1", "")
+                contexto["descricao1"] = desc1
+                if arquivo1 and arquivo1.filename:
+                    caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
+                    arquivo1.save(caminho1)
+                    imagens.append(caminho1)
+                    contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+                else:
+                    contexto["imagem1"] = ""
 
-        # === Imagens 2 a 7 ===
-        for i in range(2, 8):
-            arquivo = request.files.get(f"imagem{i}")
-            desc = request.form.get(f"descricao{i}", "")
-            contexto[f"descricao{i}"] = desc
-            if arquivo and arquivo.filename:
-                caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
-                arquivo.save(caminho)
-                imagens.append(caminho)
-                contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
-            else:
-                contexto[f"imagem{i}"] = ""
+            # === Imagens 2 a 7 ===
+            for i in range(2, 8):
+                arquivo = request.files.get(f"imagem{i}")
+                desc = request.form.get(f"descricao{i}", "")
+                contexto[f"descricao{i}"] = desc
+                if arquivo and arquivo.filename:
+                    caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
+                    arquivo.save(caminho)
+                    imagens.append(caminho)
+                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
+                else:
+                    contexto[f"imagem{i}"] = ""
 
-        # === Gerar e salvar o arquivo final ===
-        nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
-        caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
+            # === Salvar DOCX ===
+            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
+            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
 
-        doc.render(contexto)
-        doc.save(caminho_saida)
+            doc.render(contexto)
+            doc.save(caminho_saida)
 
-        return send_file(caminho_saida, as_attachment=True)
+            return send_file(caminho_saida, as_attachment=True)
 
-    except Exception as e:
-        return f"Erro interno: {e}", 500
+        except Exception as e:
+            return f"Erro interno: {e}", 500
 
-    # fallback em caso de POST que não deu erro mas não gerou retorno
     return render_template("formulario.html", campos=campos)
 
 @app.route("/logout")
