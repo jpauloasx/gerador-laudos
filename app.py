@@ -31,7 +31,12 @@ def index():
             contexto["grau_risco"] = request.form.get("grau_risco")
 
             # Solo - novos grupos
-            contexto["problemas_solo"] = ", ".join(request.form.getlist("problemas_solo"))
+            problemas = request.form.getlist("problemas_solo")
+            outro = request.form.get("problemas_solo_outro", "").strip()
+                if outro:
+                    problemas.append(outro)
+                contexto["problemas_solo"] = ", ".join(problemas)
+
             contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
             contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
