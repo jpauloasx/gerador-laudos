@@ -33,8 +33,8 @@ def index():
             # Solo - novos grupos
             problemas = request.form.getlist("problemas_solo")
             outro = request.form.get("problemas_solo_outro", "").strip()
-                if outro:
-                    problemas.append(outro)
+            if outro:
+                problemas.append(outro)
                 contexto["problemas_solo"] = ", ".join(problemas)
 
             contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
