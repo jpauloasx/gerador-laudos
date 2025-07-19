@@ -29,16 +29,29 @@
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
       
-    <!-- Campos principais, tratando CPF, Telefone e Data com máscaras de preenchimento -->
+    <!-- Campos principais, tratando CPF, Telefone e Data com máscaras de preenchimento e geoloc -->
 {% for label, name in campos %}
   <div class="mb-3">
     <label class="form-label">{{ label }}</label>
+
     {% if name == "cpf" %}
       <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
+
     {% elif name == "telefone" %}
       <input type="text" name="telefone" id="telefone" class="form-control" maxlength="15" required>
+
     {% elif name == "data_vistoria" %}
       <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
+
+    {% elif name == "latitude" %}
+      <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
+        📍 Atualizar Localização
+      </button>
+      <input type="text" name="latitude" id="latitude" class="form-control" readonly>
+
+    {% elif name == "longitude" %}
+      <input type="text" name="longitude" id="longitude" class="form-control" readonly>
+
     {% else %}
       <input type="text" name="{{ name }}" class="form-control" required>
     {% endif %}
@@ -172,6 +185,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+ <!-- Script de Geolocalização-->
+<script>
+function atualizarLocalizacao() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      const lat = document.getElementById("latitude");
+      const lon = document.getElementById("longitude");
+
+      if (lat && lon) {
+        lat.value = position.coords.latitude.toFixed(6);
+        lon.value = position.coords.longitude.toFixed(6);
+      }
+    }, function (error) {
+      alert("Erro ao obter localização: " + error.message);
+    });
+  } else {
+    alert("Geolocalização não é suportada pelo seu navegador.");
+  }
+}
+</script>
 
   <!-- Script de limpeza -->
   <script>
