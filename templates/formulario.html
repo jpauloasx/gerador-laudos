@@ -113,18 +113,27 @@
           <option>MUITO ALTO</option>
         </select>
       </div>
-      
-      <!-- Imagens e descrições -->
-      <h4 class="mt-5 mb-3">Imagens e Descrições</h4>
-      {% for i in range(1, 8) %}
-        <div class="mb-2">
-          <label class="form-label">Imagem {{ i }}</label>
-          <input type="file" name="imagem{{ i }}" class="form-control">
-        </div>
-        <div class="mb-4">
-          <input type="text" name="descricao{{ i }}" class="form-control" placeholder="Descrição da imagem {{ i }}">
-        </div>
-      {% endfor %}
+
+<!-- Imagens e descrições -->
+  <h4 class="mt-5 mb-3">Imagens e Descrições</h4>
+{% for i in range(1, 8) %}
+  {% if i == 1 %}
+    <div id="imagem1_block">
+  {% endif %}
+
+  <div class="mb-2">
+    <label class="form-label">Imagem {{ i }}</label>
+    <input type="file" name="imagem{{ i }}" class="form-control">
+  </div>
+  <div class="mb-4">
+    <input type="text" name="descricao{{ i }}" class="form-control" placeholder="Descrição da imagem {{ i }}">
+  </div>
+
+  {% if i == 1 %}
+    </div>
+  {% endif %}
+{% endfor %}
+
 
       <!-- Botões -->
       <div class="d-grid gap-2 mt-4">
@@ -204,6 +213,27 @@ function atualizarLocalizacao() {
     alert("Geolocalização não é suportada pelo seu navegador.");
   }
 }
+</script>
+
+<script>
+  document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        document.querySelector("input[name='latitude']").value = position.coords.latitude.toFixed(6);
+        document.querySelector("input[name='longitude']").value = position.coords.longitude.toFixed(6);
+
+        // Oculta o campo da imagem 1
+        const img1 = document.getElementById("imagem1_block");
+        if (img1) {
+          img1.style.display = "none";
+        }
+      }, function (error) {
+        alert("Erro ao obter localização. Adicione manualmente.");
+      });
+    } else {
+      alert("Geolocalização não suportada pelo navegador.");
+    }
+  });
 </script>
 
   <!-- Script de limpeza -->
