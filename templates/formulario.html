@@ -29,18 +29,21 @@
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
       
-    <!-- Campos principais -->
-  {% for label, name in campos %}
-    <div class="mb-3">
-      <label class="form-label">{{ label }}</label>
-      {% if name == "cpf" %}
-        <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
-      {% else %}
-        <input type="text" name="{{ name }}" class="form-control" required>
-      {% endif %}
-    </div>
-  {% endfor %}
-
+    <!-- Campos principais, tratando CPF, Telefone e Data com máscaras de preenchimento -->
+{% for label, name in campos %}
+  <div class="mb-3">
+    <label class="form-label">{{ label }}</label>
+    {% if name == "cpf" %}
+      <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
+    {% elif name == "telefone" %}
+      <input type="text" name="telefone" id="telefone" class="form-control" maxlength="15" required>
+    {% elif name == "data_vistoria" %}
+      <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
+    {% else %}
+      <input type="text" name="{{ name }}" class="form-control" required>
+    {% endif %}
+  </div>
+{% endfor %}
 
       <!-- Grupos de solo -->
       <div class="mb-4">
@@ -118,9 +121,10 @@
     </form>
   </div>
 
- <!-- Script de máscara do CPF-->
+ <!-- Script de máscara do CPF, Telefone e Data-->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  // CPF
   const cpfInput = document.getElementById("cpf");
   if (cpfInput) {
     cpfInput.addEventListener("input", function () {
@@ -134,8 +138,40 @@ document.addEventListener("DOMContentLoaded", function () {
       cpfInput.value = formatado;
     });
   }
+
+  // TELEFONE
+  const telInput = document.getElementById("telefone");
+  if (telInput) {
+    telInput.addEventListener("input", function () {
+      let valor = telInput.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      let formatado = "";
+      if (valor.length > 0) formatado = "(" + valor.slice(0, 2);
+      if (valor.length >= 3) formatado += ") " + valor.slice(2, 7);
+      if (valor.length >= 8) formatado += "-" + valor.slice(7, 11);
+
+      telInput.value = formatado;
+    });
+  }
+  // DATA
+  const dataInput = document.getElementById("data_vistoria");
+  if (dataInput) {
+    dataInput.addEventListener("input", function () {
+      let valor = dataInput.value.replace(/\D/g, "");
+      if (valor.length > 8) valor = valor.slice(0, 8);
+
+      let formatado = "";
+      if (valor.length > 0) formatado = valor.slice(0, 2);
+      if (valor.length >= 3) formatado += "/" + valor.slice(2, 4);
+      if (valor.length >= 5) formatado += "/" + valor.slice(4, 8);
+
+      dataInput.value = formatado;
+    });
+  }
 });
 </script>
+
 
   <!-- Script de limpeza -->
   <script>
