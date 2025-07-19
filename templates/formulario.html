@@ -85,7 +85,9 @@
       <!-- Botões -->
       <div class="d-grid gap-2 mt-4">
         <button type="submit" class="btn btn-primary">Gerar Laudo</button>
-        <button type="button" class="btn btn-secondary mt-2" onclick="limparFormulario()">Limpar Tudo</button>
+        <button type="button" class="btn btn-outline-danger mt-2" onclick="confirmarLimpeza()">
+          🗑️ Limpar Tudo
+        </button>
       </div>
     </form>
   </div>
@@ -108,5 +110,32 @@ function limparFormulario() {
   });
 }
 </script>
+
+<script>
+function confirmarLimpeza() {
+  if (confirm("Tem certeza que deseja limpar todos os campos do formulário?")) {
+    limparFormulario();
+  }
+}
+
+function limparFormulario() {
+  // Limpa inputs de texto
+  document.querySelectorAll('input[type="text"]').forEach(el => el.value = "");
+
+  // Limpa selects múltiplos
+  document.querySelectorAll('select[multiple]').forEach(select => {
+    Array.from(select.options).forEach(option => option.selected = false);
+  });
+
+  // Limpa arquivos (imagens)
+  document.querySelectorAll('input[type="file"]').forEach(el => el.value = "");
+
+  // Reseta selects simples (grau de risco)
+  document.querySelectorAll('select:not([multiple])').forEach(select => {
+    select.selectedIndex = 0;
+  });
+}
+</script>
+
 </body>
 </html>
