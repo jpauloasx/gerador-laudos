@@ -65,6 +65,7 @@ def index():
             contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
             contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
+
 imagens = []
 
 latitude = request.form.get("latitude")
@@ -92,19 +93,33 @@ else:
         contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
     else:
         contexto["imagem1"] = ""
+imagens = []
 
-# === Imagens 2 a 7 ===
-for i in range(2, 8):
-    arquivo = request.files.get(f"imagem{i}")
-    desc = request.form.get(f"descricao{i}", "")
-    contexto[f"descricao{i}"] = desc
-    if arquivo and arquivo.filename:
-        caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
-        arquivo.save(caminho)
-        imagens.append(caminho)
-        contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
+latitude = request.form.get("latitude")
+longitude = request.form.get("longitude")
+
+# === Se latitude e longitude estiverem presentes, gerar mapa automático ===
+if latitude and longitude:
+    mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
+    if gerar_mapa_estatico(latitude, longitude, mapa_path):
+        contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
+        contexto["descricao1"] = "Localização Geográfica"
+        imagens.append(mapa_path)
     else:
-        contexto[f"imagem{i}"] = ""
+        contexto["imagem1"] = ""
+        contexto["descricao1"] = ""
+else:
+    # Se não tiver geolocalização, o usuário pode enviar a imagem 1 manualmente
+    arquivo1 = request.files.get("imagem1")
+    desc1 = request.form.get("descricao1", "")
+    contexto["descricao1"] = desc1
+    if arquivo1 and arquivo1.filename:
+        caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
+        arquivo1.save(caminho1)
+        imagens.append(caminho1)
+        contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+    else:
+        contexto["imagem1"] = ""
 
             nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
