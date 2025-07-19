@@ -93,35 +93,8 @@ else:
         contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
     else:
         contexto["imagem1"] = ""
-imagens = []
 
-latitude = request.form.get("latitude")
-longitude = request.form.get("longitude")
-
-# === Se latitude e longitude estiverem presentes, gerar mapa automático ===
-if latitude and longitude:
-    mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
-    if gerar_mapa_estatico(latitude, longitude, mapa_path):
-        contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
-        contexto["descricao1"] = "Localização Geográfica"
-        imagens.append(mapa_path)
-    else:
-        contexto["imagem1"] = ""
-        contexto["descricao1"] = ""
-else:
-    # Se não tiver geolocalização, o usuário pode enviar a imagem 1 manualmente
-    arquivo1 = request.files.get("imagem1")
-    desc1 = request.form.get("descricao1", "")
-    contexto["descricao1"] = desc1
-    if arquivo1 and arquivo1.filename:
-        caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
-        arquivo1.save(caminho1)
-        imagens.append(caminho1)
-        contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
-    else:
-        contexto["imagem1"] = ""
-
-            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
+        nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
 
             doc.render(contexto)
@@ -129,7 +102,7 @@ else:
 
             return send_file(caminho_saida, as_attachment=True)
         except Exception as e:
-            return f"Erro interno: {e}", 500
+        return f"Erro interno: {e}", 500
 
     return render_template("formulario.html", campos=campos)
 
