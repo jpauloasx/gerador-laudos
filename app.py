@@ -1,12 +1,25 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file redirect, url_for, session
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date
 import os
 
 app = Flask(__name__)
+app.secret_key = "DC_g&rad0r"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if username == "defesacivil" and password == "DC_g&rad0r":
+            session["logado"] = True
+            return redirect(url_for("index"))
+        else:
+            return render_template("login.html", erro="Usuário ou senha incorretos.")
+    return render_template("login.html")
 
 campos = [
     ("Nº do Laudo", "numero_laudo"),
@@ -23,6 +36,8 @@ campos = [
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
     if request.method == "POST":
         try:
             doc = DocxTemplate("modelo_laudo_imagens.docx")
@@ -65,6 +80,11 @@ def index():
             return f"Erro interno: {e}", 500
 
     return render_template("formulario.html", campos=campos)
+
+@app.route("/logout")
+def logout():
+    session.pop("logado", None)
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     import os
