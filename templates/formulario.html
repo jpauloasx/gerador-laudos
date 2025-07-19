@@ -29,13 +29,18 @@
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
       
-      <!-- Campos principais -->
-      {% for label, name in campos %}
-        <div class="mb-3">
-          <label class="form-label">{{ label }}</label>
-          <input type="text" name="{{ name }}" class="form-control" required>
-        </div>
-      {% endfor %}
+    <!-- Campos principais -->
+  {% for label, name in campos %}
+    <div class="mb-3">
+      <label class="form-label">{{ label }}</label>
+      {% if name == "cpf" %}
+        <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
+      {% else %}
+        <input type="text" name="{{ name }}" class="form-control" required>
+      {% endif %}
+    </div>
+  {% endfor %}
+
 
       <!-- Grupos de solo -->
       <div class="mb-4">
@@ -113,6 +118,25 @@
     </form>
   </div>
 
+ <!-- Script de máscara do CPF-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const cpfInput = document.getElementById("cpf");
+  if (cpfInput) {
+    cpfInput.addEventListener("input", function () {
+      let valor = cpfInput.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+      let formatado = "";
+      if (valor.length > 0) formatado = valor.slice(0, 3);
+      if (valor.length >= 4) formatado += "." + valor.slice(3, 6);
+      if (valor.length >= 7) formatado += "." + valor.slice(6, 9);
+      if (valor.length >= 10) formatado += "-" + valor.slice(9, 11);
+      cpfInput.value = formatado;
+    });
+  }
+});
+</script>
+
   <!-- Script de limpeza -->
   <script>
     function confirmarLimpeza() {
@@ -132,5 +156,6 @@
       });
     }
   </script>
+
 </body>
 </html>
