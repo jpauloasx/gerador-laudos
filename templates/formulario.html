@@ -89,5 +89,24 @@
       </div>
     </form>
   </div>
+<script>
+function limparFormulario() {
+  // Limpa inputs de texto
+  document.querySelectorAll('input[type="text"]').forEach(el => el.value = "");
+
+  // Limpa selects múltiplos
+  document.querySelectorAll('select[multiple]').forEach(select => {
+    Array.from(select.options).forEach(option => option.selected = false);
+  });
+
+  // Limpa arquivos (imagens)
+  document.querySelectorAll('input[type="file"]').forEach(el => el.value = "");
+
+  // Limpa selects simples (ex: grau de risco) para valor padrão
+  document.querySelectorAll('select:not([multiple])').forEach(select => {
+    select.selectedIndex = 0;
+  });
+}
+</script>
 </body>
 </html>
