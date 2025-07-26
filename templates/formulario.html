@@ -199,44 +199,70 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
- <!-- Script de Geolocalização-->
+<!-- Leaflet + html2canvas para gerar imagem do minimapa -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Campo oculto com imagem base64 -->
+<input type="hidden" name="imagem1_base64" id="imagem1_base64">
+
+<!-- Container invisível do mapa -->
+<div id="map-container" style="width: 300px; height: 300px; display: none;"></div>
+
 <script>
-function atualizarLocalizacao() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        const latitude = position.coords.latitude.toFixed(6);
-        const longitude = position.coords.longitude.toFixed(6);
+  function atualizarLocalizacao() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude.toFixed(6);
+          const lon = position.coords.longitude.toFixed(6);
 
-        // Preenche os campos
-        document.getElementById("latitude").value = latitude;
-        document.getElementById("longitude").value = longitude;
+          document.getElementById("latitude").value = lat;
+          document.getElementById("longitude").value = lon;
 
-        // Oculta o campo da imagem 1 (caso esteja visível)
-        const img1 = document.getElementById("imagem1_block");
-        if (img1) img1.style.display = "none";
+          document.getElementById("imagem1_block").style.display = "none";
 
-        // Mostra botão para visualizar no mapa
-        const linkMapa = document.getElementById("link_mapa");
-        if (linkMapa) {
-          linkMapa.href = `https://www.google.com/maps?q=${latitude},${longitude}`;
-          linkMapa.style.display = "inline-block";
+          const linkMapa = document.getElementById("link_mapa");
+          if (linkMapa) {
+            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
+            linkMapa.style.display = "inline-block";
+          }
+
+          // Renderiza minimapa
+          const container = document.getElementById("map-container");
+          container.style.display = "block";
+          container.innerHTML = ""; // limpa instância anterior
+
+          const mapa = L.map("map-container").setView([lat, lon], 16);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap',
+          }).addTo(mapa);
+          L.marker([lat, lon]).addTo(mapa);
+
+          setTimeout(() => {
+            html2canvas(container).then(canvas => {
+              const base64 = canvas.toDataURL("image/png");
+              document.getElementById("imagem1_base64").value = base64;
+              container.style.display = "none"; // oculta novamente
+            });
+          }, 1000); // espera mapa carregar
+        },
+        function (error) {
+          alert("Erro ao obter localização: " + error.message);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
-      },
-      function (error) {
-        alert("Erro ao obter localização: " + error.message + ". Adicione manualmente.");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    );
-  } else {
-    alert("Geolocalização não suportada pelo seu navegador.");
+      );
+    } else {
+      alert("Geolocalização não suportada.");
+    }
   }
-}
 </script>
+
 
 <script>
   document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
@@ -279,6 +305,5 @@ function atualizarLocalizacao() {
       });
     }
   </script>
-
 </body>
 </html>
