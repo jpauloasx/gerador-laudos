@@ -4,6 +4,7 @@ from docx.shared import Mm
 from datetime import date
 import os
 import requests
+import base64
 
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
@@ -17,7 +18,7 @@ def login():
         password = request.form.get("password")
         if username == "defesacivil" and password == "DC_g&rad0r":
             session["logado"] = True
-            return redirect(url_for("index"))
+            return redirect(url_for("formulario"))
         else:
             return render_template("login.html", erro="Usuário ou senha incorretos.")
     return render_template("login.html")
@@ -37,6 +38,9 @@ campos = [
 
 @app.route("/", methods=["GET", "POST"])
 def formulario():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
     if request.method == "POST":
         try:
             doc = DocxTemplate("modelo_laudo_imagens.docx")
@@ -57,21 +61,17 @@ def formulario():
 
             imagens = []
 
-            latitude = request.form.get("latitude")
-            longitude = request.form.get("longitude")
-
-            # === Imagem 1 automática ou manual ===
-            if latitude and longitude:
-                mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
-                if gerar_mapa_estatico(latitude, longitude, mapa_path):
-                    contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
-                    contexto["descricao1"] = "Geolocalização do endereço"
-                    imagens.append(mapa_path)
-                else:
-                    contexto["imagem1"] = ""
-                    contexto["descricao1"] = ""
+            # Imagem 1 (geolocalização via base64 ou upload manual)
+            base64_img = request.form.get("imagem1_base64")
+            if base64_img and base64_img.startswith("data:image/png;base64,"):
+                img_data = base64.b64decode(base64_img.split(",")[1])
+                caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
+                with open(caminho1, "wb") as f:
+                    f.write(img_data)
+                contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+                contexto["descricao1"] = "Localização Geográfica"
+                imagens.append(caminho1)
             else:
-                # Upload manual da imagem 1
                 arquivo1 = request.files.get("imagem1")
                 desc1 = request.form.get("descricao1", "")
                 contexto["descricao1"] = desc1
@@ -82,9 +82,8 @@ def formulario():
                     contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
                 else:
                     contexto["imagem1"] = ""
-                    contexto["descricao1"] = ""
 
-            # === Imagens 2 a 7 ===
+            # Imagens 2 a 7
             for i in range(2, 8):
                 arquivo = request.files.get(f"imagem{i}")
                 desc = request.form.get(f"descricao{i}", "")
@@ -97,7 +96,7 @@ def formulario():
                 else:
                     contexto[f"imagem{i}"] = ""
 
-            # === Salvar e enviar o laudo ===
+            # Gerar e enviar o laudo
             nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
 
@@ -117,7 +116,6 @@ def logout():
     return redirect(url_for("login"))
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
