@@ -205,23 +205,29 @@ function atualizarLocalizacao() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       function (position) {
-        const lat = document.getElementById("latitude");
-        const lon = document.getElementById("longitude");
+        const latitude = position.coords.latitude.toFixed(6);
+        const longitude = position.coords.longitude.toFixed(6);
 
-        if (lat && lon) {
-          lat.value = position.coords.latitude.toFixed(6);
-          lon.value = position.coords.longitude.toFixed(6);
-        }
+        // Preenche os campos
+        document.getElementById("latitude").value = latitude;
+        document.getElementById("longitude").value = longitude;
 
-        // Ocultar campo da imagem 1
+        // Oculta o campo da imagem 1 (caso esteja visível)
         const img1 = document.getElementById("imagem1_block");
         if (img1) img1.style.display = "none";
+
+        // Mostra botão para visualizar no mapa
+        const linkMapa = document.getElementById("link_mapa");
+        if (linkMapa) {
+          linkMapa.href = `https://www.google.com/maps?q=${latitude},${longitude}`;
+          linkMapa.style.display = "inline-block";
+        }
       },
       function (error) {
-        alert("Erro ao obter localização: " + error.message + ". Tente manualmente.");
+        alert("Erro ao obter localização: " + error.message + ". Adicione manualmente.");
       },
       {
-        enableHighAccuracy: true, // 👉 usa GPS se disponível
+        enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0
       }
@@ -231,7 +237,6 @@ function atualizarLocalizacao() {
   }
 }
 </script>
-
 
 <script>
   document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
