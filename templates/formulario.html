@@ -223,7 +223,7 @@ function atualizarLocalizacao() {
         document.querySelector("input[name='latitude']").value = position.coords.latitude.toFixed(6);
         document.querySelector("input[name='longitude']").value = position.coords.longitude.toFixed(6);
 
-        // Oculta o campo da imagem 1
+        // Oculta o campo da Imagem 1 (div com id="imagem1_block")
         const img1 = document.getElementById("imagem1_block");
         if (img1) {
           img1.style.display = "none";
@@ -236,6 +236,7 @@ function atualizarLocalizacao() {
     }
   });
 </script>
+
 
   <!-- Script de limpeza -->
   <script>
