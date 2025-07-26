@@ -35,15 +35,6 @@ campos = [
     ("Data da Vistoria", "data_vistoria"),
 ]
 
-def gerar_mapa_estatico(lat, lon, caminho_destino):
-    url = f"https://static-maps.yandex.ru/1.x/?ll={lon},{lat}&z=16&size=450,450&l=map&pt={lon},{lat},pm2rdm"
-    r = requests.get(url)
-    if r.status_code == 200:
-        with open(caminho_destino, "wb") as f:
-            f.write(r.content)
-        return True
-    return False
-
 @app.route("/", methods=["GET", "POST"])
 def formulario():
     if request.method == "POST":
