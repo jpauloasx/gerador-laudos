@@ -69,12 +69,12 @@ def formulario():
             latitude = request.form.get("latitude")
             longitude = request.form.get("longitude")
 
-            # === Se latitude e longitude estiverem presentes, gerar mapa automático ===
+            # === Imagem 1 automática ou manual ===
             if latitude and longitude:
                 mapa_path = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
                 if gerar_mapa_estatico(latitude, longitude, mapa_path):
                     contexto["imagem1"] = InlineImage(doc, mapa_path, width=Mm(100))
-                    contexto["descricao1"] = "Localização Geográfica"
+                    contexto["descricao1"] = "Geolocalização do endereço"
                     imagens.append(mapa_path)
                 else:
                     contexto["imagem1"] = ""
@@ -91,6 +91,7 @@ def formulario():
                     contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
                 else:
                     contexto["imagem1"] = ""
+                    contexto["descricao1"] = ""
 
             # === Imagens 2 a 7 ===
             for i in range(2, 8):
@@ -105,7 +106,7 @@ def formulario():
                 else:
                     contexto[f"imagem{i}"] = ""
 
-            # === Salvar DOCX ===
+            # === Salvar e enviar o laudo ===
             nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
 
