@@ -43,11 +43,15 @@
     {% elif name == "data_vistoria" %}
       <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
 
-    {% elif name == "latitude" %}
-     <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn-atualizar-localizacao">
-      📍 Atualizar Localização
-      </button>
-      <input type="text" name="latitude" id="latitude" class="form-control" readonly>
+{% elif name == "latitude" %}
+  <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
+    📍 Atualizar Localização
+  </button>
+  <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
+  <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
+    🌍 Ver no Mapa
+  </a>
+
 
     {% elif name == "longitude" %}
       <input type="text" name="longitude" id="longitude" class="form-control" readonly>
@@ -199,22 +203,35 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
 function atualizarLocalizacao() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      const lat = document.getElementById("latitude");
-      const lon = document.getElementById("longitude");
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const lat = document.getElementById("latitude");
+        const lon = document.getElementById("longitude");
 
-      if (lat && lon) {
-        lat.value = position.coords.latitude.toFixed(6);
-        lon.value = position.coords.longitude.toFixed(6);
+        if (lat && lon) {
+          lat.value = position.coords.latitude.toFixed(6);
+          lon.value = position.coords.longitude.toFixed(6);
+        }
+
+        // Ocultar campo da imagem 1
+        const img1 = document.getElementById("imagem1_block");
+        if (img1) img1.style.display = "none";
+      },
+      function (error) {
+        alert("Erro ao obter localização: " + error.message + ". Tente manualmente.");
+      },
+      {
+        enableHighAccuracy: true, // 👉 usa GPS se disponível
+        timeout: 10000,
+        maximumAge: 0
       }
-    }, function (error) {
-      alert("Erro ao obter localização: " + error.message);
-    });
+    );
   } else {
-    alert("Geolocalização não é suportada pelo seu navegador.");
+    alert("Geolocalização não suportada pelo seu navegador.");
   }
 }
 </script>
+
 
 <script>
   document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
