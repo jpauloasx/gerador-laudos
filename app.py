@@ -61,53 +61,51 @@ def formulario():
 
             imagens = []
 
-# Imagem 1 (geolocalização via base64 ou upload manual)
-base64_img = request.form.get("imagem1_base64")
+            # Imagem 1 (geolocalização via base64 ou upload manual)
+            base64_img = request.form.get("imagem1_base64")
 
-if base64_img and base64_img.startswith("data:image/png;base64,"):
-    print("✔️ Base64 recebido:", base64_img[:30], "...")
+            if base64_img and base64_img.startswith("data:image/png;base64,"):
+                print("✔️ Base64 recebido:", base64_img[:30], "...")
 
-    try:
-        img_data = base64.b64decode(base64_img.split(",")[1])
-        caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
-        with open(caminho1, "wb") as f:
-            f.write(img_data)
+            try:
+                img_data = base64.b64decode(base64_img.split(",")[1])
+                caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
+                with open(caminho1, "wb") as f:
+                    f.write(img_data)
 
-        print("📷 Imagem do mapa salva em:", caminho1)
-        print("📦 Tamanho do arquivo:", os.path.getsize(caminho1), "bytes")
+                    print("📷 Imagem do mapa salva em:", caminho1)
+                    print("📦 Tamanho do arquivo:", os.path.getsize(caminho1), "bytes")
 
-        contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
-        contexto["descricao1"] = "Localização Geográfica"
-        imagens.append(caminho1)
+                    contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+                    contexto["descricao1"] = "Localização Geográfica"
+                    imagens.append(caminho1)
 
-    except Exception as e:
-        print("❌ Erro ao salvar imagem base64:", str(e))
-        contexto["imagem1"] = ""
-        contexto["descricao1"] = ""
-else:
-    print("⚠️ Nenhum base64 recebido. Usando upload manual.")
+            except Exception as e:
+                print("❌ Erro ao salvar imagem base64:", str(e))
+                contexto["imagem1"] = ""
+                contexto["descricao1"] = ""
+            else:
+                print("⚠️ Nenhum base64 recebido. Usando upload manual.")
 
-    try:
-        arquivo1 = request.files.get("imagem1")
-        desc1 = request.form.get("descricao1", "")
-        contexto["descricao1"] = desc1
+                try:
+                    arquivo1 = request.files.get("imagem1")
+                    desc1 = request.form.get("descricao1", "")
+                    contexto["descricao1"] = desc1
 
-        if arquivo1 and arquivo1.filename:
-            caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
-            arquivo1.save(caminho1)
-            print("📤 Imagem manual salva em:", caminho1)
-            print("📦 Tamanho do arquivo:", os.path.getsize(caminho1), "bytes")
+                    if arquivo1 and arquivo1.filename:
+                        caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
+                        arquivo1.save(caminho1)
+                        print("📤 Imagem manual salva em:", caminho1)
+                        print("📦 Tamanho do arquivo:", os.path.getsize(caminho1), "bytes")
 
-            imagens.append(caminho1)
-            contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
-        else:
-            contexto["imagem1"] = ""
-    except Exception as e:
-        print("❌ Erro ao processar imagem1 manual:", str(e))
-        contexto["imagem1"] = ""
-
-
-
+                        imagens.append(caminho1)
+                        contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+                    else:
+                        contexto["imagem1"] = ""
+                except Exception as e:
+                    print("❌ Erro ao processar imagem1 manual:", str(e))
+                    contexto["imagem1"] = ""
+                    
            # Imagens 2 a 7
             for i in range(2, 8):
                 arquivo = request.files.get(f"imagem{i}")
@@ -142,3 +140,4 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
