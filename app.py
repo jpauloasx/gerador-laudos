@@ -63,7 +63,6 @@ def formulario():
 
             # Imagem 1 (geolocalização via base64 ou upload manual)
             base64_img = request.form.get("imagem1_base64")
-                print("Base64 recebido:", base64_img[:30] if base64_img else "Vazio")
             if base64_img and base64_img.startswith("data:image/png;base64,"):
                 img_data = base64.b64decode(base64_img.split(",")[1])
                 caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
