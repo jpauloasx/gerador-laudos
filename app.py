@@ -31,10 +31,16 @@ def login():
         password = request.form.get("password")
         if username == "defesacivil" and password == "DC_g&rad0r":
             session["logado"] = True
-            return redirect(url_for("formulario"))
+            return redirect(url_for("home"))
         else:
             return render_template("login.html", erro="Usuário ou senha incorretos.")
     return render_template("login.html")
+
+@app.route("/home")
+def home():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+    return render_template("home.html")
 
 # Campos do formulário
 campos = [
@@ -120,6 +126,27 @@ def formulario():
 
     return render_template("formulario.html", campos=campos)
 
+@app.route("/chuvas")
+def chuvas():
+    return "📌 Página de Chuvas (em construção)"
+
+@app.route("/incendios")
+def incendios():
+    return "📌 Página de Incêndios (em construção)"
+
+@app.route("/equipes")
+def equipes():
+    return "📌 Página de Equipes (em construção)"
+
+@app.route("/atendimentos")
+def atendimentos():
+    return "📌 Página de Atendimentos (em construção)"
+
+@app.route("/dashboard")
+def dashboard():
+    return "📌 Página de Dashboard (em construção)"
+
+
 @app.route("/logout")
 def logout():
     session.pop("logado", None)
@@ -128,5 +155,6 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
