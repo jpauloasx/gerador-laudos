@@ -3,13 +3,26 @@ from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date
 import os
-import requests
 import base64
+from staticmap import StaticMap, CircleMarker
 
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# --- Função para gerar mapa OSM ---
+def gerar_mapa(lat, lon, caminho_saida):
+    try:
+        m = StaticMap(600, 400)
+        marker = CircleMarker((float(lon), float(lat)), 'red', 12)
+        m.add_marker(marker)
+        image = m.render(zoom=16)
+        image.save(caminho_saida)
+        return caminho_saida
+    except Exception as e:
+        print("❌ Erro ao gerar mapa OSM:", str(e))
+        return None
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -62,43 +75,23 @@ def formulario():
 
             imagens = []
 
-            # --- Imagem 1 (base64 ou upload manual) ---
-            base64_img = request.form.get("imagem1_base64")
-
-            if base64_img and base64_img.startswith("data:image/png;base64,"):
-                try:
-                    img_data = base64.b64decode(base64_img.split(",")[1])
-                    caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1_mapa.png")
-                    with open(caminho1, "wb") as f:
-                        f.write(img_data)
-
-                    contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
+            # --- Gerar mapa automático OSM ---
+            lat = request.form.get("latitude")
+            lon = request.form.get("longitude")
+            if lat and lon:
+                caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
+                if caminho_mapa:
+                    contexto["imagem1"] = InlineImage(doc, caminho_mapa, width=Mm(100))
                     contexto["descricao1"] = "Localização Geográfica"
-                    imagens.append(caminho1)
-
-                except Exception as e:
-                    print("❌ Erro ao salvar imagem base64:", str(e))
+                    imagens.append(caminho_mapa)
+                else:
                     contexto["imagem1"] = ""
                     contexto["descricao1"] = ""
             else:
-                # Se não veio base64, tenta upload manual
-                try:
-                    arquivo1 = request.files.get("imagem1")
-                    desc1 = request.form.get("descricao1", "")
-                    contexto["descricao1"] = desc1
+                contexto["imagem1"] = ""
+                contexto["descricao1"] = ""
 
-                    if arquivo1 and arquivo1.filename:
-                        caminho1 = os.path.join(UPLOAD_FOLDER, "imagem1.jpg")
-                        arquivo1.save(caminho1)
-                        contexto["imagem1"] = InlineImage(doc, caminho1, width=Mm(100))
-                        imagens.append(caminho1)
-                    else:
-                        contexto["imagem1"] = ""
-                except Exception as e:
-                    print("❌ Erro ao processar imagem1 manual:", str(e))
-                    contexto["imagem1"] = ""
-
-            # --- Imagens 2 a 7 ---
+            # --- Imagens 2 a 7 (upload manual) ---
             for i in range(2, 8):
                 arquivo = request.files.get(f"imagem{i}")
                 desc = request.form.get(f"descricao{i}", "")
@@ -134,6 +127,3 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
