@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Principal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md text-center">
+    <h1 class="text-2xl font-bold text-orange-600 mb-6">Menu Principal</h1>
+    
+    <div class="space-y-4">
+      <a href="{{ url_for('chuvas') }}" class="block bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600">🌧️ Chuvas</a>
+      <a href="{{ url_for('incendios') }}" class="block bg-red-500 text-white py-3 rounded-lg shadow hover:bg-red-600">🔥 Incêndios</a>
+      <a href="{{ url_for('equipes') }}" class="block bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600">👨‍🚒 Equipes</a>
+      <a href="{{ url_for('atendimentos') }}" class="block bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600">🚑 Atendimentos</a>
+      <a href="{{ url_for('dashboard') }}" class="block bg-orange-500 text-white py-3 rounded-lg shadow hover:bg-orange-600">📊 Dashboard</a>
+    </div>
+
+    <div class="mt-6">
+      <a href="{{ url_for('logout') }}" class="text-gray-500 hover:underline">Sair</a>
+    </div>
+  </div>
+</body>
+</html>
