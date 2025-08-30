@@ -2,3 +2,5 @@ Flask
 docxtpl
 python-docx
 requests
+staticmap
+Pillow
