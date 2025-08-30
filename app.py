@@ -57,7 +57,7 @@ campos = [
     ("Data da Vistoria", "data_vistoria"),
 ]
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/chuvas", methods=["GET", "POST"])
 def formulario():
     if not session.get("logado"):
         return redirect(url_for("login"))
@@ -126,10 +126,6 @@ def formulario():
 
     return render_template("formulario.html", campos=campos)
 
-@app.route("/chuvas")
-def chuvas():
-    return "📌 Página de Chuvas (em construção)"
-
 @app.route("/incendios")
 def incendios():
     return "📌 Página de Incêndios (em construção)"
@@ -155,6 +151,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
