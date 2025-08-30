@@ -42,7 +42,7 @@ campos = [
     ("Número do Processo", "numero_processo"),
     ("Nome", "nome"),
     ("CPF", "cpf"),
-    ("Pessoas na Casa", "pessoas_casa"),
+    ("N° de Pessoas na Casa", "numero_pessoas"),
     ("Telefone", "telefone"),
     ("Endereço (Rua, Quadra, Lote)", "endereco"),
     ("Bairro", "bairro"),
@@ -128,4 +128,5 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
