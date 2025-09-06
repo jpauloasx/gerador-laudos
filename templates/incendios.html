@@ -61,16 +61,17 @@
         <input type="number" name="n_ocorrencia" required class="w-full border rounded px-3 py-2">
       </div>
 
-      <div>
-        <label class="font-semibold">Equipe</label>
-        <select name="equipe" required class="w-full border rounded px-3 py-2">
-          <option value="">-- Selecione --</option>
-          <option>Equipe Alfa</option>
-          <option>Equipe Bravo</option>
-          <option>Equipe Charlie</option>
-          <option>Equipe Delta</option>
-        </select>
-      </div>
+<div>
+  <label class="font-semibold">Equipes</label>
+  <select name="equipe" multiple required class="w-full border rounded px-3 py-2 h-32">
+    <option value="Equipe Alfa">Equipe Alfa</option>
+    <option value="Equipe Bravo">Equipe Bravo</option>
+    <option value="Equipe Charlie">Equipe Charlie</option>
+    <option value="Equipe Delta">Equipe Delta</option>
+  </select>
+  <p class="text-sm text-gray-500 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar várias equipes.</p>
+</div>
+
 
       <div>
         <label class="font-semibold">Endereço</label>
@@ -140,3 +141,4 @@
   </div>
 </body>
 </html>
+
