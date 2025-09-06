@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Incêndios</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Máscara de CEP
+    function mascaraCEP(input) {
+      let v = input.value.replace(/\D/g, "");
+      if (v.length > 5) v = v.slice(0,5) + "-" + v.slice(5,8);
+      input.value = v;
+    }
+  </script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+    <h1 class="text-2xl font-bold text-red-600 mb-6">Registro de Incêndio</h1>
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+
+      <div>
+        <label class="font-semibold">Data da Ocorrência</label>
+        <input type="date" name="data_ocorrencia" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Origem da Ocorrência</label>
+        <input type="text" name="origem_ocorrencia" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Nº Ocorrência</label>
+        <input type="number" name="n_ocorrencia" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Equipe</label>
+        <select name="equipe" required class="w-full border rounded px-3 py-2">
+          <option value="">-- Selecione --</option>
+          <option>Equipe Alfa</option>
+          <option>Equipe Bravo</option>
+          <option>Equipe Charlie</option>
+          <option>Equipe Delta</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="font-semibold">Endereço</label>
+        <input type="text" name="endereco" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Bairro</label>
+        <input type="text" name="bairro" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">CEP</label>
+        <input type="text" name="cep" maxlength="9" oninput="mascaraCEP(this)" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Descrição</label>
+        <textarea name="descricao" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
+      </div>
+
+      <div>
+        <label class="font-semibold">Data da Vistoria</label>
+        <input type="date" name="data_vistoria" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Nome</label>
+        <input type="text" name="nome" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">E-mail</label>
+        <input type="email" name="email" required class="w-full border rounded px-3 py-2">
+      </div>
+
+      <div>
+        <label class="font-semibold">Relato</label>
+        <textarea name="relato" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
+      </div>
+
+      <div>
+        <label class="font-semibold">Recomendações</label>
+        <textarea name="recomendacoes" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
+      </div>
+
+      <h2 class="text-lg font-bold mt-6">Imagens</h2>
+      {% for i in range(1,5) %}
+      <div>
+        <label class="font-semibold">Imagem {{i}}</label>
+        <input type="file" name="imagem{{i}}" accept="image/*" class="w-full border rounded px-3 py-2">
+        <input type="text" name="descricao{{i}}" placeholder="Descrição da Figura {{i}}" class="w-full border rounded px-3 py-2 mt-2">
+      </div>
+      {% endfor %}
+
+      <div class="text-center mt-6">
+        <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">Gerar Relatório</button>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>
