@@ -11,30 +11,35 @@
       if (v.length > 5) v = v.slice(0,5) + "-" + v.slice(5,8);
       input.value = v;
     }
+
+    // Confirmação para limpar formulário
+    function confirmarLimpar(form) {
+      if (confirm("Tem certeza que deseja limpar todos os campos?")) {
+        form.reset();
+      }
+    }
   </script>
-
 </head>
-
-
 
 <body class="bg-gray-100 p-8">
   <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-    <h1 class="text-2xl font-bold text-red-600 mb-6">Registro de Incêndio</h1>
-    <form method="POST" enctype="multipart/form-data" class="space-y-4">
-   <!-- VOLTAR -->
-    <div class="d-flex justify-content-end mb-3">
-      <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+
+    <!-- TOPO: Botão Voltar -->
+    <div class="flex justify-end mb-4">
+      <a href="{{ url_for('home') }}" class="text-sm text-gray-600 hover:text-red-600">⬅ Voltar</a>
     </div>
 
     <!-- LOGOS -->
-    <div class="row justify-content-center align-items-center mb-4">
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="img-fluid" style="max-height: 100px;">
-      </div>
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="img-fluid" style="max-height: 100px;">
-      </div>
+    <div class="flex justify-center items-center gap-6 mb-6">
+      <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" alt="Defesa Civil" class="h-20">
+      <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" alt="Prefeitura de Cuiabá" class="h-20">
     </div>
+
+    <!-- TÍTULO -->
+    <h1 class="text-2xl font-bold text-red-600 mb-6 text-center">Registro de Incêndio</h1>
+
+    <!-- FORMULÁRIO -->
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
 
       <div>
         <label class="font-semibold">Data da Ocorrência</label>
@@ -121,15 +126,17 @@
       </div>
       {% endfor %}
 
-      <div class="text-center mt-6">
-        <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">Gerar Relatório</button>
+      <!-- BOTÕES -->
+      <div class="flex justify-center gap-4 mt-6">
+        <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+          Gerar Relatório
+        </button>
+        <button type="button" onclick="confirmarLimpar(this.form)" class="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500">
+          Limpar Tudo
+        </button>
       </div>
 
     </form>
   </div>
 </body>
 </html>
-
-
-
-
