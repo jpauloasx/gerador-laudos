@@ -126,7 +126,7 @@ def chuvas():
 
     return render_template("formulario.html", campos=campos)
 
-@app.route("/incendios")
+@app.route("/incendios", methods=["GET", "POST"])
 def incendios():
     if not session.get("logado"):
         return redirect(url_for("login"))
@@ -134,6 +134,49 @@ def incendios():
     if request.method == "POST":
         try:
             doc = DocxTemplate("modelo_laudo_incendio.docx")
+            contexto = {}
+
+            # Campos principais
+            contexto["data_ocorrencia"] = request.form.get("data_ocorrencia")
+            contexto["origem_ocorrencia"] = request.form.get("origem_ocorrencia")
+            contexto["n_ocorrencia"] = request.form.get("n_ocorrencia")
+            contexto["equipe"] = request.form.get("equipe")
+            contexto["endereco"] = request.form.get("endereco")
+            contexto["bairro"] = request.form.get("bairro")
+            contexto["cep"] = request.form.get("cep")
+            contexto["descricao"] = request.form.get("descricao")
+            contexto["data_vistoria"] = request.form.get("data_vistoria")
+            contexto["nome"] = request.form.get("nome")
+            contexto["email"] = request.form.get("email")
+            contexto["relato"] = request.form.get("relato")
+            contexto["recomendacoes"] = request.form.get("recomendacoes")
+
+            # Imagens
+            for i in range(1, 5):
+                arquivo = request.files.get(f"imagem{i}")
+                desc = request.form.get(f"descricao{i}", "")
+                contexto[f"descricao{i}"] = desc
+
+                if arquivo and arquivo.filename:
+                    caminho = os.path.join(UPLOAD_FOLDER, f"incendio_imagem{i}.jpg")
+                    arquivo.save(caminho)
+                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
+                else:
+                    contexto[f"imagem{i}"] = ""
+
+            # Gerar documento
+            nome_arquivo = f"Incendio_{contexto['n_ocorrencia']}.docx"
+            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
+
+            doc.render(contexto)
+            doc.save(caminho_saida)
+
+            return send_file(caminho_saida, as_attachment=True)
+
+        except Exception as e:
+            return f"Erro interno: {e}", 500
+
+    return render_template("incendios.html")
 
 @app.route("/equipes")
 def equipes():
@@ -156,6 +199,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
