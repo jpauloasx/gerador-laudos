@@ -128,7 +128,12 @@ def chuvas():
 
 @app.route("/incendios")
 def incendios():
-    return "📌 Página de Incêndios (em construção)"
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        try:
+            doc = DocxTemplate("modelo_laudo_incendio.docx")
 
 @app.route("/equipes")
 def equipes():
@@ -151,6 +156,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
