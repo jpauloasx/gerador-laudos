@@ -5,6 +5,7 @@ from datetime import date
 import os
 import base64
 from staticmap import StaticMap, CircleMarker
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
@@ -135,9 +136,17 @@ def incendios():
         try:
             doc = DocxTemplate("modelo_laudo_incendio.docx")
             contexto = {}
+            def formatar_data(data_str):
+                if data_str:  # se não estiver vazio
+                    return datetime.strptime(data_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+                return ""
 
+                contexto["data_ocorrencia"] = formatar_data(request.form.get("data_ocorrencia"))
+                contexto["data_vistoria"] = formatar_data(request.form.get("data_vistoria"))
+                contexto["data_fim"] =formatar_data(request.form.get("data_vistoria"))
+                
             # Campos principais
-            contexto["data_ocorrencia"] = request.form.get("data_ocorrencia")
+            
             contexto["n_os"] = request.form.get("n_os")
             contexto["origem_ocorrencia"] = request.form.get("origem_ocorrencia")
             contexto["n_ocorrencia"] = request.form.get("n_ocorrencia")
@@ -146,12 +155,11 @@ def incendios():
             contexto["bairro"] = request.form.get("bairro")
             contexto["cep"] = request.form.get("cep")
             contexto["descricao"] = request.form.get("descricao")
-            contexto["data_vistoria"] = request.form.get("data_vistoria")
             contexto["nome"] = request.form.get("nome")
             contexto["email"] = request.form.get("email")
             contexto["relato"] = request.form.get("relato")
             contexto["recomendacoes"] = request.form.get("recomendacoes")
-            contexto["data_fim"] = request.form.get("data_fim")
+            
 
             # Imagens
             for i in range(1, 5):
@@ -201,6 +209,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
