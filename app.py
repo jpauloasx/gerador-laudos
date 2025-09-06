@@ -141,7 +141,7 @@ def incendios():
             contexto["n_os"] = request.form.get("n_os")
             contexto["origem_ocorrencia"] = request.form.get("origem_ocorrencia")
             contexto["n_ocorrencia"] = request.form.get("n_ocorrencia")
-            contexto["equipe"] = request.form.get("equipe")
+            contexto["equipe"] = ", ".join(request.form.getlist("equipe"))
             contexto["endereco"] = request.form.get("endereco")
             contexto["bairro"] = request.form.get("bairro")
             contexto["cep"] = request.form.get("cep")
@@ -200,6 +200,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
