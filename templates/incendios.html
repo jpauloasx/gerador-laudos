@@ -15,6 +15,12 @@
 
 </head>
 
+
+
+<body class="bg-gray-100 p-8">
+  <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+    <h1 class="text-2xl font-bold text-red-600 mb-6">Registro de Incêndio</h1>
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
    <!-- VOLTAR -->
     <div class="d-flex justify-content-end mb-3">
       <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
@@ -30,11 +36,6 @@
       </div>
     </div>
 
-<body class="bg-gray-100 p-8">
-  <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-    <h1 class="text-2xl font-bold text-red-600 mb-6">Registro de Incêndio</h1>
-    <form method="POST" enctype="multipart/form-data" class="space-y-4">
-
       <div>
         <label class="font-semibold">Data da Ocorrência</label>
         <input type="date" name="data_ocorrencia" required class="w-full border rounded px-3 py-2">
@@ -42,7 +43,7 @@
 
       <div>
         <label class="font-semibold">Número da OS</label>
-        <input type="date" name="n_os" required class="w-full border rounded px-3 py-2">
+        <input type="text" name="n_os" required class="w-full border rounded px-3 py-2">
       </div>
 
       <div>
@@ -128,6 +129,7 @@
   </div>
 </body>
 </html>
+
 
 
 
