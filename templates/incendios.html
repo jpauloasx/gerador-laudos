@@ -12,6 +12,22 @@
       input.value = v;
     }
   </script>
+
+   <!-- VOLTAR -->
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+    </div>
+
+    <!-- LOGOS -->
+    <div class="row justify-content-center align-items-center mb-4">
+      <div class="col-auto">
+        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="img-fluid" style="max-height: 100px;">
+      </div>
+      <div class="col-auto">
+        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="img-fluid" style="max-height: 100px;">
+      </div>
+    </div>
+
 </head>
 <body class="bg-gray-100 p-8">
   <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
@@ -111,4 +127,5 @@
   </div>
 </body>
 </html>
+
 
