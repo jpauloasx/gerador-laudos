@@ -151,6 +151,7 @@ def incendios():
             contexto["email"] = request.form.get("email")
             contexto["relato"] = request.form.get("relato")
             contexto["recomendacoes"] = request.form.get("recomendacoes")
+            contexto["data_fim"] = request.form.get("data_fim")
 
             # Imagens
             for i in range(1, 5):
@@ -200,6 +201,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
