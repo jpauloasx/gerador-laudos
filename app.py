@@ -143,7 +143,7 @@ def incendios():
 
                 contexto["data_ocorrencia"] = formatar_data(request.form.get("data_ocorrencia"))
                 contexto["data_vistoria"] = formatar_data(request.form.get("data_vistoria"))
-                contexto["data_fim"] =formatar_data(request.form.get("data_vistoria"))
+                contexto["data_fim"] =formatar_data(request.form.get("data_fim"))
                 
             # Campos principais
             
@@ -209,6 +209,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
