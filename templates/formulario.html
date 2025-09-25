@@ -24,7 +24,7 @@
     </div>
 
     <!-- TÍTULO -->
-    <h2 class="mb-4 text-center text-primary">Gerador de Laudo Técnico</h2>
+    <h2 class="mb-4 text-center text-primary">Gerador de Relatório Técnico</h2>
 
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
@@ -42,6 +42,9 @@
 
     {% elif name == "data_vistoria" %}
       <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
+
+    {% elif name == "data_relatorio" %}
+    <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
 
 {% elif name == "latitude" %}
   <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
@@ -72,7 +75,7 @@
           <option>Alta saturação hídrica (encharcado)</option>
         </select>
         <input type="text" name="problemas_solo_outro" class="form-control mt-2" placeholder="Outro tipo de solo...">
-      </div>
+      </div> -->
 
       <div class="mb-4">
         <h5>Presença de cursos d'água</h5>
