@@ -56,7 +56,7 @@ campos = [
     ("Latitude", "latitude"),
     ("Longitude", "longitude"),
     ("Data da Vistoria", "data_vistoria"),
-    ("Data do relatorio", "data_relatorio")
+    ("Data do relatório", "data_relatorio")
 ]
 
 @app.route("/chuvas", methods=["GET", "POST"])
@@ -119,7 +119,7 @@ def chuvas():
                     contexto[f"imagem{i}"] = ""
 
             # --- Finalizar Word ---
-            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
+            nome_arquivo = f"Laudo_{contexto['bairro']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
 
             doc.render(contexto)
@@ -215,6 +215,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
