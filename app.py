@@ -56,6 +56,7 @@ campos = [
     ("Latitude", "latitude"),
     ("Longitude", "longitude"),
     ("Data da Vistoria", "data_vistoria"),
+    ("Data do relatorio", "data_relatorio")
 ]
 
 @app.route("/chuvas", methods=["GET", "POST"])
@@ -76,8 +77,12 @@ def chuvas():
             if outro:
                 problemas.append(outro)
             contexto["problemas_solo"] = ", ".join(problemas)
-
-            contexto["presenca_cursos"] = ", ".join(request.form.getlist("presenca_cursos"))
+            # Presença cursos
+            presenca = request.form.getlist("presenca_cursos")
+            cursos = request.form.get("presenca_cursos_outro", "").strip()
+            if cursos:
+                presenca.append(cursos)
+            contexto["presenca_cursos"] = ", ".join(presenca)
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
             contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
 
@@ -210,6 +215,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
