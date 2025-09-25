@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
       telInput.value = formatado;
     });
   }
-  // DATA
+  // DATA VISTORIA
   const dataInput = document.getElementById("data_vistoria");
   if (dataInput) {
     dataInput.addEventListener("input", function () {
@@ -202,6 +202,36 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+// DATA RELATÓRIO
+  <script>
+  const dataInput = document.getElementById("data_relatorio");
+  if (dataInput) {
+    dataInput.addEventListener("input", function () {
+      let valor = dataInput.value.replace(/\D/g, "");
+      if (valor.length > 8) valor = valor.slice(0, 8);
+
+      if (valor.length === 8) {
+        // Quebra o valor em partes
+        const dia = parseInt(valor.slice(0, 2));
+        const mes = parseInt(valor.slice(2, 4));
+        const ano = valor.slice(4, 8);
+
+        // Array com meses por extenso
+        const meses = [
+          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        // Verificação básica se o mês é válido
+        if (mes >= 1 && mes <= 12) {
+          dataInput.value = `${dia} de ${meses[mes - 1]} de ${ano}`;
+        }
+      }
+    });
+  }
+</script>
+
 </script>
 
 <!-- Leaflet + html2canvas para gerar imagem do minimapa -->
