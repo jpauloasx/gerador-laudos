@@ -154,8 +154,6 @@ def chuvas():
             doc.save(caminho_saida)
 
             # Após gerar o laudo DOCX com sucesso:
-
-from salvar_atendimento import salvar_atendimento  # se estiver em outro arquivo, ajuste o import
             atendimento = {
                 "rota": "chuvas",
                 "numero_laudo": numero_laudo,  # variável que você já usa no nome do DOCX
@@ -377,6 +375,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
