@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for, session
+ffrom flask import Flask, render_template, request, send_file, redirect, url_for, session
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date
@@ -153,17 +153,17 @@ def chuvas():
             doc.save(caminho_saida)
 
             # --- Registrar atendimento ---
-atendimento = {
-    "origem": "Chuvas",
-    "numero_laudo": contexto.get("numero_laudo"),
-    "latitude": contexto.get("latitude"),
-    "longitude": contexto.get("longitude"),
-    "bairro": contexto.get("bairro"),
-    "data_vistoria": contexto.get("data_vistoria"),
-    "grau_risco": contexto.get("grau_risco"),
-    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-}
-salvar_atendimento(atendimento)
+            atendimento = {
+                "origem": "Chuvas",
+                "numero_laudo": contexto.get("numero_laudo"),
+                "latitude": contexto.get("latitude"),
+                "longitude": contexto.get("longitude"),
+                "bairro": contexto.get("bairro"),
+                "data_vistoria": contexto.get("data_vistoria"),
+                "grau_risco": contexto.get("grau_risco"),
+                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+                }
+            salvar_atendimento(atendimento)
 
             return send_file(caminho_saida, as_attachment=True)
 
@@ -242,17 +242,17 @@ def regularizacao():
             doc.save(caminho_saida)
 
             # --- Registrar atendimento ---
-atendimento = {
-    "origem": "Regularização Fundiária",
-    "numero_laudo": contexto.get("numero_laudo"),
-    "latitude": contexto.get("latitude"),
-    "longitude": contexto.get("longitude"),
-    "bairro": contexto.get("bairro"),
-    "data_vistoria": contexto.get("data_vistoria"),
-    "grau_risco": contexto.get("grau_risco"),
-    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-}
-salvar_atendimento(atendimento)
+            atendimento = {
+                "origem": "Regularização Fundiária",
+                "numero_laudo": contexto.get("numero_laudo"),
+                "latitude": contexto.get("latitude"),
+                "longitude": contexto.get("longitude"),
+                "bairro": contexto.get("bairro"),
+                "data_vistoria": contexto.get("data_vistoria"),
+                "grau_risco": contexto.get("grau_risco"),
+                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+                }
+            salvar_atendimento(atendimento)
 
             return send_file(caminho_saida, as_attachment=True)
 
@@ -318,17 +318,17 @@ def incendios():
             doc.save(caminho_saida)
 
             # --- Registrar atendimento ---
-atendimento = {
-    "origem": "Incêndios",
-    "numero_laudo": contexto.get("numero_laudo"),
-    "latitude": contexto.get("latitude"),
-    "longitude": contexto.get("longitude"),
-    "bairro": contexto.get("bairro"),
-    "data_vistoria": contexto.get("data_vistoria"),
-    "grau_risco": contexto.get("grau_risco"),
-    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-}
-salvar_atendimento(atendimento)
+            atendimento = {
+                "origem": "Incêndios",
+                "numero_laudo": contexto.get("numero_laudo"),
+                "latitude": contexto.get("latitude"),
+                "longitude": contexto.get("longitude"),
+                "bairro": contexto.get("bairro"),
+                "data_vistoria": contexto.get("data_vistoria"),
+                "grau_risco": contexto.get("grau_risco"),
+                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+            }
+            salvar_atendimento(atendimento)
 
             return send_file(caminho_saida, as_attachment=True)
 
