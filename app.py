@@ -131,6 +131,80 @@ def chuvas():
 
     return render_template("formulario.html", campos=campos)
 
+@app.route("/regularizacao", methods=["GET", "POST"])
+def chuvas():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        try:
+            doc = DocxTemplate("modelo_laudo_imagens.docx")
+            contexto = {campo[1]: request.form.get(campo[1]) for campo in campos}
+            contexto["ano"] = date.today().year
+            contexto["grau_risco"] = request.form.get("grau_risco")
+
+            # Problemas solo
+            problemas = request.form.getlist("problemas_solo")
+            outro = request.form.get("problemas_solo_outro", "").strip()
+            if outro:
+                problemas.append(outro)
+            contexto["problemas_solo"] = ", ".join(problemas)
+            # Presença cursos
+            presenca = request.form.getlist("presenca_cursos")
+            cursos = request.form.get("presenca_cursos_outro", "").strip()
+            if cursos:
+                presenca.append(cursos)
+            contexto["presenca_cursos"] = ", ".join(presenca)
+            contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
+            contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
+
+            imagens = []
+
+            # --- Gerar mapa automático OSM ---
+            lat = request.form.get("latitude")
+            lon = request.form.get("longitude")
+            if lat and lon:
+                caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
+                if caminho_mapa:
+                    contexto["imagem1"] = InlineImage(doc, caminho_mapa, width=Mm(100))
+                    contexto["descricao1"] = "Localização Geográfica"
+                    imagens.append(caminho_mapa)
+                else:
+                    contexto["imagem1"] = ""
+                    contexto["descricao1"] = ""
+            else:
+                contexto["imagem1"] = ""
+                contexto["descricao1"] = ""
+
+            # --- Imagens 2 a 7 (upload manual) ---
+            for i in range(2, 8):
+                arquivo = request.files.get(f"imagem{i}")
+                desc = request.form.get(f"descricao{i}", "")
+                contexto[f"descricao{i}"] = desc
+
+                if arquivo and arquivo.filename:
+                    caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
+                    arquivo.save(caminho)
+                    imagens.append(caminho)
+                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
+                else:
+                    contexto[f"imagem{i}"] = ""
+
+            # --- Finalizar Word ---
+            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
+            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
+
+            doc.render(contexto)
+            doc.save(caminho_saida)
+
+            return send_file(caminho_saida, as_attachment=True)
+
+        except Exception as e:
+            return f"Erro interno: {e}", 500
+
+    return render_template("formulario.html", campos=campos)
+
+
 @app.route("/incendios", methods=["GET", "POST"])
 def incendios():
     if not session.get("logado"):
@@ -214,6 +288,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
