@@ -147,7 +147,6 @@
   {% endif %}
 {% endfor %}
 
-
       <!-- Botões -->
       <div class="d-grid gap-2 mt-4">
         <button type="submit" class="btn btn-primary">✅ Gerar Laudo</button>
@@ -155,6 +154,55 @@
       </div>
     </form>
   </div>
+  
+<script>
+  function atualizarLocalizacao() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude.toFixed(6);
+          const lon = position.coords.longitude.toFixed(6);
+
+          document.getElementById("latitude").value = lat;
+          document.getElementById("longitude").value = lon;
+
+          // Oculta imagem 1 se existir
+          const img1 = document.getElementById("imagem1_block");
+          if (img1) img1.style.display = "none";
+
+          // Atualiza link do mapa
+          const linkMapa = document.getElementById("link_mapa");
+          if (linkMapa) {
+            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
+            linkMapa.style.display = "inline-block";
+          }
+
+          // Renderiza mapa em base64
+          const container = document.getElementById("map-container");
+          container.style.display = "block";
+          container.innerHTML = "";
+
+          const mapa = L.map("map-container").setView([lat, lon], 16);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap'
+          }).addTo(mapa);
+          L.marker([lat, lon]).addTo(mapa);
+
+          setTimeout(() => {
+            html2canvas(container).then(canvas => {
+              document.getElementById("imagem1_base64").value = canvas.toDataURL("image/png");
+              container.style.display = "none";
+            });
+          }, 1200);
+        },
+        error => alert("Erro ao obter localização: " + error.message),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      alert("Geolocalização não suportada pelo navegador.");
+    }
+  }
+</script>
 
 </body>
 </html>
