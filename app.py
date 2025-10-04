@@ -42,14 +42,10 @@ def home():
     if not session.get("logado"):
         return redirect(url_for("login"))
     return render_template("home.html")
-
-# Campos do formulário
-campos = [
+# Campos base (comuns aos dois)
+campos_base = [
     ("Nº do Laudo", "numero_laudo"),
     ("Solicitação (n° Processo, Ofício, OS, etc)", "n_processo"),
-#    ("Nome", "nome"),
-#    ("CPF", "cpf"),
-#    ("Telefone", "telefone"),
     ("Endereço (Rua, Quadra, Lote)", "endereco"),
     ("Bairro", "bairro"),
     ("Latitude", "latitude"),
@@ -58,10 +54,20 @@ campos = [
     ("Data do relatório", "data_relatorio")
 ]
 
+# Campos exclusivos de regularização
+campos_extra_reg = [
+    ("Nome", "nome"),
+    ("CPF", "cpf"),
+    ("Telefone", "telefone")
+]
+
+# Rota /chuvas → sem nome, cpf, telefone
 @app.route("/chuvas", methods=["GET", "POST"])
 def chuvas():
     if not session.get("logado"):
         return redirect(url_for("login"))
+
+    campos = campos_base  # só os comuns
 
     if request.method == "POST":
         try:
@@ -70,26 +76,27 @@ def chuvas():
             contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco")
 
-            # Problemas solo
+            # --- Problemas no solo ---
             problemas = request.form.getlist("problemas_solo")
             outro = request.form.get("problemas_solo_outro", "").strip()
             if outro:
                 problemas.append(outro)
             contexto["problemas_solo"] = ", ".join(problemas)
-            # Presença cursos
+
+            # --- Presença de cursos d'água ---
             presenca = request.form.getlist("presenca_cursos")
             cursos = request.form.get("presenca_cursos_outro", "").strip()
             if cursos:
                 presenca.append(cursos)
             contexto["presenca_cursos"] = ", ".join(presenca)
+
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
             contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
 
             imagens = []
 
             # --- Gerar mapa automático OSM ---
-            lat = request.form.get("latitude")
-            lon = request.form.get("longitude")
+            lat, lon = request.form.get("latitude"), request.form.get("longitude")
             if lat and lon:
                 caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
                 if caminho_mapa:
@@ -103,7 +110,7 @@ def chuvas():
                 contexto["imagem1"] = ""
                 contexto["descricao1"] = ""
 
-            # --- Imagens 2 a 7 (upload manual) ---
+            # --- Imagens 2 a 7 ---
             for i in range(2, 8):
                 arquivo = request.files.get(f"imagem{i}")
                 desc = request.form.get(f"descricao{i}", "")
@@ -117,24 +124,25 @@ def chuvas():
                 else:
                     contexto[f"imagem{i}"] = ""
 
-            # --- Finalizar Word ---
             nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
-
             doc.render(contexto)
             doc.save(caminho_saida)
 
             return send_file(caminho_saida, as_attachment=True)
-
         except Exception as e:
             return f"Erro interno: {e}", 500
 
     return render_template("chuvas.html", campos=campos)
 
+
+# Rota /regularizacao → inclui nome, cpf, telefone
 @app.route("/regularizacao", methods=["GET", "POST"])
 def regularizacao():
     if not session.get("logado"):
         return redirect(url_for("login"))
+
+    campos = campos_extra_reg + campos_base  # adiciona os extras
 
     if request.method == "POST":
         try:
@@ -143,26 +151,27 @@ def regularizacao():
             contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco")
 
-            # Problemas solo
+            # --- Problemas no solo ---
             problemas = request.form.getlist("problemas_solo")
             outro = request.form.get("problemas_solo_outro", "").strip()
             if outro:
                 problemas.append(outro)
             contexto["problemas_solo"] = ", ".join(problemas)
-            # Presença cursos
+
+            # --- Presença de cursos d'água ---
             presenca = request.form.getlist("presenca_cursos")
             cursos = request.form.get("presenca_cursos_outro", "").strip()
             if cursos:
                 presenca.append(cursos)
             contexto["presenca_cursos"] = ", ".join(presenca)
+
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
             contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
 
             imagens = []
 
             # --- Gerar mapa automático OSM ---
-            lat = request.form.get("latitude")
-            lon = request.form.get("longitude")
+            lat, lon = request.form.get("latitude"), request.form.get("longitude")
             if lat and lon:
                 caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
                 if caminho_mapa:
@@ -176,7 +185,7 @@ def regularizacao():
                 contexto["imagem1"] = ""
                 contexto["descricao1"] = ""
 
-            # --- Imagens 2 a 7 (upload manual) ---
+            # --- Imagens 2 a 7 ---
             for i in range(2, 8):
                 arquivo = request.files.get(f"imagem{i}")
                 desc = request.form.get(f"descricao{i}", "")
@@ -190,15 +199,12 @@ def regularizacao():
                 else:
                     contexto[f"imagem{i}"] = ""
 
-            # --- Finalizar Word ---
             nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
             caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
-
             doc.render(contexto)
             doc.save(caminho_saida)
 
             return send_file(caminho_saida, as_attachment=True)
-
         except Exception as e:
             return f"Erro interno: {e}", 500
 
@@ -288,6 +294,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
