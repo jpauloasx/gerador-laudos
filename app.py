@@ -154,18 +154,18 @@ def chuvas():
             doc.save(caminho_saida)
 
             # Após gerar o laudo DOCX com sucesso:
-                atendimento = {
-                    "rota": "chuvas",
-                    "numero_laudo": numero_laudo,  # variável que você já usa no nome do DOCX
-                    "latitude": request.form.get("latitude", ""),
-                    "longitude": request.form.get("longitude", ""),
-                    "bairro": request.form.get("bairro", ""),
-                    "data_vistoria": request.form.get("data_vistoria", ""),
-                    "grau_risco": request.form.get("grau_risco", ""),
-                    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-                    }
+            atendimento = {
+                "rota": "chuvas",
+                "numero_laudo": numero_laudo,  # variável que você já usa no nome do DOCX
+                "latitude": request.form.get("latitude", ""),
+                "longitude": request.form.get("longitude", ""),
+                "bairro": request.form.get("bairro", ""),
+                "data_vistoria": request.form.get("data_vistoria", ""),
+                "grau_risco": request.form.get("grau_risco", ""),
+                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                }
 
-                    salvar_atendimento(atendimento)
+            salvar_atendimento(atendimento)
 
             return send_file(caminho_saida, as_attachment=True)
 
