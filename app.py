@@ -2,11 +2,10 @@ from flask import Flask, render_template, request, send_file, redirect, url_for,
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date
-import os
+import os,json
 import base64
 from staticmap import StaticMap, CircleMarker
 from datetime import datetime
-import json
 
 
 
@@ -15,8 +14,10 @@ app.secret_key = "DC_g&rad0r"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 DATA_FILE = "data/atendimentos.json"
 os.makedirs("data", exist_ok=True)
+
 def salvar_atendimento(atendimento):
     try:
         if os.path.exists(DATA_FILE):
@@ -30,9 +31,9 @@ def salvar_atendimento(atendimento):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
+        print(f"✅ Atendimento salvo: {atendimento['numero_laudo']}")
     except Exception as e:
         print(f"❌ Erro ao salvar atendimento: {e}")
-
 
 # --- Função para gerar mapa OSM ---
 def gerar_mapa(lat, lon, caminho_saida):
@@ -152,18 +153,22 @@ def chuvas():
             doc.render(contexto)
             doc.save(caminho_saida)
 
-            # --- Registrar atendimento ---
-            atendimento = {
-                "origem": "Chuvas",
-                "numero_laudo": contexto.get("numero_laudo"),
-                "latitude": contexto.get("latitude"),
-                "longitude": contexto.get("longitude"),
-                "bairro": contexto.get("bairro"),
-                "data_vistoria": contexto.get("data_vistoria"),
-                "grau_risco": contexto.get("grau_risco"),
-                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-                }
-            salvar_atendimento(atendimento)
+            # Após gerar o laudo DOCX com sucesso:
+                from datetime import datetime
+                from salvar_atendimento import salvar_atendimento  # se estiver em outro arquivo, ajuste o import
+
+                atendimento = {
+                    "rota": "chuvas",
+                    "numero_laudo": numero_laudo,  # variável que você já usa no nome do DOCX
+                    "latitude": request.form.get("latitude", ""),
+                    "longitude": request.form.get("longitude", ""),
+                    "bairro": request.form.get("bairro", ""),
+                    "data_vistoria": request.form.get("data_vistoria", ""),
+                    "grau_risco": request.form.get("grau_risco", ""),
+                    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    }
+
+                    salvar_atendimento(atendimento)
 
             return send_file(caminho_saida, as_attachment=True)
 
@@ -373,6 +378,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
