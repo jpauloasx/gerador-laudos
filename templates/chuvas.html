@@ -49,18 +49,19 @@
     {% elif name == "data_relatorio" %}
       <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
 
-    {% elif name == "latitude" %}
-  <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
-    📍 Atualizar Localização
-  </button>
+ {% elif name == "latitude" %}
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <button type="button" id="btn-atualizar-localizacao" class="btn btn-sm btn-outline-primary" onclick="atualizarLocalizacao()">
+      📍 Atualizar Localização
+    </button>
+    <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
+      🌍 Ver no Mapa
+    </a>
+  </div>
   <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
-  <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-    🌍 Ver no Mapa
-  </a>
 
-
-    {% elif name == "longitude" %}
-      <input type="text" name="longitude" id="longitude" class="form-control" readonly>
+{% elif name == "longitude" %}
+  <input type="text" name="longitude" id="longitude" class="form-control" readonly>
 
     {% else %}
       <input type="text" name="{{ name }}" class="form-control" required>
