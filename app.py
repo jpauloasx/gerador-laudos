@@ -129,7 +129,7 @@ def chuvas():
         except Exception as e:
             return f"Erro interno: {e}", 500
 
-    return render_template("formulario.html", campos=campos)
+    return render_template("chuvas.html", campos=campos)
 
 @app.route("/regularizacao", methods=["GET", "POST"])
 def chuvas():
@@ -202,7 +202,7 @@ def chuvas():
         except Exception as e:
             return f"Erro interno: {e}", 500
 
-    return render_template("formulario.html", campos=campos)
+    return render_template("regularizacao.html", campos=campos)
 
 
 @app.route("/incendios", methods=["GET", "POST"])
@@ -288,6 +288,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
