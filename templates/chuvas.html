@@ -203,7 +203,25 @@
     }
   }
 </script>
+ <!-- Script de limpeza -->
+  <script>
+    function confirmarLimpeza() {
+      if (confirm("Tem certeza que deseja limpar todos os campos do formulário?")) {
+        limparFormulario();
+      }
+    }
 
+    function limparFormulario() {
+      document.querySelectorAll('input[type="text"]').forEach(el => el.value = "");
+      document.querySelectorAll('select[multiple]').forEach(select => {
+        Array.from(select.options).forEach(option => option.selected = false);
+      });
+      document.querySelectorAll('input[type="file"]').forEach(el => el.value = "");
+      document.querySelectorAll('select:not([multiple])').forEach(select => {
+        select.selectedIndex = 0;
+      });
+    }
+  </script>
 </body>
 </html>
 
