@@ -132,7 +132,7 @@ def chuvas():
     return render_template("chuvas.html", campos=campos)
 
 @app.route("/regularizacao", methods=["GET", "POST"])
-def regular():
+def regularizacao():
     if not session.get("logado"):
         return redirect(url_for("login"))
 
@@ -288,6 +288,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
