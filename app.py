@@ -152,6 +152,19 @@ def chuvas():
             doc.render(contexto)
             doc.save(caminho_saida)
 
+            # --- Registrar atendimento ---
+atendimento = {
+    "origem": "Chuvas",
+    "numero_laudo": contexto.get("numero_laudo"),
+    "latitude": contexto.get("latitude"),
+    "longitude": contexto.get("longitude"),
+    "bairro": contexto.get("bairro"),
+    "data_vistoria": contexto.get("data_vistoria"),
+    "grau_risco": contexto.get("grau_risco"),
+    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+}
+salvar_atendimento(atendimento)
+
             return send_file(caminho_saida, as_attachment=True)
 
         except Exception as e:
@@ -228,6 +241,19 @@ def regularizacao():
             doc.render(contexto)
             doc.save(caminho_saida)
 
+            # --- Registrar atendimento ---
+atendimento = {
+    "origem": "Regularização Fundiária",
+    "numero_laudo": contexto.get("numero_laudo"),
+    "latitude": contexto.get("latitude"),
+    "longitude": contexto.get("longitude"),
+    "bairro": contexto.get("bairro"),
+    "data_vistoria": contexto.get("data_vistoria"),
+    "grau_risco": contexto.get("grau_risco"),
+    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+}
+salvar_atendimento(atendimento)
+
             return send_file(caminho_saida, as_attachment=True)
 
         except Exception as e:
@@ -291,6 +317,19 @@ def incendios():
             doc.render(contexto)
             doc.save(caminho_saida)
 
+            # --- Registrar atendimento ---
+atendimento = {
+    "origem": "Incêndios",
+    "numero_laudo": contexto.get("numero_laudo"),
+    "latitude": contexto.get("latitude"),
+    "longitude": contexto.get("longitude"),
+    "bairro": contexto.get("bairro"),
+    "data_vistoria": contexto.get("data_vistoria"),
+    "grau_risco": contexto.get("grau_risco"),
+    "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+}
+salvar_atendimento(atendimento)
+
             return send_file(caminho_saida, as_attachment=True)
 
         except Exception as e:
@@ -304,7 +343,20 @@ def equipes():
 
 @app.route("/atendimentos")
 def atendimentos():
-    return "📌 Página de Atendimentos (em construção)"
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                atendimentos = json.load(f)
+        else:
+            atendimentos = []
+    except Exception as e:
+        atendimentos = []
+        print("❌ Erro ao ler atendimentos:", e)
+
+    return render_template("atendimentos.html", atendimentos=atendimentos)
 
 @app.route("/dashboard")
 def dashboard():
@@ -321,6 +373,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
