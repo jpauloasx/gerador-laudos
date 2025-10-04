@@ -156,7 +156,6 @@ def chuvas():
             # Após gerar o laudo DOCX com sucesso:
             atendimento = {
                 "rota": "chuvas",
-                "numero_laudo": numero_laudo,  # variável que você já usa no nome do DOCX
                 "latitude": request.form.get("latitude", ""),
                 "longitude": request.form.get("longitude", ""),
                 "bairro": request.form.get("bairro", ""),
@@ -375,6 +374,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
