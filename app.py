@@ -6,11 +6,37 @@ import os
 import base64
 from staticmap import StaticMap, CircleMarker
 from datetime import datetime
+import json
+
+import json
+
+DATA_FILE = "data/atendimentos.json"
+os.makedirs("data", exist_ok=True)
+
+
 
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+def salvar_atendimento(atendimento):
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                dados = json.load(f)
+        else:
+            dados = []
+
+        dados.append(atendimento)
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(dados, f, ensure_ascii=False, indent=2)
+
+    except Exception as e:
+        print(f"❌ Erro ao salvar atendimento: {e}")
+
 
 # --- Função para gerar mapa OSM ---
 def gerar_mapa(lat, lon, caminho_saida):
@@ -294,9 +320,12 @@ def logout():
     session.pop("logado", None)
     return redirect(url_for("login"))
 
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
