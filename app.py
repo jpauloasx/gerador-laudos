@@ -8,10 +8,7 @@ from staticmap import StaticMap, CircleMarker
 from datetime import datetime
 import json
 
-import json
 
-DATA_FILE = "data/atendimentos.json"
-os.makedirs("data", exist_ok=True)
 
 
 
@@ -20,7 +17,8 @@ app.secret_key = "DC_g&rad0r"
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
+DATA_FILE = "data/atendimentos.json"
+os.makedirs("data", exist_ok=True)
 def salvar_atendimento(atendimento):
     try:
         if os.path.exists(DATA_FILE):
@@ -325,6 +323,7 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
