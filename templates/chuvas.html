@@ -50,13 +50,14 @@
       <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
 
     {% elif name == "latitude" %}
-      <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
-        📍 Atualizar Localização
-      </button>
-      <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
-      <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-        🌍 Ver no Mapa
-      </a>
+  <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
+    📍 Atualizar Localização
+  </button>
+  <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
+  <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
+    🌍 Ver no Mapa
+  </a>
+
 
     {% elif name == "longitude" %}
       <input type="text" name="longitude" id="longitude" class="form-control" readonly>
