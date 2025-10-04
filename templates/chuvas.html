@@ -1,1 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador de Relatório - Análise Defesa Civil de Cuiabá-MT</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <div class="container py-4 px-3 px-md-5">
 
+   <!-- VOLTAR -->
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+    </div>
+
+    <!-- LOGOS -->
+    <div class="row justify-content-center align-items-center mb-4">
+      <div class="col-auto">
+        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="img-fluid" style="max-height: 100px;">
+      </div>
+      <div class="col-auto">
+        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="img-fluid" style="max-height: 100px;">
+      </div>
+    </div>
+
+    <!-- TÍTULO -->
+    <h2 class="mb-4 text-center text-primary">Gerador de Relatório Técnico</h2>
+
+    <!-- FORMULÁRIO -->
+    <form method="POST" enctype="multipart/form-data">
+      
+    <!-- Campos principais, tratando CPF, Telefone e Data com máscaras de preenchimento e geoloc -->
+{% for label, name in campos %}
+  <div class="mb-3">
+    <label class="form-label">{{ label }}</label>
+
+    {% if name == "cpf" %}
+      <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
+
+    {% elif name == "telefone" %}
+      <input type="text" name="telefone" id="telefone" class="form-control" maxlength="15" required>
+
+    {% elif name == "data_vistoria" %}
+      <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
+
+    {% elif name == "data_relatorio" %}
+    <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
+
+{% elif name == "latitude" %}
+  <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
+    📍 Atualizar Localização
+  </button>
+  <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
+  <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
+    🌍 Ver no Mapa
+  </a>
+
+
+    {% elif name == "longitude" %}
+      <input type="text" name="longitude" id="longitude" class="form-control" readonly>
+
+    {% else %}
+      <input type="text" name="{{ name }}" class="form-control" required>
+    {% endif %}
+  </div>
+{% endfor %}
+
+      <!-- Grupos de solo -->
+      <div class="mb-4">
+        <h5>Características do Solo</h5>
+        <select class="form-select" name="problemas_solo" multiple>
+          <option>Arenoso</option>
+          <option>Argiloso</option>
+          <option>Alta declividade</option>
+          <option>Alta saturação hídrica (encharcado)</option>
+        </select>
+        <input type="text" name="problemas_solo_outro" class="form-control mt-2" placeholder="Outro tipo de solo...">
+      </div> 
+
+      <div class="mb-4">
+        <h5>Presença de cursos d'água</h5>
+        <select class="form-select" name="presenca_cursos" multiple>
+          <option>Córrego</option>
+          <option>Rio</option>
+          <option>Riacho</option>
+          <option>Lençol freático</option>
+          <option>Não identificado</option>
+        </select>
+        <input type="text" name="presenca_cursos_outro" class="form-control mt-2" placeholder="Outro...">
+      </div>
+
+      <div class="mb-4">
+        <h5>Sinais de instabilidade</h5>
+        <select class="form-select" name="sinais_instabilidade" multiple>
+          <option>Trincas e Rachaduras</option>
+          <option>Erosão</option>
+          <option>Inclinação</option>
+          <option>Deslizamento</option>
+          <option>Infiltração</option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <h5>Potenciais fatores de risco</h5>
+        <select class="form-select" name="fatores_risco" multiple>
+          <option>Acúmulo de água</option>
+          <option>Ausência e/ou deficiência de drenagem</option>
+          <option>Desníveis acentuados no terreno</option>
+          <option>Macro-fissuras em muros, indicando movimentação do solo</option>
+          <option>Ocupações em áreas suscetíveis a alagamento e/ou escorregamento</option>
+        </select>
+      </div>
+
+      <!-- Grau de Risco -->
+      <div class="mb-3">
+        <label class="form-label">Grau de Risco</label>
+        <select name="grau_risco" class="form-select">
+          <option>MUITO BAIXO</option>
+          <option>BAIXO</option>
+          <option selected>MÉDIO</option>
+          <option>ALTO</option>
+          <option>MUITO ALTO</option>
+        </select>
+      </div>
+
+<!-- Imagens e descrições -->
+  <h4 class="mt-5 mb-3">Imagens e Descrições</h4>
+{% for i in range(1, 8) %}
+  {% if i == 1 %}
+    <div id="imagem1_block">
+  {% endif %}
+
+  <div class="mb-2">
+    <label class="form-label">Imagem {{ i }}</label>
+    <input type="file" name="imagem{{ i }}" class="form-control">
+  </div>
+  <div class="mb-4">
+    <input type="text" name="descricao{{ i }}" class="form-control" placeholder="Descrição da imagem {{ i }}">
+  </div>
+
+  {% if i == 1 %}
+    </div>
+  {% endif %}
+{% endfor %}
+
+
+      <!-- Botões -->
+      <div class="d-grid gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">✅ Gerar Laudo</button>
+        <button type="button" class="btn btn-outline-danger" onclick="confirmarLimpeza()">🗑️ Limpar Tudo</button>
+      </div>
+    </form>
+  </div>
+
+ <!-- Script de máscara do CPF, Telefone e Data-->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // CPF
+  const cpfInput = document.getElementById("cpf");
+  if (cpfInput) {
+    cpfInput.addEventListener("input", function () {
+      let valor = cpfInput.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+      let formatado = "";
+      if (valor.length > 0) formatado = valor.slice(0, 3);
+      if (valor.length >= 4) formatado += "." + valor.slice(3, 6);
+      if (valor.length >= 7) formatado += "." + valor.slice(6, 9);
+      if (valor.length >= 10) formatado += "-" + valor.slice(9, 11);
+      cpfInput.value = formatado;
+    });
+  }
+
+  // TELEFONE
+  const telInput = document.getElementById("telefone");
+  if (telInput) {
+    telInput.addEventListener("input", function () {
+      let valor = telInput.value.replace(/\D/g, "");
+      if (valor.length > 11) valor = valor.slice(0, 11);
+
+      let formatado = "";
+      if (valor.length > 0) formatado = "(" + valor.slice(0, 2);
+      if (valor.length >= 3) formatado += ") " + valor.slice(2, 7);
+      if (valor.length >= 8) formatado += "-" + valor.slice(7, 11);
+
+      telInput.value = formatado;
+    });
+  }
+  // DATA VISTORIA
+  const dataInput = document.getElementById("data_vistoria");
+  if (dataInput) {
+    dataInput.addEventListener("input", function () {
+      let valor = dataInput.value.replace(/\D/g, "");
+      if (valor.length > 8) valor = valor.slice(0, 8);
+
+      let formatado = "";
+      if (valor.length > 0) formatado = valor.slice(0, 2);
+      if (valor.length >= 3) formatado += "/" + valor.slice(2, 4);
+      if (valor.length >= 5) formatado += "/" + valor.slice(4, 8);
+
+      dataInput.value = formatado;
+    });
+  }
+});
+
+// DATA RELATÓRIO
+  const dataInput = document.getElementById("data_relatorio");
+  if (dataInput) {
+    dataInput.addEventListener("input", function () {
+      let valor = dataInput.value.replace(/\D/g, "");
+      if (valor.length > 8) valor = valor.slice(0, 8);
+
+      if (valor.length === 8) {
+        // Quebra o valor em partes
+        const dia = parseInt(valor.slice(0, 2));
+        const mes = parseInt(valor.slice(2, 4));
+        const ano = valor.slice(4, 8);
+
+        // Array com meses por extenso
+        const meses = [
+          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        // Verificação básica se o mês é válido
+        if (mes >= 1 && mes <= 12) {
+          dataInput.value = `${dia} de ${meses[mes - 1]} de ${ano}`;
+        }
+      }
+    });
+  }
+</script>
+
+
+<!-- Leaflet + html2canvas para gerar imagem do minimapa -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Campo oculto com imagem base64 -->
+<input type="hidden" name="imagem1_base64" id="imagem1_base64">
+
+<!-- Container invisível do mapa -->
+<div id="map-container" style="width: 300px; height: 300px; display: none;"></div>
+
+<script>
+  function atualizarLocalizacao() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude.toFixed(6);
+          const lon = position.coords.longitude.toFixed(6);
+
+          document.getElementById("latitude").value = lat;
+          document.getElementById("longitude").value = lon;
+
+          document.getElementById("imagem1_block").style.display = "none";
+
+          const linkMapa = document.getElementById("link_mapa");
+          if (linkMapa) {
+            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
+            linkMapa.style.display = "inline-block";
+          }
+
+          // Renderiza minimapa
+          const container = document.getElementById("map-container");
+          container.style.display = "block";
+          container.innerHTML = ""; // limpa instância anterior
+
+          const mapa = L.map("map-container").setView([lat, lon], 16);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap',
+          }).addTo(mapa);
+          L.marker([lat, lon]).addTo(mapa);
+
+          setTimeout(() => {
+            html2canvas(container).then(canvas => {
+              const base64 = canvas.toDataURL("image/png");
+              document.getElementById("imagem1_base64").value = base64;
+              container.style.display = "none"; // oculta novamente
+            });
+          }, 1000); // espera mapa carregar
+        },
+        function (error) {
+          alert("Erro ao obter localização: " + error.message);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      alert("Geolocalização não suportada.");
+    }
+  }
+</script>
+
+
+<script>
+  document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        document.querySelector("input[name='latitude']").value = position.coords.latitude.toFixed(6);
+        document.querySelector("input[name='longitude']").value = position.coords.longitude.toFixed(6);
+
+        // Oculta o campo da Imagem 1 (div com id="imagem1_block")
+        const img1 = document.getElementById("imagem1_block");
+        if (img1) {
+          img1.style.display = "none";
+        }
+      }, function (error) {
+        alert("Erro ao obter localização. Adicione manualmente.");
+      });
+    } else {
+      alert("Geolocalização não suportada pelo navegador.");
+    }
+  });
+</script>
+
+
+  <!-- Script de limpeza -->
+  <script>
+    function confirmarLimpeza() {
+      if (confirm("Tem certeza que deseja limpar todos os campos do formulário?")) {
+        limparFormulario();
+      }
+    }
+
+    function limparFormulario() {
+      document.querySelectorAll('input[type="text"]').forEach(el => el.value = "");
+      document.querySelectorAll('select[multiple]').forEach(select => {
+        Array.from(select.options).forEach(option => option.selected = false);
+      });
+      document.querySelectorAll('input[type="file"]').forEach(el => el.value = "");
+      document.querySelectorAll('select:not([multiple])').forEach(select => {
+        select.selectedIndex = 0;
+      });
+    }
+  </script>
+</body>
+</html>
