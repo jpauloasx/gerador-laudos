@@ -24,12 +24,12 @@
     </div>
 
     <!-- TÍTULO -->
-    <h2 class="mb-4 text-center text-primary">Gerador de Relatório Técnico</h2>
+    <h2 class="mb-4 text-center text-primary">Gerador de Relatório Técnico - Chuvas</h2>
 
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
       
-    <!-- Campos principais, tratando CPF, Telefone e Data com máscaras de preenchimento e geoloc -->
+    <!-- Campos principais -->
 {% for label, name in campos %}
   <div class="mb-3">
     <label class="form-label">{{ label }}</label>
@@ -40,21 +40,23 @@
     {% elif name == "telefone" %}
       <input type="text" name="telefone" id="telefone" class="form-control" maxlength="15" required>
 
+    {% elif name == "nome" %}
+      <input type="text" name="nome" id="nome" class="form-control" required>
+
     {% elif name == "data_vistoria" %}
       <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
 
     {% elif name == "data_relatorio" %}
-    <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
+      <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
 
-{% elif name == "latitude" %}
-  <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
-    📍 Atualizar Localização
-  </button>
-  <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
-  <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-    🌍 Ver no Mapa
-  </a>
-
+    {% elif name == "latitude" %}
+      <button type="button" class="btn btn-sm btn-outline-primary mb-2" onclick="atualizarLocalizacao()">
+        📍 Atualizar Localização
+      </button>
+      <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
+      <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
+        🌍 Ver no Mapa
+      </a>
 
     {% elif name == "longitude" %}
       <input type="text" name="longitude" id="longitude" class="form-control" readonly>
@@ -152,190 +154,6 @@
     </form>
   </div>
 
- <!-- Script de máscara do CPF, Telefone e Data-->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // CPF
-  const cpfInput = document.getElementById("cpf");
-  if (cpfInput) {
-    cpfInput.addEventListener("input", function () {
-      let valor = cpfInput.value.replace(/\D/g, "");
-      if (valor.length > 11) valor = valor.slice(0, 11);
-      let formatado = "";
-      if (valor.length > 0) formatado = valor.slice(0, 3);
-      if (valor.length >= 4) formatado += "." + valor.slice(3, 6);
-      if (valor.length >= 7) formatado += "." + valor.slice(6, 9);
-      if (valor.length >= 10) formatado += "-" + valor.slice(9, 11);
-      cpfInput.value = formatado;
-    });
-  }
-
-  // TELEFONE
-  const telInput = document.getElementById("telefone");
-  if (telInput) {
-    telInput.addEventListener("input", function () {
-      let valor = telInput.value.replace(/\D/g, "");
-      if (valor.length > 11) valor = valor.slice(0, 11);
-
-      let formatado = "";
-      if (valor.length > 0) formatado = "(" + valor.slice(0, 2);
-      if (valor.length >= 3) formatado += ") " + valor.slice(2, 7);
-      if (valor.length >= 8) formatado += "-" + valor.slice(7, 11);
-
-      telInput.value = formatado;
-    });
-  }
-  // DATA VISTORIA
-  const dataInput = document.getElementById("data_vistoria");
-  if (dataInput) {
-    dataInput.addEventListener("input", function () {
-      let valor = dataInput.value.replace(/\D/g, "");
-      if (valor.length > 8) valor = valor.slice(0, 8);
-
-      let formatado = "";
-      if (valor.length > 0) formatado = valor.slice(0, 2);
-      if (valor.length >= 3) formatado += "/" + valor.slice(2, 4);
-      if (valor.length >= 5) formatado += "/" + valor.slice(4, 8);
-
-      dataInput.value = formatado;
-    });
-  }
-});
-
-// DATA RELATÓRIO
-  const dataInput = document.getElementById("data_relatorio");
-  if (dataInput) {
-    dataInput.addEventListener("input", function () {
-      let valor = dataInput.value.replace(/\D/g, "");
-      if (valor.length > 8) valor = valor.slice(0, 8);
-
-      if (valor.length === 8) {
-        // Quebra o valor em partes
-        const dia = parseInt(valor.slice(0, 2));
-        const mes = parseInt(valor.slice(2, 4));
-        const ano = valor.slice(4, 8);
-
-        // Array com meses por extenso
-        const meses = [
-          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
-        ];
-
-        // Verificação básica se o mês é válido
-        if (mes >= 1 && mes <= 12) {
-          dataInput.value = `${dia} de ${meses[mes - 1]} de ${ano}`;
-        }
-      }
-    });
-  }
-</script>
-
-
-<!-- Leaflet + html2canvas para gerar imagem do minimapa -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<!-- Campo oculto com imagem base64 -->
-<input type="hidden" name="imagem1_base64" id="imagem1_base64">
-
-<!-- Container invisível do mapa -->
-<div id="map-container" style="width: 300px; height: 300px; display: none;"></div>
-
-<script>
-  function atualizarLocalizacao() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function (position) {
-          const lat = position.coords.latitude.toFixed(6);
-          const lon = position.coords.longitude.toFixed(6);
-
-          document.getElementById("latitude").value = lat;
-          document.getElementById("longitude").value = lon;
-
-          document.getElementById("imagem1_block").style.display = "none";
-
-          const linkMapa = document.getElementById("link_mapa");
-          if (linkMapa) {
-            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
-            linkMapa.style.display = "inline-block";
-          }
-
-          // Renderiza minimapa
-          const container = document.getElementById("map-container");
-          container.style.display = "block";
-          container.innerHTML = ""; // limpa instância anterior
-
-          const mapa = L.map("map-container").setView([lat, lon], 16);
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; OpenStreetMap',
-          }).addTo(mapa);
-          L.marker([lat, lon]).addTo(mapa);
-
-          setTimeout(() => {
-            html2canvas(container).then(canvas => {
-              const base64 = canvas.toDataURL("image/png");
-              document.getElementById("imagem1_base64").value = base64;
-              container.style.display = "none"; // oculta novamente
-            });
-          }, 1000); // espera mapa carregar
-        },
-        function (error) {
-          alert("Erro ao obter localização: " + error.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      alert("Geolocalização não suportada.");
-    }
-  }
-</script>
-
-
-<script>
-  document.getElementById("btn-atualizar-localizacao").addEventListener("click", function () {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        document.querySelector("input[name='latitude']").value = position.coords.latitude.toFixed(6);
-        document.querySelector("input[name='longitude']").value = position.coords.longitude.toFixed(6);
-
-        // Oculta o campo da Imagem 1 (div com id="imagem1_block")
-        const img1 = document.getElementById("imagem1_block");
-        if (img1) {
-          img1.style.display = "none";
-        }
-      }, function (error) {
-        alert("Erro ao obter localização. Adicione manualmente.");
-      });
-    } else {
-      alert("Geolocalização não suportada pelo navegador.");
-    }
-  });
-</script>
-
-
-  <!-- Script de limpeza -->
-  <script>
-    function confirmarLimpeza() {
-      if (confirm("Tem certeza que deseja limpar todos os campos do formulário?")) {
-        limparFormulario();
-      }
-    }
-
-    function limparFormulario() {
-      document.querySelectorAll('input[type="text"]').forEach(el => el.value = "");
-      document.querySelectorAll('select[multiple]').forEach(select => {
-        Array.from(select.options).forEach(option => option.selected = false);
-      });
-      document.querySelectorAll('input[type="file"]').forEach(el => el.value = "");
-      document.querySelectorAll('select:not([multiple])').forEach(select => {
-        select.selectedIndex = 0;
-      });
-    }
-  </script>
 </body>
 </html>
+
