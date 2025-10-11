@@ -1,21 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, jsonify
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date, datetime
 import os, json
-from staticmap import StaticMap, CircleMarker
+from staticmap import StaticMap, CircleMarker 
+import os, json
 
-# --- Configuração inicial ---
 app = Flask(__name__)
-app.secret_key = "DC_g&rad0r"
 
-UPLOAD_FOLDER = "uploads/laudos"
 DATA_FILE = "data/atendimentos.json"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs("data", exist_ok=True)
 
-# --- Função para salvar atendimentos ---
 def salvar_atendimento(atendimento):
+    """Salva o atendimento no arquivo JSON"""
     try:
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -28,9 +25,25 @@ def salvar_atendimento(atendimento):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
-        print(f"✅ Atendimento salvo: {atendimento['numero_laudo']}")
     except Exception as e:
         print(f"❌ Erro ao salvar atendimento: {e}")
+
+
+@app.route("/atendimentos")
+def atendimentos():
+    """Exibe a lista de atendimentos"""
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                dados = json.load(f)
+        else:
+            dados = []
+    except Exception as e:
+        dados = []
+        print(f"❌ Erro ao carregar atendimentos: {e}")
+
+    return render_template("atendimentos.html", atendimentos=dados)
+
 
 # --- Gerar mapa OSM ---
 def gerar_mapa(lat, lon, caminho_saida):
@@ -198,6 +211,7 @@ def download(filename):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
