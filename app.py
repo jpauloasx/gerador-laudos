@@ -208,72 +208,113 @@ def chuvas():
     return render_template("chuvas.html", campos=campos_chuvas)
 
 
-
 @app.route("/regularizacao", methods=["GET", "POST"])
 def regularizacao():
     if not session.get("logado"):
         return redirect(url_for("login"))
+
     if request.method == "POST":
         try:
-            contexto = {campo[1]: request.form.get(campo[1]) for campo in campos_base}
+            contexto = {campo[1]: request.form.get(campo[1], "") for campo in campos_base}
+            contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco", "")
 
             numero_laudo = processar_laudo(contexto, "regularizacao", "modelo_laudo_reg.docx")
 
             if numero_laudo:
-                salvar_atendimento({
+                atendimento = {
                     "origem": "Regularização Fundiária",
                     "numero_laudo": numero_laudo,
-                    "bairro": contexto.get("bairro"),
-                    "latitude": contexto.get("latitude"),
-                    "longitude": contexto.get("longitude"),
-                    "data_vistoria": contexto.get("data_vistoria"),
-                    "grau_risco": contexto.get("grau_risco"),
-                    "arquivo": f"uploads/Regularizacao_{numero_laudo}.docx",
+                    "bairro": contexto.get("bairro", ""),
+                    "latitude": contexto.get("latitude", ""),
+                    "longitude": contexto.get("longitude", ""),
+                    "data_vistoria": contexto.get("data_vistoria", ""),
+                    "grau_risco": contexto.get("grau_risco", ""),
+                    "arquivo": f"Regularizacao_{numero_laudo}.docx",
                     "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-                })
+                }
 
-            return redirect(url_for("atendimentos"))
+                os.makedirs("data", exist_ok=True)
+                if not os.path.exists(DATA_FILE):
+                    with open(DATA_FILE, "w", encoding="utf-8") as f:
+                        json.dump([], f, ensure_ascii=False, indent=2)
+
+                try:
+                    with open(DATA_FILE, "r", encoding="utf-8") as f:
+                        conteudo = f.read().strip()
+                        dados = json.loads(conteudo) if conteudo else []
+                except json.JSONDecodeError:
+                    dados = []
+
+                dados.append(atendimento)
+                with open(DATA_FILE, "w", encoding="utf-8") as f:
+                    json.dump(dados, f, ensure_ascii=False, indent=2)
+
+                return redirect(url_for("atendimentos"))
+            else:
+                return "Erro ao gerar o laudo de regularização", 500
 
         except Exception as e:
             return f"Erro interno: {e}", 500
+
     return render_template("regularizacao.html", campos=campos_base)
+
 
 
 @app.route("/incendios", methods=["GET", "POST"])
 def incendios():
     if not session.get("logado"):
         return redirect(url_for("login"))
+
     if request.method == "POST":
         try:
             contexto = {
-                "n_os": request.form.get("n_os"),
-                "origem_ocorrencia": request.form.get("origem_ocorrencia"),
-                "n_ocorrencia": request.form.get("n_ocorrencia"),
-                "bairro": request.form.get("bairro"),
-                "descricao": request.form.get("descricao"),
-                "data_vistoria": request.form.get("data_vistoria")
+                "n_ocorrencia": request.form.get("n_ocorrencia", ""),
+                "bairro": request.form.get("bairro", ""),
+                "latitude": request.form.get("latitude", ""),
+                "longitude": request.form.get("longitude", ""),
+                "data_vistoria": request.form.get("data_vistoria", ""),
+                "grau_risco": request.form.get("grau_risco", "")
             }
 
             numero_laudo = processar_laudo(contexto, "incendios", "modelo_laudo_incendio.docx")
 
             if numero_laudo:
-                salvar_atendimento({
+                atendimento = {
                     "origem": "Incêndios",
                     "numero_laudo": numero_laudo,
-                    "bairro": contexto.get("bairro"),
+                    "bairro": contexto.get("bairro", ""),
                     "latitude": contexto.get("latitude", ""),
                     "longitude": contexto.get("longitude", ""),
-                    "data_vistoria": contexto.get("data_vistoria"),
+                    "data_vistoria": contexto.get("data_vistoria", ""),
                     "grau_risco": contexto.get("grau_risco", ""),
-                    "arquivo": f"uploads/Incendios_{numero_laudo}.docx",
+                    "arquivo": f"Incendios_{numero_laudo}.docx",
                     "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-                })
+                }
 
-            return redirect(url_for("atendimentos"))
+                os.makedirs("data", exist_ok=True)
+                if not os.path.exists(DATA_FILE):
+                    with open(DATA_FILE, "w", encoding="utf-8") as f:
+                        json.dump([], f, ensure_ascii=False, indent=2)
+
+                try:
+                    with open(DATA_FILE, "r", encoding="utf-8") as f:
+                        conteudo = f.read().strip()
+                        dados = json.loads(conteudo) if conteudo else []
+                except json.JSONDecodeError:
+                    dados = []
+
+                dados.append(atendimento)
+                with open(DATA_FILE, "w", encoding="utf-8") as f:
+                    json.dump(dados, f, ensure_ascii=False, indent=2)
+
+                return redirect(url_for("atendimentos"))
+            else:
+                return "Erro ao gerar o laudo de incêndios", 500
 
         except Exception as e:
             return f"Erro interno: {e}", 500
+
     return render_template("incendios.html")
 
 
@@ -328,6 +369,7 @@ def download_arquivo(nome_arquivo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
