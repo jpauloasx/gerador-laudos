@@ -309,12 +309,26 @@ def dashboard():
     return "📊 Página de Dashboard (em construção)"
 
 
+@app.route("/download/<nome_arquivo>")
+def download_arquivo(nome_arquivo):
+    """Permite baixar qualquer laudo salvo em /uploads"""
+    try:
+        caminho = os.path.join("uploads", nome_arquivo)
+        if not os.path.exists(caminho):
+            return f"Arquivo {nome_arquivo} não encontrado.", 404
+        return send_file(caminho, as_attachment=True)
+    except Exception as e:
+        print(f"❌ Erro ao baixar arquivo: {e}")
+        return f"Erro ao baixar arquivo: {e}", 500
+
+
 # =====================================================
 # 🔹 Inicialização
 # =====================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
