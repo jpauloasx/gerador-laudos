@@ -56,9 +56,9 @@
               </td>
               <td class="px-4 py-2 text-center">
                 {% if a.arquivo %}
-                  <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}" 
-                     class="text-blue-600 hover:text-blue-800 font-semibold">
-                    📥 Download
+                  <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}"
+                   class="text-blue-600 hover:underline">
+                     📥 Download
                   </a>
                 {% else %}
                   –
