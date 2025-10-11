@@ -105,20 +105,58 @@
     }).addTo(mapa);
 
     const atendimentos = {{ atendimentos_json | safe }};
-    const icones = {
-      "Chuvas": L.icon({
-        iconUrl: "https://cdn-icons-png.flaticon.com/512/1163/1163624.png",
-        iconSize: [28, 28]
-      }),
-      "Regularização Fundiária": L.icon({
-        iconUrl: "https://cdn-icons-png.flaticon.com/512/484/484167.png",
-        iconSize: [28, 28]
-      }),
-      "Incêndios": L.icon({
-        iconUrl: "https://cdn-icons-png.flaticon.com/512/482/482541.png",
-        iconSize: [28, 28]
-      })
-    };
+    // Função que retorna cor conforme o grau de risco
+function corPorRisco(risco) {
+  if (!risco) return "gray";
+  const r = risco.toUpperCase();
+  if (r.includes("MUITO ALTO")) return "red";
+  if (r.includes("ALTO")) return "orange";
+  if (r.includes("MÉDIO")) return "yellow";
+  if (r.includes("BAIXO")) return "green";
+  if (r.includes("MUITO BAIXO")) return "lightgreen";
+  return "gray";
+}
+
+// Função para criar ícone circular colorido
+function iconeCircular(cor) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+      <circle cx="16" cy="16" r="10" fill="${cor}" stroke="black" stroke-width="1"/>
+    </svg>`;
+  return L.icon({
+    iconUrl: "data:image/svg+xml;base64," + btoa(svg),
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -28]
+  });
+}
+
+// Adiciona marcadores com ícones coloridos
+atendimentos.forEach(a => {
+  if (a.latitude && a.longitude) {
+    const lat = parseFloat(a.latitude);
+    const lon = parseFloat(a.longitude);
+    if (!isNaN(lat) && !isNaN(lon)) {
+      const tipo = a.origem || "Atendimento";
+      const risco = a.grau_risco || "Não informado";
+      const cor = corPorRisco(risco);
+
+      const popup = `
+        <div style="font-size:14px">
+          <b>${tipo}</b><br>
+          📍 Bairro: ${a.bairro || "-"}<br>
+          🗓️ Data: ${a.data_vistoria || "-"}<br>
+          ⚠️ Risco: <b>${risco}</b><br>
+          <a href="/download/${a.arquivo}" target="_blank">📥 Baixar Laudo</a>
+        </div>
+      `;
+
+      const marker = L.marker([lat, lon], { icon: iconeCircular(cor) }).addTo(mapa);
+      marker.bindPopup(popup);
+    }
+  }
+});
+
 
     atendimentos.forEach(a => {
       if (a.latitude && a.longitude) {
