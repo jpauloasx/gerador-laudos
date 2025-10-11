@@ -158,31 +158,55 @@ campos_chuvas = [
 def chuvas():
     if not session.get("logado"):
         return redirect(url_for("login"))
+
     if request.method == "POST":
         try:
-            contexto = {campo[1]: request.form.get(campo[1]) for campo in campos_chuvas}
+            contexto = {campo[1]: request.form.get(campo[1], "") for campo in campos_chuvas}
+            contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco", "")
 
             numero_laudo = processar_laudo(contexto, "chuvas", "modelo_laudo_chuvas.docx")
 
             if numero_laudo:
-                salvar_atendimento({
+                atendimento = {
                     "origem": "Chuvas",
                     "numero_laudo": numero_laudo,
-                    "bairro": contexto.get("bairro"),
-                    "latitude": contexto.get("latitude"),
-                    "longitude": contexto.get("longitude"),
-                    "data_vistoria": contexto.get("data_vistoria"),
-                    "grau_risco": contexto.get("grau_risco"),
-                    "arquivo": f"uploads/Chuvas_{numero_laudo}.docx",
+                    "bairro": contexto.get("bairro", ""),
+                    "latitude": contexto.get("latitude", ""),
+                    "longitude": contexto.get("longitude", ""),
+                    "data_vistoria": contexto.get("data_vistoria", ""),
+                    "grau_risco": contexto.get("grau_risco", ""),
+                    "arquivo": f"Chuvas_{numero_laudo}.docx",
                     "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-                })
+                }
 
-            return redirect(url_for("atendimentos"))
+                # Garante que o arquivo JSON existe
+                os.makedirs("data", exist_ok=True)
+                if not os.path.exists(DATA_FILE):
+                    with open(DATA_FILE, "w", encoding="utf-8") as f:
+                        json.dump([], f, ensure_ascii=False, indent=2)
+
+                # Salva o atendimento
+                with open(DATA_FILE, "r", encoding="utf-8") as f:
+                    dados = json.load(f)
+
+                dados.append(atendimento)
+
+                with open(DATA_FILE, "w", encoding="utf-8") as f:
+                    json.dump(dados, f, ensure_ascii=False, indent=2)
+
+                print(f"✅ Atendimento salvo no JSON: {atendimento}")
+
+                return redirect(url_for("atendimentos"))
+            else:
+                return "Erro ao gerar o laudo", 500
 
         except Exception as e:
+            print(f"❌ Erro interno em /chuvas: {e}")
             return f"Erro interno: {e}", 500
+
     return render_template("chuvas.html", campos=campos_chuvas)
+
 
 
 @app.route("/regularizacao", methods=["GET", "POST"])
@@ -291,6 +315,7 @@ def dashboard():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
