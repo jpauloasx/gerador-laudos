@@ -78,11 +78,21 @@
                 {% endif %}
               </td>
 
-              <td class="text-center">
-                <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}" class="btn btn-sm btn-primary">
-                  📥 Download
-                </a>
-              </td>
+<td class="text-center">
+  <div class="d-flex justify-content-center gap-2">
+    {% if a.arquivo %}
+      <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}" 
+         class="btn btn-sm btn-primary">
+        📥
+      </a>
+    {% endif %}
+    <form method="POST" action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" 
+          onsubmit="return confirm('Tem certeza que deseja excluir este atendimento?');">
+      <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+    </form>
+  </div>
+</td>
+
             </tr>
             {% else %}
             <tr>
