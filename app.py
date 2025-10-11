@@ -1,24 +1,26 @@
-from flask import Flask, render_template, request, send_file, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
-from datetime import date
-import os,json
-import base64
+from datetime import date, datetime
+import os, json
 from staticmap import StaticMap, CircleMarker
-from datetime import datetime
-
-
 
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
+
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 DATA_FILE = "data/atendimentos.json"
 os.makedirs("data", exist_ok=True)
 
+
+# ==========================================================
+# FUNÇÕES AUXILIARES
+# ==========================================================
+
 def salvar_atendimento(atendimento):
+    """Salva um novo atendimento no JSON"""
     try:
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -35,8 +37,9 @@ def salvar_atendimento(atendimento):
     except Exception as e:
         print(f"❌ Erro ao salvar atendimento: {e}")
 
-# --- Função para gerar mapa OSM ---
+
 def gerar_mapa(lat, lon, caminho_saida):
+    """Gera uma imagem de mapa com base na latitude/longitude"""
     try:
         m = StaticMap(600, 400)
         marker = CircleMarker((float(lon), float(lat)), 'red', 12)
@@ -47,6 +50,11 @@ def gerar_mapa(lat, lon, caminho_saida):
     except Exception as e:
         print("❌ Erro ao gerar mapa OSM:", str(e))
         return None
+
+
+# ==========================================================
+# ROTAS DE AUTENTICAÇÃO
+# ==========================================================
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -60,12 +68,28 @@ def login():
             return render_template("login.html", erro="Usuário ou senha incorretos.")
     return render_template("login.html")
 
+
+@app.route("/logout")
+def logout():
+    session.pop("logado", None)
+    return redirect(url_for("login"))
+
+
+# ==========================================================
+# PÁGINA INICIAL
+# ==========================================================
+
 @app.route("/home")
 def home():
     if not session.get("logado"):
         return redirect(url_for("login"))
     return render_template("home.html")
-# Campos base (usados por ambos)
+
+
+# ==========================================================
+# CAMPOS BASE
+# ==========================================================
+
 campos_base = [
     ("Nº do Laudo", "numero_laudo"),
     ("Solicitação (n° Processo, Ofício, OS, etc)", "n_processo"),
@@ -77,13 +101,45 @@ campos_base = [
     ("Data do relatório", "data_relatorio")
 ]
 
-# Campos adicionais apenas para /chuvas
 campos_chuvas = [
     ("Nome", "nome"),
     ("CPF", "cpf"),
     ("Telefone", "telefone")
 ] + campos_base
 
+
+# ==========================================================
+# FUNÇÃO GENÉRICA DE GERAÇÃO DE LAUDO
+# ==========================================================
+
+def gerar_e_salvar_laudo(tipo, modelo_docx, contexto, imagens):
+    """Gera o .docx, salva e registra o atendimento"""
+    doc = DocxTemplate(modelo_docx)
+    doc.render(contexto)
+
+    numero_laudo = contexto.get("numero_laudo") or datetime.now().strftime("%Y%m%d%H%M%S")
+    nome_arquivo = f"{tipo}_{numero_laudo}.docx"
+    caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
+    doc.save(caminho_saida)
+
+    atendimento = {
+        "tipo": tipo.capitalize(),
+        "numero_laudo": numero_laudo,
+        "bairro": contexto.get("bairro", ""),
+        "latitude": contexto.get("latitude", ""),
+        "longitude": contexto.get("longitude", ""),
+        "grau_risco": contexto.get("grau_risco", ""),
+        "arquivo": caminho_saida,
+        "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    }
+
+    salvar_atendimento(atendimento)
+    return caminho_saida
+
+
+# ==========================================================
+# ROTAS DE LAUDOS
+# ==========================================================
 
 @app.route("/chuvas", methods=["GET", "POST"])
 def chuvas():
@@ -92,23 +148,20 @@ def chuvas():
 
     if request.method == "POST":
         try:
-            doc = DocxTemplate("modelo_laudo_chuvas.docx")
             contexto = {campo[1]: request.form.get(campo[1]) for campo in campos_chuvas}
             contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco")
 
-            # Problemas solo
+            # Solo
             problemas = request.form.getlist("problemas_solo")
             outro = request.form.get("problemas_solo_outro", "").strip()
-            if outro:
-                problemas.append(outro)
+            if outro: problemas.append(outro)
             contexto["problemas_solo"] = ", ".join(problemas)
 
             # Presença cursos
             presenca = request.form.getlist("presenca_cursos")
             cursos = request.form.get("presenca_cursos_outro", "").strip()
-            if cursos:
-                presenca.append(cursos)
+            if cursos: presenca.append(cursos)
             contexto["presenca_cursos"] = ", ".join(presenca)
 
             contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
@@ -116,57 +169,16 @@ def chuvas():
 
             imagens = []
 
-            # --- Gerar mapa automático OSM ---
-            lat = request.form.get("latitude")
-            lon = request.form.get("longitude")
+            # Gerar mapa
+            lat, lon = request.form.get("latitude"), request.form.get("longitude")
             if lat and lon:
-                caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
-                if caminho_mapa:
-                    contexto["imagem1"] = InlineImage(doc, caminho_mapa, width=Mm(100))
+                mapa_path = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
+                if mapa_path:
+                    contexto["imagem1"] = InlineImage(DocxTemplate("modelo_laudo_chuvas.docx"), mapa_path, width=Mm(100))
                     contexto["descricao1"] = "Localização Geográfica"
-                    imagens.append(caminho_mapa)
-                else:
-                    contexto["imagem1"] = ""
-                    contexto["descricao1"] = ""
-            else:
-                contexto["imagem1"] = ""
-                contexto["descricao1"] = ""
 
-            # --- Imagens 2 a 7 (upload manual) ---
-            for i in range(2, 8):
-                arquivo = request.files.get(f"imagem{i}")
-                desc = request.form.get(f"descricao{i}", "")
-                contexto[f"descricao{i}"] = desc
-
-                if arquivo and arquivo.filename:
-                    caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
-                    arquivo.save(caminho)
-                    imagens.append(caminho)
-                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
-                else:
-                    contexto[f"imagem{i}"] = ""
-
-            # --- Finalizar Word ---
-            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
-            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
-
-            doc.render(contexto)
-            doc.save(caminho_saida)
-
-            # Após gerar o laudo DOCX com sucesso:
-            atendimento = {
-                "rota": "chuvas",
-                "latitude": request.form.get("latitude", ""),
-                "longitude": request.form.get("longitude", ""),
-                "bairro": request.form.get("bairro", ""),
-                "data_vistoria": request.form.get("data_vistoria", ""),
-                "grau_risco": request.form.get("grau_risco", ""),
-                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-                }
-
-            salvar_atendimento(atendimento)
-
-            return send_file(caminho_saida, as_attachment=True)
+            caminho_saida = gerar_e_salvar_laudo("chuvas", "modelo_laudo_chuvas.docx", contexto, imagens)
+            return redirect(url_for("atendimentos"))
 
         except Exception as e:
             return f"Erro interno: {e}", 500
@@ -181,81 +193,12 @@ def regularizacao():
 
     if request.method == "POST":
         try:
-            doc = DocxTemplate("modelo_laudo_reg.docx")
             contexto = {campo[1]: request.form.get(campo[1]) for campo in campos_base}
             contexto["ano"] = date.today().year
             contexto["grau_risco"] = request.form.get("grau_risco")
 
-            # Problemas solo
-            problemas = request.form.getlist("problemas_solo")
-            outro = request.form.get("problemas_solo_outro", "").strip()
-            if outro:
-                problemas.append(outro)
-            contexto["problemas_solo"] = ", ".join(problemas)
-
-            # Presença cursos
-            presenca = request.form.getlist("presenca_cursos")
-            cursos = request.form.get("presenca_cursos_outro", "").strip()
-            if cursos:
-                presenca.append(cursos)
-            contexto["presenca_cursos"] = ", ".join(presenca)
-
-            contexto["sinais_instabilidade"] = ", ".join(request.form.getlist("sinais_instabilidade"))
-            contexto["fatores_risco"] = ", ".join(request.form.getlist("fatores_risco"))
-
-            imagens = []
-
-            # --- Gerar mapa automático OSM ---
-            lat = request.form.get("latitude")
-            lon = request.form.get("longitude")
-            if lat and lon:
-                caminho_mapa = gerar_mapa(lat, lon, os.path.join(UPLOAD_FOLDER, "mapa.png"))
-                if caminho_mapa:
-                    contexto["imagem1"] = InlineImage(doc, caminho_mapa, width=Mm(100))
-                    contexto["descricao1"] = "Localização Geográfica"
-                    imagens.append(caminho_mapa)
-                else:
-                    contexto["imagem1"] = ""
-                    contexto["descricao1"] = ""
-            else:
-                contexto["imagem1"] = ""
-                contexto["descricao1"] = ""
-
-            # --- Imagens 2 a 7 (upload manual) ---
-            for i in range(2, 8):
-                arquivo = request.files.get(f"imagem{i}")
-                desc = request.form.get(f"descricao{i}", "")
-                contexto[f"descricao{i}"] = desc
-
-                if arquivo and arquivo.filename:
-                    caminho = os.path.join(UPLOAD_FOLDER, f"imagem{i}.jpg")
-                    arquivo.save(caminho)
-                    imagens.append(caminho)
-                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
-                else:
-                    contexto[f"imagem{i}"] = ""
-
-            # --- Finalizar Word ---
-            nome_arquivo = f"Laudo_{contexto['numero_laudo']}-{contexto['ano']}.docx"
-            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
-
-            doc.render(contexto)
-            doc.save(caminho_saida)
-
-            # --- Registrar atendimento ---
-            atendimento = {
-                "origem": "Regularização Fundiária",
-                "numero_laudo": contexto.get("numero_laudo"),
-                "latitude": contexto.get("latitude"),
-                "longitude": contexto.get("longitude"),
-                "bairro": contexto.get("bairro"),
-                "data_vistoria": contexto.get("data_vistoria"),
-                "grau_risco": contexto.get("grau_risco"),
-                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
-                }
-            salvar_atendimento(atendimento)
-
-            return send_file(caminho_saida, as_attachment=True)
+            caminho_saida = gerar_e_salvar_laudo("regularizacao", "modelo_laudo_reg.docx", contexto, [])
+            return redirect(url_for("atendimentos"))
 
         except Exception as e:
             return f"Erro interno: {e}", 500
@@ -270,77 +213,26 @@ def incendios():
 
     if request.method == "POST":
         try:
-            doc = DocxTemplate("modelo_laudo_incendio.docx")
-            contexto = {}
-            def formatar_data(data_str):
-                if data_str:  # se não estiver vazio
-                    return datetime.strptime(data_str, "%Y-%m-%d").strftime("%d/%m/%Y")
-                return ""
-
-
-                
-            # Campos principais
-            
-            contexto["n_os"] = request.form.get("n_os")
-            contexto["origem_ocorrencia"] = request.form.get("origem_ocorrencia")
-            contexto["n_ocorrencia"] = request.form.get("n_ocorrencia")
-            contexto["equipe"] = ", ".join(request.form.getlist("equipe"))
-            contexto["endereco"] = request.form.get("endereco")
-            contexto["bairro"] = request.form.get("bairro")
-            contexto["cep"] = request.form.get("cep")
-            contexto["descricao"] = request.form.get("descricao")
-            contexto["nome"] = request.form.get("nome")
-            contexto["email"] = request.form.get("email")
-            contexto["relato"] = request.form.get("relato")
-            contexto["recomendacoes"] = request.form.get("recomendacoes")
-            contexto["data_ocorrencia"] = formatar_data(request.form.get("data_ocorrencia"))
-            contexto["data_vistoria"] = formatar_data(request.form.get("data_vistoria"))
-            contexto["data_fim"] = formatar_data(request.form.get("data_fim"))
-            
-
-            # Imagens
-            for i in range(1, 5):
-                arquivo = request.files.get(f"imagem{i}")
-                desc = request.form.get(f"descricao{i}", "")
-                contexto[f"descricao{i}"] = desc
-
-                if arquivo and arquivo.filename:
-                    caminho = os.path.join(UPLOAD_FOLDER, f"incendio_imagem{i}.jpg")
-                    arquivo.save(caminho)
-                    contexto[f"imagem{i}"] = InlineImage(doc, caminho, width=Mm(100))
-                else:
-                    contexto[f"imagem{i}"] = ""
-
-            # Gerar documento
-            nome_arquivo = f"Incendio_{contexto['n_ocorrencia']}.docx"
-            caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
-
-            doc.render(contexto)
-            doc.save(caminho_saida)
-
-            # --- Registrar atendimento ---
-            atendimento = {
-                "origem": "Incêndios",
-                "numero_laudo": contexto.get("numero_laudo"),
-                "latitude": contexto.get("latitude"),
-                "longitude": contexto.get("longitude"),
-                "bairro": contexto.get("bairro"),
-                "data_vistoria": contexto.get("data_vistoria"),
-                "grau_risco": contexto.get("grau_risco"),
-                "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M")
+            contexto = {
+                "n_ocorrencia": request.form.get("n_ocorrencia"),
+                "bairro": request.form.get("bairro"),
+                "latitude": request.form.get("latitude"),
+                "longitude": request.form.get("longitude"),
+                "data_vistoria": request.form.get("data_vistoria"),
             }
-            salvar_atendimento(atendimento)
 
-            return send_file(caminho_saida, as_attachment=True)
+            caminho_saida = gerar_e_salvar_laudo("incendios", "modelo_laudo_incendio.docx", contexto, [])
+            return redirect(url_for("atendimentos"))
 
         except Exception as e:
             return f"Erro interno: {e}", 500
 
     return render_template("incendios.html")
 
-@app.route("/equipes")
-def equipes():
-    return "📌 Página de Equipes (em construção)"
+
+# ==========================================================
+# ROTA DE ATENDIMENTOS
+# ==========================================================
 
 @app.route("/atendimentos")
 def atendimentos():
@@ -359,22 +251,23 @@ def atendimentos():
 
     return render_template("atendimentos.html", atendimentos=atendimentos)
 
-@app.route("/dashboard")
-def dashboard():
-    return "📌 Página de Dashboard (em construção)"
+
+@app.route("/download/<path:filename>")
+def download(filename):
+    """Permite baixar o DOCX pelo botão da lista"""
+    try:
+        return send_file(filename, as_attachment=True)
+    except Exception as e:
+        return f"Erro ao baixar arquivo: {e}", 500
 
 
-@app.route("/logout")
-def logout():
-    session.pop("logado", None)
-    return redirect(url_for("login"))
-
-
+# ==========================================================
+# MAIN
+# ==========================================================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
 
 
 
