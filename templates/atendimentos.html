@@ -2,45 +2,62 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Atendimentos</title>
+  <title>Atendimentos Realizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-8">
-  <div class="max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
-    <h1 class="text-2xl font-bold mb-4 text-gray-700">📋 Atendimentos Realizados</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-red-700 text-white py-4 shadow-md">
+    <h1 class="text-center text-2xl font-semibold">📋 Atendimentos Realizados</h1>
+  </header>
+
+  <main class="flex-grow p-6">
     {% if atendimentos %}
-      <table class="min-w-full table-auto border-collapse">
-        <thead class="bg-blue-600 text-white">
-          <tr>
-            <th class="px-4 py-2 text-left">Origem</th>
-            <th class="px-4 py-2 text-left">Nº Laudo</th>
-            <th class="px-4 py-2 text-left">Latitude</th>
-            <th class="px-4 py-2 text-left">Longitude</th>
-            <th class="px-4 py-2 text-left">Bairro</th>
-            <th class="px-4 py-2 text-left">Data Vistoria</th>
-            <th class="px-4 py-2 text-left">Grau de Risco</th>
-            <th class="px-4 py-2 text-left">Registrado em</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in atendimentos %}
-          <tr class="border-b hover:bg-gray-50">
-            <td class="px-4 py-2">{{ a.origem }}</td>
-            <td class="px-4 py-2">{{ a.numero_laudo or '-' }}</td>
-            <td class="px-4 py-2">{{ a.latitude or '-' }}</td>
-            <td class="px-4 py-2">{{ a.longitude or '-' }}</td>
-            <td class="px-4 py-2">{{ a.bairro or '-' }}</td>
-            <td class="px-4 py-2">{{ a.data_vistoria or '-' }}</td>
-            <td class="px-4 py-2">{{ a.grau_risco or '-' }}</td>
-            <td class="px-4 py-2 text-sm text-gray-500">{{ a.data_registro }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-lg">
+          <thead class="bg-gray-200 text-gray-700 uppercase text-sm">
+            <tr>
+              <th class="py-3 px-4 text-left">Rota</th>
+              <th class="py-3 px-4 text-left">Nº do Laudo</th>
+              <th class="py-3 px-4 text-left">Latitude</th>
+              <th class="py-3 px-4 text-left">Longitude</th>
+              <th class="py-3 px-4 text-left">Bairro</th>
+              <th class="py-3 px-4 text-left">Data da Vistoria</th>
+              <th class="py-3 px-4 text-left">Grau de Risco</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-800">
+            {% for a in atendimentos %}
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-2 px-4 font-medium text-red-700">{{ a.rota }}</td>
+              <td class="py-2 px-4">{{ a.numero_laudo or "-" }}</td>
+              <td class="py-2 px-4">{{ a.latitude or "-" }}</td>
+              <td class="py-2 px-4">{{ a.longitude or "-" }}</td>
+              <td class="py-2 px-4">{{ a.bairro or "-" }}</td>
+              <td class="py-2 px-4">{{ a.data_vistoria or "-" }}</td>
+              <td class="py-2 px-4">
+                {% if a.grau_risco == "Alto" %}
+                  <span class="px-2 py-1 bg-red-100 text-red-700 rounded-md font-semibold">{{ a.grau_risco }}</span>
+                {% elif a.grau_risco == "Médio" %}
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md font-semibold">{{ a.grau_risco }}</span>
+                {% elif a.grau_risco == "Baixo" %}
+                  <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md font-semibold">{{ a.grau_risco }}</span>
+                {% else %}
+                  {{ a.grau_risco or "-" }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     {% else %}
-      <p class="text-gray-500">Nenhum atendimento registrado.</p>
+      <p class="text-center text-gray-600 mt-10 text-lg">Nenhum atendimento registrado até o momento.</p>
     {% endif %}
-  </div>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-200 text-center py-3">
+    Defesa Civil - Sistema de Laudos © {{ now().year }}
+  </footer>
 </body>
 </html>
-
