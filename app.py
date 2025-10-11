@@ -339,16 +339,6 @@ def atendimentos():
     return render_template("atendimentos.html", atendimentos=atendimentos, atendimentos_json=json.dumps(atendimentos, ensure_ascii=False))
 
 
-@app.route("/equipes")
-def equipes():
-    return "📌 Página de Equipes (em construção)"
-
-
-@app.route("/dashboard")
-def dashboard():
-    return "📊 Página de Dashboard (em construção)"
-
-
 @app.route("/download/<nome_arquivo>")
 def download_arquivo(nome_arquivo):
     """Permite baixar qualquer laudo salvo em /uploads"""
@@ -361,6 +351,37 @@ def download_arquivo(nome_arquivo):
         print(f"❌ Erro ao baixar arquivo: {e}")
         return f"Erro ao baixar arquivo: {e}", 500
 
+@app.route("/excluir_atendimento/<numero_laudo>", methods=["POST"])
+def excluir_atendimento(numero_laudo):
+    """Exclui um atendimento do arquivo JSON com base no número do laudo"""
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                dados = json.load(f)
+        else:
+            dados = []
+
+        # Filtra todos que NÃO têm o número_laudo informado
+        novos_dados = [a for a in dados if str(a.get("numero_laudo")) != str(numero_laudo)]
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(novos_dados, f, ensure_ascii=False, indent=2)
+
+        print(f"🗑️ Atendimento {numero_laudo} removido com sucesso.")
+        return redirect(url_for("atendimentos"))
+
+    except Exception as e:
+        print(f"❌ Erro ao excluir atendimento: {e}")
+        return "Erro ao excluir atendimento", 500
+
+@app.route("/equipes")
+def equipes():
+    return "📌 Página de Equipes (em construção)"
+
+
+@app.route("/dashboard")
+def dashboard():
+    return "📊 Página de Dashboard (em construção)"
 
 # =====================================================
 # 🔹 Inicialização
@@ -368,6 +389,7 @@ def download_arquivo(nome_arquivo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
