@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, jsonify, send_file
 from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 from datetime import date, datetime
@@ -328,6 +328,7 @@ def download_arquivo(nome_arquivo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
