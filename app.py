@@ -51,7 +51,7 @@ def gerar_mapa(lat, lon, caminho_saida):
 
 
 def processar_laudo(contexto, tipo, modelo_docx):
-    """Gera o arquivo DOCX e salva no diretório uploads"""
+    """Gera o arquivo DOCX, salva no diretório uploads e registra o atendimento"""
     try:
         doc = DocxTemplate(modelo_docx)
         os.makedirs("uploads", exist_ok=True)
@@ -62,7 +62,7 @@ def processar_laudo(contexto, tipo, modelo_docx):
             numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
             contexto["numero_laudo"] = numero_laudo
 
-        # Mapa
+        # Gera mapa se houver lat/lon
         lat, lon = contexto.get("latitude"), contexto.get("longitude")
         if lat and lon:
             caminho_mapa = os.path.join("uploads", f"mapa_{numero_laudo}.png")
@@ -86,14 +86,29 @@ def processar_laudo(contexto, tipo, modelo_docx):
             else:
                 contexto[f"imagem{i}"] = ""
 
-        # Finaliza documento
+        # Gera o documento final
         contexto["ano"] = date.today().year
         nome_arquivo = f"{tipo.capitalize()}_{numero_laudo}.docx"
         caminho_saida = os.path.join("uploads", nome_arquivo)
         doc.render(contexto)
         doc.save(caminho_saida)
 
-        print(f"✅ Laudo gerado: {caminho_saida}")
+        # --- NOVO: salvar registro em atendimentos.json ---
+        atendimento = {
+            "origem": tipo.capitalize(),
+            "numero_laudo": numero_laudo,
+            "bairro": contexto.get("bairro"),
+            "latitude": contexto.get("latitude"),
+            "longitude": contexto.get("longitude"),
+            "data_vistoria": contexto.get("data_vistoria"),
+            "grau_risco": contexto.get("grau_risco"),
+            "arquivo": nome_arquivo,
+            "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        }
+
+        salvar_atendimento(atendimento)
+        print(f"✅ Atendimento salvo: {numero_laudo}")
+
         return numero_laudo
 
     except Exception as e:
@@ -389,6 +404,7 @@ def dashboard():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
