@@ -19,7 +19,9 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Banco de dados SQLite
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/atendimentos.db"
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(BASE_DIR, "atendimentos.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 os.makedirs("data", exist_ok=True)
 
@@ -288,6 +290,7 @@ def atendimentos():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
