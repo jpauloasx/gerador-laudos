@@ -18,11 +18,14 @@ os.makedirs("data", exist_ok=True)
 # 🔹 Funções auxiliares
 # =====================================================
 def salvar_atendimento(atendimento):
-    """Salva o registro do atendimento em atendimentos.json"""
     try:
+        os.makedirs("data", exist_ok=True)
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r", encoding="utf-8") as f:
-                dados = json.load(f)
+                try:
+                    dados = json.load(f)
+                except json.JSONDecodeError:
+                    dados = []
         else:
             dados = []
 
@@ -31,7 +34,6 @@ def salvar_atendimento(atendimento):
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
-        print(f"✅ Atendimento salvo: {atendimento.get('numero_laudo', 'sem número')}")
     except Exception as e:
         print(f"❌ Erro ao salvar atendimento: {e}")
 
@@ -404,6 +406,7 @@ def dashboard():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
