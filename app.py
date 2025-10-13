@@ -353,7 +353,11 @@ def atendimentos():
         print("❌ Erro ao ler atendimentos:", e)
         atendimentos = []
 
-    return render_template("atendimentos.html", atendimentos=atendimentos, atendimentos_json=json.dumps(atendimentos, ensure_ascii=False))
+    return render_template(
+    "atendimentos.html",
+    atendimentos=atendimentos,
+    atendimentos_json=json.dumps(atendimentos, ensure_ascii=False)
+)
 
 
 @app.route("/download/<nome_arquivo>")
@@ -406,6 +410,7 @@ def dashboard():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
