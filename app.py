@@ -322,10 +322,15 @@ def dashboard():
 
 @app.route("/painel")
 def painel():
-    # Lê os atendimentos do JSON
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        atendimentos = json.load(f)
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            atendimentos = json.load(f)
+    except Exception:
+        atendimentos = []
     return render_template("painel.html", atendimentos=atendimentos)
+
 
 
 # ==========================================================
@@ -465,6 +470,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
