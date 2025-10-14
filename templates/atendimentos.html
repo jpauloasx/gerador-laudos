@@ -8,9 +8,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body class="bg-gray-100">
 
   <div class="max-w-7xl mx-auto p-6">
+    <!-- TOPO -->
     <div class="flex justify-between items-center mb-4">
       <div class="flex space-x-2">
         <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">🏠 Início</a>
@@ -19,8 +21,12 @@
       <button id="btnInserir" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">➕ Inserir</button>
     </div>
 
-    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Atendimentos Registrados</h2>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800">Atendimentos Registrados</h2>
+      <span class="text-gray-600 text-sm">📋 Total: {{ atendimentos|length }} registros</span>
+    </div>
 
+    <!-- TABELA -->
     <div class="overflow-x-auto bg-white rounded-xl shadow">
       <table class="min-w-full border-collapse">
         <thead class="bg-gray-50 text-gray-700 text-sm">
@@ -35,9 +41,10 @@
             <th class="px-4 py-2 text-center">Ações</th>
           </tr>
         </thead>
+
         <tbody class="text-sm text-gray-700">
           {% for a in atendimentos %}
-          <tr class="border-t">
+          <tr class="border-t hover:bg-gray-50">
             <td class="px-4 py-2">{{ a.origem }}</td>
             <td class="px-4 py-2">{{ a.numero_laudo }}</td>
             <td class="px-4 py-2">{{ a.bairro }}</td>
@@ -45,18 +52,19 @@
             <td class="px-4 py-2">{{ a.longitude }}</td>
             <td class="px-4 py-2">{{ a.data_vistoria }}</td>
 
-            <!-- Coluna de risco com cor -->
+            <!-- GRAU DE RISCO COLORIDO -->
             <td class="px-4 py-2">
               {% if a.grau_risco %}
-                {% if "MUITO ALTO" in a.grau_risco.upper() %}
+                {% set risco = a.grau_risco.upper() %}
+                {% if "MUITO ALTO" in risco %}
                   <span class="px-2 py-1 rounded bg-red-600 text-white font-semibold">{{ a.grau_risco }}</span>
-                {% elif "ALTO" in a.grau_risco.upper() %}
+                {% elif "ALTO" in risco %}
                   <span class="px-2 py-1 rounded bg-orange-500 text-white font-semibold">{{ a.grau_risco }}</span>
-                {% elif "MÉDIO" in a.grau_risco.upper() %}
+                {% elif "MÉDIO" in risco %}
                   <span class="px-2 py-1 rounded bg-yellow-400 text-gray-800 font-semibold">{{ a.grau_risco }}</span>
-                {% elif "BAIXO" in a.grau_risco.upper() %}
+                {% elif "BAIXO" in risco %}
                   <span class="px-2 py-1 rounded bg-green-600 text-white font-semibold">{{ a.grau_risco }}</span>
-                {% elif "MUITO BAIXO" in a.grau_risco.upper() %}
+                {% elif "MUITO BAIXO" in risco %}
                   <span class="px-2 py-1 rounded bg-green-300 text-gray-800 font-semibold">{{ a.grau_risco }}</span>
                 {% else %}
                   {{ a.grau_risco }}
@@ -66,25 +74,26 @@
               {% endif %}
             </td>
 
-           <td class="px-4 py-2 text-center flex justify-center space-x-2">
-  {% if a.arquivo %}
-    <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}"
-       class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
-       ⬇️ Download
-    </a>
-  {% endif %}
-
-  <form action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" method="POST" onsubmit="return confirm('Excluir este atendimento?')">
-    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Excluir</button>
-  </form>
-</td>
-
+            <!-- AÇÕES -->
+            <td class="px-4 py-2 text-center flex justify-center space-x-2">
+              {% if a.arquivo %}
+                <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}"
+                   class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded" target="_blank">
+                   ⬇️ Download
+                </a>
+              {% endif %}
+              <form action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" method="POST"
+                    onsubmit="return confirm('Excluir este atendimento?')">
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Excluir</button>
+              </form>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
+    <!-- MAPA -->
     <div id="painelMapa" class="hidden mt-6 h-[600px] rounded-xl overflow-hidden shadow"></div>
   </div>
 
@@ -150,7 +159,7 @@
     const btnInserir = document.getElementById("btnInserir");
     const cancelar = document.getElementById("cancelarInserir");
 
-    // Painel Leaflet
+    // PAINEL MAPA
     btnPainel.addEventListener("click", () => {
       mapa.classList.toggle("hidden");
       if (!mapa._inicializado) {
@@ -170,32 +179,28 @@
           else if (risco.includes("MUITO BAIXO")) color = "#b7f7b7";
 
           const marker = L.circleMarker([a.latitude, a.longitude], {
-  color,
-  radius: 8,
-  fillOpacity: 0.9
-}).addTo(map);
+            color,
+            radius: 8,
+            fillOpacity: 0.9
+          }).addTo(map);
 
-const risco = a.grau_risco || "-";
-const popup = `
-  <div style="font-size:14px; line-height:1.4">
-    <b>${a.origem}</b><br>
-    📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
-    🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
-    ⚠️ <b>Risco:</b> ${risco}<br>
-    🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
-    ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
-  </div>
-`;
-
-marker.bindPopup(popup);
-
+          const popup = `
+            <div style="font-size:14px; line-height:1.4">
+              <b>${a.origem}</b><br>
+              📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
+              🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
+              ⚠️ <b>Risco:</b> ${risco}<br>
+              🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
+              ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
+            </div>`;
+          marker.bindPopup(popup);
         });
 
         mapa._inicializado = true;
       }
     });
 
-    // Modal Inserção Manual
+    // MODAL INSERÇÃO
     btnInserir.onclick = () => modal.classList.remove("hidden");
     cancelar.onclick = () => modal.classList.add("hidden");
 
@@ -218,8 +223,5 @@ marker.bindPopup(popup);
       }
     });
   </script>
-
 </body>
 </html>
-
-
