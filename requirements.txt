@@ -4,4 +4,5 @@ python-docx
 requests
 staticmap
 Pillow
+PyGithub
 flask_sqlalchemy
