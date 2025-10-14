@@ -161,6 +161,19 @@
     });
 
     window.onload = initMap;
+
+    // Atualização automática a cada 60 segundos
+setInterval(async () => {
+  try {
+    const res = await fetch("/painel_dados"); // nova rota que devolve o JSON de atendimentos
+    if (!res.ok) return;
+    const dadosAtualizados = await res.json();
+    renderMarkers(dadosAtualizados);
+    console.log("🔄 Painel atualizado automaticamente");
+  } catch (e) {
+    console.warn("Falha ao atualizar painel:", e);
+  }
+}, 60000);
   </script>
 </body>
 </html>
