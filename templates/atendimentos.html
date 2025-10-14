@@ -5,8 +5,6 @@
   <title>Atendimentos - Defesa Civil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -16,7 +14,7 @@
     <div class="flex justify-between items-center mb-4">
       <div class="flex space-x-2">
         <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">🏠 Início</a>
-        <button id="btnPainel" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">🗺️ Painel</button>
+        <a href="{{ url_for('painel') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">🗺️ Painel</a>
       </div>
       <button id="btnInserir" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">➕ Inserir</button>
     </div>
@@ -92,9 +90,6 @@
         </tbody>
       </table>
     </div>
-
-    <!-- MAPA -->
-    <div id="painelMapa" class="hidden mt-6 h-[600px] rounded-xl overflow-hidden shadow"></div>
   </div>
 
   <!-- MODAL INSERÇÃO MANUAL -->
@@ -152,55 +147,10 @@
 
   <!-- SCRIPT -->
   <script>
-    const atendimentos = {{ atendimentos_json|safe }};
-    const btnPainel = document.getElementById("btnPainel");
-    const mapa = document.getElementById("painelMapa");
     const modal = document.getElementById("modalInserir");
     const btnInserir = document.getElementById("btnInserir");
     const cancelar = document.getElementById("cancelarInserir");
 
-    // PAINEL MAPA
-    btnPainel.addEventListener("click", () => {
-      mapa.classList.toggle("hidden");
-      if (!mapa._inicializado) {
-        const map = L.map("painelMapa").setView([-15.6, -56.1], 6);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
-        }).addTo(map);
-
-        atendimentos.forEach(a => {
-          if (!a.latitude || !a.longitude) return;
-          let color = "gray";
-          const risco = (a.grau_risco || "").toUpperCase();
-          if (risco.includes("MUITO ALTO")) color = "red";
-          else if (risco.includes("ALTO")) color = "orange";
-          else if (risco.includes("MÉDIO")) color = "yellow";
-          else if (risco.includes("BAIXO")) color = "green";
-          else if (risco.includes("MUITO BAIXO")) color = "#b7f7b7";
-
-          const marker = L.circleMarker([a.latitude, a.longitude], {
-            color,
-            radius: 8,
-            fillOpacity: 0.9
-          }).addTo(map);
-
-          const popup = `
-            <div style="font-size:14px; line-height:1.4">
-              <b>${a.origem}</b><br>
-              📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
-              🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
-              ⚠️ <b>Risco:</b> ${risco}<br>
-              🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
-              ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
-            </div>`;
-          marker.bindPopup(popup);
-        });
-
-        mapa._inicializado = true;
-      }
-    });
-
-    // MODAL INSERÇÃO
     btnInserir.onclick = () => modal.classList.remove("hidden");
     cancelar.onclick = () => modal.classList.add("hidden");
 
