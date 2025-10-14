@@ -6,3 +6,4 @@ staticmap
 Pillow
 PyGithub
 flask_sqlalchemy
+jsonify
