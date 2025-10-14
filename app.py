@@ -374,7 +374,7 @@ def incendios():
     return render_template("incendios.html")
 
 # ==========================================================
-# LISTAGEM / MAPA / DOWNLOAD / EXCLUIR
+# LISTAGEM / MAPA / DOWNLOAD / EXCLUIR / INSERIR 
 # ==========================================================
 @app.route("/atendimentos")
 def atendimentos():
@@ -419,12 +419,45 @@ def excluir_atendimento(numero_laudo):
         print(f"❌ Erro ao excluir {numero_laudo}: {e}")
         return "Erro ao excluir atendimento.", 500
 
+@app.route("/inserir_atendimento", methods=["POST"])
+def inserir_atendimento():
+    """
+    Insere manualmente um atendimento já realizado (sem gerar laudo).
+    """
+    try:
+        dados = request.get_json()
+        numero_laudo = dados.get("numero_laudo", "").strip()
+        if not numero_laudo:
+            return "Número de laudo obrigatório.", 400
+
+        atendimento = {
+            "origem": dados.get("origem", "Manual"),
+            "numero_laudo": numero_laudo,
+            "bairro": dados.get("bairro", ""),
+            "latitude": dados.get("latitude", ""),
+            "longitude": dados.get("longitude", ""),
+            "data_vistoria": dados.get("data_vistoria", ""),
+            "grau_risco": dados.get("grau_risco", ""),
+            "arquivo": "",
+            "arquivo_github": "",
+            "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        }
+
+        adicionar_atendimento_e_sincronizar(atendimento)
+        return {"status": "ok"}, 200
+
+    except Exception as e:
+        print(f"❌ Erro ao inserir atendimento manual: {e}")
+        return "Erro interno.", 500
+
+
 # ==========================================================
 # RUN
 # ==========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
