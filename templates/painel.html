@@ -7,55 +7,88 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #painelMapa {
+      width: 100%;
+      height: 100vh;
+    }
+    /* Filtros flutuantes */
+    .filtros-flutuantes {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 280px;
+    }
+    .filtros-flutuantes label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+    .leaflet-popup-content {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100">
-  <div class="max-w-7xl mx-auto p-6">
-    <!-- TOPO -->
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex space-x-2">
-        <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">🏠 Início</a>
-        <a href="{{ url_for('atendimentos') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">📋 Atendimentos</a>
-      </div>
-      <h2 class="text-2xl font-semibold text-gray-800">🗺️ Painel de Atendimentos</h2>
+<body>
+
+  <!-- FILTROS FLUTUANTES -->
+  <div class="filtros-flutuantes space-y-2">
+    <div class="flex justify-between items-center">
+      <h2 class="font-semibold text-gray-800 text-lg">🗺️ Painel</h2>
+      <a href="{{ url_for('atendimentos') }}" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-1 rounded">← Voltar</a>
     </div>
 
-    <!-- FILTROS -->
-    <div class="bg-white shadow rounded-xl p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-      <div>
-        <label class="block text-sm font-medium text-gray-600">Tipo</label>
-        <select id="filtroTipo" class="w-full border rounded p-2">
-          <option value="">Todos</option>
-          <option>Chuvas</option>
-          <option>Regularização</option>
-          <option>Incêndios</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-600">Bairro</label>
-        <input id="filtroBairro" type="text" class="w-full border rounded p-2" placeholder="Ex: Centro">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-600">Grau de Risco</label>
-        <select id="filtroRisco" class="w-full border rounded p-2">
-          <option value="">Todos</option>
-          <option>MUITO BAIXO</option>
-          <option>BAIXO</option>
-          <option>MÉDIO</option>
-          <option>ALTO</option>
-          <option>MUITO ALTO</option>
-        </select>
-      </div>
-      <div class="flex items-end justify-end">
-        <button id="btnFiltrar" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🔍 Filtrar</button>
-      </div>
+    <div>
+      <label for="filtroTipo">Tipo</label>
+      <select id="filtroTipo" class="w-full border rounded p-1 text-sm">
+        <option value="">Todos</option>
+        <option>Chuvas</option>
+        <option>Regularização</option>
+        <option>Incêndios</option>
+      </select>
     </div>
 
-    <!-- MAPA -->
-    <div id="painelMapa" class="h-[900px] rounded-xl overflow-hidden shadow bg-white"></div>
+    <div>
+      <label for="filtroBairro">Bairro</label>
+      <input id="filtroBairro" type="text" placeholder="Ex: Centro" class="w-full border rounded p-1 text-sm">
+    </div>
+
+    <div>
+      <label for="filtroRisco">Grau de Risco</label>
+      <select id="filtroRisco" class="w-full border rounded p-1 text-sm">
+        <option value="">Todos</option>
+        <option>MUITO BAIXO</option>
+        <option>BAIXO</option>
+        <option>MÉDIO</option>
+        <option>ALTO</option>
+        <option>MUITO ALTO</option>
+      </select>
+    </div>
+
+    <div class="flex justify-between mt-2">
+      <button id="btnFiltrar" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">🔍 Filtrar</button>
+      <button id="btnLimpar" class="bg-gray-400 hover:bg-gray-500 text-white px-2 py-1 rounded text-sm">♻️ Limpar</button>
+    </div>
+
+    <p id="contador" class="text-xs text-gray-500 mt-2">Exibindo todos os atendimentos</p>
   </div>
 
-  <!-- SCRIPT -->
+  <!-- MAPA -->
+  <div id="painelMapa"></div>
+
   <script>
     const atendimentos = {{ atendimentos|tojson }};
     let map, markers = [];
@@ -90,17 +123,18 @@
         }).addTo(map);
 
         const popup = `
-          <div style="font-size:14px; line-height:1.4">
-            <b>${a.origem}</b><br>
-            📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
-            🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
-            ⚠️ <b>Risco:</b> ${risco}<br>
-            🌐 <b>Coords:</b> ${a.latitude}, ${a.longitude}<br>
-            ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
-          </div>`;
+          <b>${a.origem}</b><br>
+          📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
+          🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
+          ⚠️ <b>Risco:</b> ${risco}<br>
+          🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
+          ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
+        `;
         marker.bindPopup(popup);
         markers.push(marker);
       });
+
+      document.getElementById("contador").textContent = `Exibindo ${lista.length} atendimentos`;
     }
 
     // FILTRAR
@@ -116,6 +150,14 @@
       });
 
       renderMarkers(filtrados);
+    });
+
+    // LIMPAR FILTROS
+    document.getElementById("btnLimpar").addEventListener("click", () => {
+      document.getElementById("filtroTipo").value = "";
+      document.getElementById("filtroBairro").value = "";
+      document.getElementById("filtroRisco").value = "";
+      renderMarkers(atendimentos);
     });
 
     window.onload = initMap;
