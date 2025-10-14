@@ -10,5 +10,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "14/10/2025 19:11:35"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "2",
+    "bairro": "Contorno Leste",
+    "latitude": "-15.612063",
+    "longitude": "-56.103078",
+    "data_vistoria": "10/10/2025",
+    "grau_risco": "ALTO",
+    "arquivo": "Regularizacao_2.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_2.docx",
+    "data_registro": "14/10/2025 19:12:26"
   }
 ]
