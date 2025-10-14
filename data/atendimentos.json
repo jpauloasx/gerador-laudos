@@ -10,5 +10,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "14/10/2025 19:28:47"
+  },
+  {
+    "origem": "Regularização",
+    "numero_laudo": "2",
+    "bairro": "Teste",
+    "latitude": "-15.612063",
+    "longitude": "-56.103078",
+    "data_vistoria": "2025-10-12",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "14/10/2025 19:29:21"
   }
 ]
