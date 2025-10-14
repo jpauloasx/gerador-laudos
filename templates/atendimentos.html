@@ -20,13 +20,15 @@
   <div class="container py-4">
 
     <!-- Cabeçalho -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="text-primary fw-bold">📋 Atendimentos Realizados</h2>
-      <div>
-        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm me-2">🏠 Início</a>
-        <button id="btnPainel" class="btn btn-outline-primary btn-sm">🗺️ Painel</button>
-      </div>
-    </div>
+<div class="flex justify-between items-center mb-4">
+  <div class="flex space-x-2">
+    <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">🏠 Início</a>
+    <button id="btnPainel" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">🗺️ Painel</button>
+  </div>
+
+  <button id="btnInserir" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">➕ Inserir</button>
+</div>
+
 
     <!-- Painel Mapa -->
     <div id="map" class="mb-4 shadow-sm border"></div>
@@ -189,6 +191,88 @@
       if (!visivel) mapa.invalidateSize();
     });
   </script>
+
+
+  <!-- Modal Inserção -->
+<div id="modalInserir" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800">Inserir Atendimento Manualmente</h3>
+    <form id="formInserir" class="space-y-3">
+      <div>
+        <label class="block text-sm font-medium">Tipo</label>
+        <select name="origem" class="w-full border rounded p-2">
+          <option>Chuvas</option>
+          <option>Regularização</option>
+          <option>Incêndios</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Nº Laudo</label>
+        <input type="text" name="numero_laudo" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Bairro</label>
+        <input type="text" name="bairro" class="w-full border rounded p-2">
+      </div>
+      <div class="flex space-x-2">
+        <div class="flex-1">
+          <label class="block text-sm font-medium">Latitude</label>
+          <input type="text" name="latitude" class="w-full border rounded p-2">
+        </div>
+        <div class="flex-1">
+          <label class="block text-sm font-medium">Longitude</label>
+          <input type="text" name="longitude" class="w-full border rounded p-2">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Data Vistoria</label>
+        <input type="date" name="data_vistoria" class="w-full border rounded p-2">
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Grau de Risco</label>
+        <select name="grau_risco" class="w-full border rounded p-2">
+          <option>MUITO BAIXO</option>
+          <option>BAIXO</option>
+          <option>MÉDIO</option>
+          <option>ALTO</option>
+          <option>MUITO ALTO</option>
+        </select>
+      </div>
+      <div class="flex justify-end space-x-2 mt-4">
+        <button type="button" id="cancelarInserir" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("modalInserir");
+  const btnInserir = document.getElementById("btnInserir");
+  const cancelar = document.getElementById("cancelarInserir");
+
+  btnInserir.onclick = () => modal.classList.remove("hidden");
+  cancelar.onclick = () => modal.classList.add("hidden");
+
+  document.getElementById("formInserir").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const dados = Object.fromEntries(formData.entries());
+
+    const res = await fetch("/inserir_atendimento", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados)
+    });
+
+    if (res.ok) {
+      modal.classList.add("hidden");
+      location.reload();
+    } else {
+      alert("Erro ao inserir atendimento.");
+    }
+  });
+</script>
 
 </body>
 </html>
