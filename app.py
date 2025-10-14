@@ -331,6 +331,15 @@ def painel():
         atendimentos = []
     return render_template("painel.html", atendimentos=atendimentos)
 
+@app.route("/painel_dados")
+def painel_dados():
+    """Retorna os atendimentos em JSON para atualização automática do mapa"""
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            atendimentos = json.load(f)
+    except Exception:
+        atendimentos = []
+    return jsonify(atendimentos)
 
 
 # ==========================================================
@@ -470,6 +479,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
