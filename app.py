@@ -320,6 +320,14 @@ def dashboard():
         return redirect(url_for("login"))
     return "📊 Página de Dashboard (em construção)"
 
+@app.route("/painel")
+def painel():
+    # Lê os atendimentos do JSON
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        atendimentos = json.load(f)
+    return render_template("painel.html", atendimentos=atendimentos)
+
+
 # ==========================================================
 # ROTAS DE LAUDO
 # ==========================================================
@@ -457,6 +465,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
