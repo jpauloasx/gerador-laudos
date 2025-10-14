@@ -170,10 +170,25 @@
           else if (risco.includes("MUITO BAIXO")) color = "#b7f7b7";
 
           const marker = L.circleMarker([a.latitude, a.longitude], {
-            color, radius: 8, fillOpacity: 0.9
-          }).addTo(map);
+  color,
+  radius: 8,
+  fillOpacity: 0.9
+}).addTo(map);
 
-          marker.bindPopup(`<b>${a.origem}</b><br>${a.bairro || ""}<br><small>${a.data_vistoria || ""}</small>`);
+const risco = a.grau_risco || "-";
+const popup = `
+  <div style="font-size:14px; line-height:1.4">
+    <b>${a.origem}</b><br>
+    📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
+    🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
+    ⚠️ <b>Risco:</b> ${risco}<br>
+    🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
+    ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
+  </div>
+`;
+
+marker.bindPopup(popup);
+
         });
 
         mapa._inicializado = true;
