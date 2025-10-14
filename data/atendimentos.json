@@ -1,14 +1,1 @@
-[
-  {
-    "origem": "Regularizacao",
-    "numero_laudo": "1",
-    "bairro": "Teste",
-    "latitude": "-15.612063",
-    "longitude": "-56.103078",
-    "data_vistoria": "10/10/2025",
-    "grau_risco": "BAIXO",
-    "arquivo": "Regularizacao_1.docx",
-    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_1.docx",
-    "data_registro": "14/10/2025 12:56:49"
-  }
-]
+[]
