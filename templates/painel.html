@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Atendimentos - Defesa Civil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="bg-gray-100">
+  <div class="max-w-7xl mx-auto p-6">
+    <!-- TOPO -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex space-x-2">
+        <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">🏠 Início</a>
+        <a href="{{ url_for('atendimentos') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded">📋 Atendimentos</a>
+      </div>
+      <h2 class="text-2xl font-semibold text-gray-800">🗺️ Painel de Atendimentos</h2>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="bg-white shadow rounded-xl p-4 mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Tipo</label>
+        <select id="filtroTipo" class="w-full border rounded p-2">
+          <option value="">Todos</option>
+          <option>Chuvas</option>
+          <option>Regularização</option>
+          <option>Incêndios</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Bairro</label>
+        <input id="filtroBairro" type="text" class="w-full border rounded p-2" placeholder="Ex: Centro">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Grau de Risco</label>
+        <select id="filtroRisco" class="w-full border rounded p-2">
+          <option value="">Todos</option>
+          <option>MUITO BAIXO</option>
+          <option>BAIXO</option>
+          <option>MÉDIO</option>
+          <option>ALTO</option>
+          <option>MUITO ALTO</option>
+        </select>
+      </div>
+      <div class="flex items-end justify-end">
+        <button id="btnFiltrar" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">🔍 Filtrar</button>
+      </div>
+    </div>
+
+    <!-- MAPA -->
+    <div id="painelMapa" class="h-[600px] rounded-xl overflow-hidden shadow bg-white"></div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const atendimentos = {{ atendimentos|tojson }};
+    let map, markers = [];
+
+    function initMap() {
+      map = L.map("painelMapa").setView([-15.6, -56.1], 6);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
+      }).addTo(map);
+      renderMarkers(atendimentos);
+    }
+
+    function renderMarkers(lista) {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      lista.forEach(a => {
+        if (!a.latitude || !a.longitude) return;
+
+        let color = "gray";
+        const risco = (a.grau_risco || "").toUpperCase();
+        if (risco.includes("MUITO ALTO")) color = "red";
+        else if (risco.includes("ALTO")) color = "orange";
+        else if (risco.includes("MÉDIO")) color = "yellow";
+        else if (risco.includes("BAIXO")) color = "green";
+        else if (risco.includes("MUITO BAIXO")) color = "#b7f7b7";
+
+        const marker = L.circleMarker([a.latitude, a.longitude], {
+          color,
+          radius: 8,
+          fillOpacity: 0.9
+        }).addTo(map);
+
+        const popup = `
+          <div style="font-size:14px; line-height:1.4">
+            <b>${a.origem}</b><br>
+            📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
+            🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
+            ⚠️ <b>Risco:</b> ${risco}<br>
+            🌐 <b>Coords:</b> ${a.latitude}, ${a.longitude}<br>
+            ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
+          </div>`;
+        marker.bindPopup(popup);
+        markers.push(marker);
+      });
+    }
+
+    // FILTRAR
+    document.getElementById("btnFiltrar").addEventListener("click", () => {
+      const tipo = document.getElementById("filtroTipo").value.toLowerCase();
+      const bairro = document.getElementById("filtroBairro").value.toLowerCase();
+      const risco = document.getElementById("filtroRisco").value.toLowerCase();
+
+      const filtrados = atendimentos.filter(a => {
+        return (!tipo || (a.origem || "").toLowerCase().includes(tipo)) &&
+               (!bairro || (a.bairro || "").toLowerCase().includes(bairro)) &&
+               (!risco || (a.grau_risco || "").toLowerCase().includes(risco));
+      });
+
+      renderMarkers(filtrados);
+    });
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
