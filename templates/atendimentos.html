@@ -66,11 +66,19 @@
               {% endif %}
             </td>
 
-            <td class="px-4 py-2 text-center">
-              <form action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" method="POST" onsubmit="return confirm('Excluir este atendimento?')">
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Excluir</button>
-              </form>
-            </td>
+           <td class="px-4 py-2 text-center flex justify-center space-x-2">
+  {% if a.arquivo %}
+    <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}"
+       class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
+       ⬇️ Download
+    </a>
+  {% endif %}
+
+  <form action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" method="POST" onsubmit="return confirm('Excluir este atendimento?')">
+    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">🗑️ Excluir</button>
+  </form>
+</td>
+
           </tr>
           {% endfor %}
         </tbody>
