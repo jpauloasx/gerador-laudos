@@ -12,18 +12,6 @@
     "data_registro": "18/10/2025 19:14:52"
   },
   {
-    "origem": "Chuvas",
-    "numero_laudo": "129",
-    "bairro": "TESTE",
-    "latitude": "-15.600845",
-    "longitude": "-56.092262",
-    "data_vistoria": "24/09/2025",
-    "grau_risco": "ALTO",
-    "arquivo": "Chuvas_129.docx",
-    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Chuvas_129.docx",
-    "data_registro": "18/10/2025 19:31:09"
-  },
-  {
     "origem": "Regularização",
     "numero_laudo": "125",
     "bairro": "Novo Paraíso II",
