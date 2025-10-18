@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Equipes - Defesa Civil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-8 mt-10">
+    
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-orange-600">👨‍🚒 Cadastro de Equipes</h1>
+      <a href="{{ url_for('home') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow">
+        ⬅️ Voltar
+      </a>
+    </div>
+
+    <form method="POST" class="space-y-4">
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Nome</label>
+        <input type="text" name="nome" class="w-full border rounded-lg p-2 focus:ring focus:ring-orange-200" required>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Matrícula</label>
+        <input type="text" name="matricula" class="w-full border rounded-lg p-2 focus:ring focus:ring-orange-200" required>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Função/Cargo</label>
+        <input type="text" name="funcao" class="w-full border rounded-lg p-2 focus:ring focus:ring-orange-200" required>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow">
+          💾 Salvar
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-8 text-center">
+      <a href="{{ url_for('viaturas') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-lg shadow">
+        🚓 Cadastrar Viaturas
+      </a>
+    </div>
+  </div>
+</body>
+</html>
