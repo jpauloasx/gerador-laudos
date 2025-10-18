@@ -318,7 +318,7 @@ def equipes():
 def dashboard():
     if not session.get("logado"):
         return redirect(url_for("login"))
-    return "📊 Página de Dashboard (em construção)"
+    return render_template("dashboard.html")
 
 @app.route("/painel")
 def painel():
@@ -479,6 +479,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
