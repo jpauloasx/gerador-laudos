@@ -308,11 +308,31 @@ def home():
         return redirect(url_for("login"))
     return render_template("home.html")
 
-@app.route("/equipes")
+@app.route("/equipes", methods=["GET", "POST"])
 def equipes():
     if not session.get("logado"):
         return redirect(url_for("login"))
-    return "📋 Página de Equipes (em construção)"
+    if request.method == "POST":
+        # Aqui pode salvar equipe no banco ou JSON
+        nome = request.form.get("nome")
+        matricula = request.form.get("matricula")
+        funcao = request.form.get("funcao")
+        print(f"👨‍🚒 Nova equipe cadastrada: {nome} ({funcao})")
+    return render_template("equipes.html")
+
+@app.route("/viaturas", methods=["GET", "POST"])
+def viaturas():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+    if request.method == "POST":
+        tipo = request.form.get("tipo")
+        marca = request.form.get("marca")
+        modelo = request.form.get("modelo")
+        prefixo = request.form.get("prefixo")
+        placa = request.form.get("placa")
+        print(f"🚓 Nova viatura cadastrada: {prefixo} - {placa}")
+    return render_template("viaturas.html")
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -479,6 +499,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
