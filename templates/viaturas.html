@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Viaturas - Defesa Civil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-8 mt-10">
+    
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-blue-600">🚓 Cadastro de Viaturas</h1>
+      <a href="{{ url_for('equipes') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow">
+        ⬅️ Voltar
+      </a>
+    </div>
+
+    <form method="POST" class="space-y-4">
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Tipo</label>
+        <select name="tipo" class="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200">
+          <option>Carro</option>
+          <option>Moto</option>
+          <option>Camionete</option>
+          <option>Embarcação</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Marca</label>
+        <input type="text" name="marca" class="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200" required>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Modelo</label>
+        <input type="text" name="modelo" class="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200" required>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Prefixo</label>
+        <input type="text" name="prefixo" class="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200" required>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Placa</label>
+        <input type="text" name="placa" class="w-full border rounded-lg p-2 focus:ring focus:ring-blue-200" required>
+      </div>
+
+      <div class="flex justify-end">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow">
+          💾 Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
