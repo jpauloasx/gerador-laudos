@@ -2,146 +2,168 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <title>📊 Dashboard - Defesa Civil de Cuiabá</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Defesa Civil Cuiabá</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
-  <div class="max-w-7xl mx-auto py-8 px-4">
-    
-    <!-- Header -->
+  <div class="max-w-7xl mx-auto py-6 px-4">
     <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center space-x-4">
-        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="h-14 w-auto" alt="Prefeitura de Cuiabá">
-        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="h-14 w-auto" alt="Defesa Civil Cuiabá">
-      </div>
-      <a href="{{ url_for('home') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded shadow">
-        ⬅️ Início
-      </a>
+      <h1 class="text-3xl font-bold text-gray-800">📊 Painel de Atendimentos</h1>
+      <a href="{{ url_for('home') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-2 rounded">🏠 Início</a>
     </div>
 
-    <h1 class="text-3xl font-bold text-center text-orange-600 mb-10">📊 Dashboard de Atendimentos</h1>
+    <!-- Container dos gráficos -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    <!-- Painel de Resumo -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white shadow-md rounded-xl p-5 text-center">
-        <h3 class="text-gray-600 text-sm">Total de Atendimentos</h3>
-        <p id="totalAtendimentos" class="text-3xl font-bold text-blue-600 mt-2">0</p>
-      </div>
-      <div class="bg-white shadow-md rounded-xl p-5 text-center">
-        <h3 class="text-gray-600 text-sm">Chuvas</h3>
-        <p id="chuvasCount" class="text-3xl font-bold text-gray-600 mt-2">0</p>
-      </div>
-      <div class="bg-white shadow-md rounded-xl p-5 text-center">
-        <h3 class="text-gray-600 text-sm">Regularização</h3>
-        <p id="regularizacaoCount" class="text-3xl font-bold text-blue-600 mt-2">0</p>
-      </div>
-      <div class="bg-white shadow-md rounded-xl p-5 text-center">
-        <h3 class="text-gray-600 text-sm">Incêndios</h3>
-        <p id="incendiosCount" class="text-3xl font-bold text-red-600 mt-2">0</p>
-      </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div class="bg-white shadow-lg rounded-xl p-6">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Distribuição por Tipo de Atendimento</h2>
-        <canvas id="graficoTipo"></canvas>
+      <!-- Total de Atendimentos -->
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-center text-gray-800 font-semibold mb-2">Atendimentos por Tipo</h3>
+        <div style="height:220px">
+          <canvas id="grafico_tipo"></canvas>
+        </div>
       </div>
 
-      <div class="bg-white shadow-lg rounded-xl p-6">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Distribuição por Grau de Risco</h2>
-        <canvas id="graficoRisco"></canvas>
+      <!-- Grau de Risco -->
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-center text-gray-800 font-semibold mb-2">Distribuição por Grau de Risco</h3>
+        <div style="height:220px">
+          <canvas id="grafico_risco"></canvas>
+        </div>
       </div>
 
-      <div class="bg-white shadow-lg rounded-xl p-6 lg:col-span-2">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Atendimentos por Bairro</h2>
-        <canvas id="graficoBairro"></canvas>
+      <!-- Atendimentos por Mês -->
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-center text-gray-800 font-semibold mb-2">Atendimentos por Mês</h3>
+        <div style="height:220px">
+          <canvas id="grafico_mes"></canvas>
+        </div>
       </div>
+
+      <!-- Gráfico por Bairro -->
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-center text-gray-800 font-semibold mb-2">Atendimentos por Bairro</h3>
+        <div style="height:220px">
+          <canvas id="grafico_bairro"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico de Conclusão -->
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-center text-gray-800 font-semibold mb-2">Percentual de Conclusão</h3>
+        <div style="height:220px">
+          <canvas id="grafico_conclusao"></canvas>
+        </div>
+      </div>
+
+      <!-- Total acumulado -->
+      <div class="bg-white p-4 rounded-xl shadow text-center flex flex-col justify-center">
+        <h3 class="text-lg text-gray-600">Total de Atendimentos</h3>
+        <p class="text-5xl font-bold text-blue-600 mt-2">{{ total_atendimentos }}</p>
+      </div>
+
     </div>
   </div>
 
-  <!-- Script -->
   <script>
-    async function carregarDashboard() {
-      const res = await fetch("/painel_dados");
-      const atendimentos = await res.json();
+    const dados = {{ dados_dashboard|safe }};
 
-      // Totais gerais
-      document.getElementById("totalAtendimentos").textContent = atendimentos.length;
-      document.getElementById("chuvasCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("chuva")).length;
-      document.getElementById("regularizacaoCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("regular")).length;
-      document.getElementById("incendiosCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("incêndio")).length;
+    // Paleta de cores padrão
+    const cores = ["#f87171","#fb923c","#facc15","#4ade80","#60a5fa","#a78bfa"];
 
-      // Distribuição por tipo
-      const tipos = ["Chuvas", "Regularização", "Incêndios"];
-      const dadosTipo = tipos.map(t => atendimentos.filter(a => a.origem?.toLowerCase().includes(t.toLowerCase())).length);
+    // ========== GRAFICO POR TIPO ==========
+    new Chart(document.getElementById("grafico_tipo"), {
+      type: "pie",
+      data: {
+        labels: Object.keys(dados.tipos),
+        datasets: [{
+          data: Object.values(dados.tipos),
+          backgroundColor: cores,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        maintainAspectRatio: false,
+      }
+    });
 
-      new Chart(document.getElementById("graficoTipo"), {
-        type: "pie",
-        data: {
-          labels: tipos,
-          datasets: [{
-            data: dadosTipo,
-            backgroundColor: ["#6b7280", "#3b82f6", "#ef4444"]
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
-        }
-      });
+    // ========== GRAFICO POR GRAU DE RISCO ==========
+    const ordemRisco = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
+    const coresRisco = ["#86efac","#22c55e","#facc15","#fb923c","#ef4444"];
 
-      // Distribuição por risco
-      const riscos = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
-      const coresRisco = ["#86efac", "#22c55e", "#eab308", "#f97316", "#dc2626"];
-      const dadosRisco = riscos.map(r => atendimentos.filter(a => a.grau_risco?.toUpperCase().includes(r)).length);
+    new Chart(document.getElementById("grafico_risco"), {
+      type: "doughnut",
+      data: {
+        labels: ordemRisco,
+        datasets: [{
+          data: ordemRisco.map(r => dados.risco[r] || 0),
+          backgroundColor: coresRisco,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        maintainAspectRatio: false,
+      }
+    });
 
-      new Chart(document.getElementById("graficoRisco"), {
-        type: "doughnut",
-        data: {
-          labels: riscos,
-          datasets: [{
-            data: dadosRisco,
-            backgroundColor: coresRisco
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
-        }
-      });
+    // ========== GRAFICO POR MÊS ==========
+    new Chart(document.getElementById("grafico_mes"), {
+      type: "bar",
+      data: {
+        labels: Object.keys(dados.meses),
+        datasets: [{
+          label: "Atendimentos",
+          data: Object.values(dados.meses),
+          backgroundColor: "#60a5fa",
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } },
+      }
+    });
 
-      // Atendimentos por bairro
-      const bairros = {};
-      atendimentos.forEach(a => {
-        const b = a.bairro || "Não informado";
-        bairros[b] = (bairros[b] || 0) + 1;
-      });
-      const labelsBairro = Object.keys(bairros);
-      const valoresBairro = Object.values(bairros);
+    // ========== GRAFICO POR BAIRRO ==========
+    new Chart(document.getElementById("grafico_bairro"), {
+      type: "bar",
+      data: {
+        labels: Object.keys(dados.bairros),
+        datasets: [{
+          label: "Atendimentos",
+          data: Object.values(dados.bairros),
+          backgroundColor: "#4ade80",
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } },
+      }
+    });
 
-      new Chart(document.getElementById("graficoBairro"), {
-        type: "bar",
-        data: {
-          labels: labelsBairro,
-          datasets: [{
-            label: "Atendimentos",
-            data: valoresBairro,
-            backgroundColor: "#3b82f6"
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } }
-        }
-      });
-    }
-
-    carregarDashboard();
+    // ========== GRAFICO DE CONCLUSÃO ==========
+    new Chart(document.getElementById("grafico_conclusao"), {
+      type: "pie",
+      data: {
+        labels: Object.keys(dados.conclusao),
+        datasets: [{
+          data: Object.values(dados.conclusao),
+          backgroundColor: ["#22c55e", "#ef4444"],
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: "bottom" } },
+        maintainAspectRatio: false,
+      }
+    });
   </script>
 </body>
 </html>
