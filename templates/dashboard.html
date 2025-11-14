@@ -2,184 +2,146 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Gerador de Relatório - Chuvas</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .container {
-      max-width: 700px;
-    }
-    select.form-select option {
-      white-space: normal !important;
-      line-height: 1.4em;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Defesa Civil Cuiabá</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body>
-  <div class="container py-4 px-3 px-md-5">
-
-    <!-- VOLTAR -->
-    <div class="d-flex justify-content-end mb-3">
-      <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">⬅️ Voltar</a>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto py-8 px-4">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center space-x-4">
+        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="h-14 w-auto" alt="Prefeitura de Cuiabá">
+        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="h-14 w-auto" alt="Defesa Civil Cuiabá">
+      </div>
+      <a href="{{ url_for('home') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded shadow">
+        ⬅️ Início
+      </a>
     </div>
 
-    <!-- LOGOS -->
-    <div class="row justify-content-center align-items-center mb-4">
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="img-fluid" style="max-height: 80px;">
+    <h1 class="text-3xl font-bold text-center text-orange-600 mb-10">📊 Dashboard de Atendimentos</h1>
+
+    <!-- Painel de Resumo -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white shadow-md rounded-xl p-5 text-center">
+        <h3 class="text-gray-600 text-sm">Total de Atendimentos</h3>
+        <p id="totalAtendimentos" class="text-3xl font-bold text-blue-600 mt-2">0</p>
       </div>
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="img-fluid" style="max-height: 80px;">
+      <div class="bg-white shadow-md rounded-xl p-5 text-center">
+        <h3 class="text-gray-600 text-sm">Chuvas</h3>
+        <p id="chuvasCount" class="text-3xl font-bold text-gray-600 mt-2">0</p>
+      </div>
+      <div class="bg-white shadow-md rounded-xl p-5 text-center">
+        <h3 class="text-gray-600 text-sm">Regularização</h3>
+        <p id="regularizacaoCount" class="text-3xl font-bold text-blue-600 mt-2">0</p>
+      </div>
+      <div class="bg-white shadow-md rounded-xl p-5 text-center">
+        <h3 class="text-gray-600 text-sm">Incêndios</h3>
+        <p id="incendiosCount" class="text-3xl font-bold text-red-600 mt-2">0</p>
       </div>
     </div>
 
-    <!-- TÍTULO -->
-    <h3 class="mb-4 text-center text-primary fw-bold">Gerador de Relatório Técnico - Chuvas</h3>
-
-    <!-- FORMULÁRIO -->
-    <form method="POST" enctype="multipart/form-data">
-
-      {% for label, name in campos %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold">{{ label }}</label>
-
-        {% if name == "latitude" %}
-        <div class="input-group mb-2">
-          <button type="button" class="btn btn-sm btn-outline-primary" onclick="atualizarLocalizacao()">📍 Atualizar</button>
-          <input type="text" name="latitude" id="latitude" class="form-control" placeholder="Ex: -15.601234" required>
-        </div>
-        <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-          🌍 Ver no Mapa
-        </a>
-
-        {% elif name == "longitude" %}
-        <input type="text" name="longitude" id="longitude" class="form-control" placeholder="Ex: -56.097900" required>
-
-        {% elif name in ["cpf", "telefone", "data_vistoria", "data_relatorio"] %}
-        <input type="text" name="{{ name }}" id="{{ name }}" class="form-control" required>
-
-        {% else %}
-        <input type="text" name="{{ name }}" class="form-control" required>
-        {% endif %}
-      </div>
-      {% endfor %}
-
-      <!-- Características do solo -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Características do Solo</h5>
-        <select class="form-select" name="problemas_solo" multiple>
-          <option>Arenoso</option>
-          <option>Argiloso</option>
-          <option>Alta declividade</option>
-          <option>Alta saturação hídrica (encharcado)</option>
-        </select>
-        <input type="text" name="problemas_solo_outro" class="form-control mt-2" placeholder="Outro tipo de solo...">
+    <!-- Gráficos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-white shadow-lg rounded-xl p-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Distribuição por Tipo de Atendimento</h2>
+        <canvas id="graficoTipo"></canvas>
       </div>
 
-      <!-- Presença de cursos d'água -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Presença de cursos d'água</h5>
-        <select class="form-select" name="presenca_cursos" multiple style="height:auto; max-height:150px;">
-          <option>Córrego</option>
-          <option>Rio</option>
-          <option>Riacho</option>
-          <option>Lençol freático</option>
-          <option>Não identificado</option>
-        </select>
-        <input type="text" name="presenca_cursos_outro" class="form-control mt-2" placeholder="Outro...">
+      <div class="bg-white shadow-lg rounded-xl p-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Distribuição por Grau de Risco</h2>
+        <canvas id="graficoRisco"></canvas>
       </div>
 
-      <!-- Sinais de instabilidade -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Sinais de Instabilidade</h5>
-        <select class="form-select" name="sinais_instabilidade" multiple>
-          <option>Trincas e Rachaduras</option>
-          <option>Erosão</option>
-          <option>Inclinação</option>
-          <option>Deslizamento</option>
-          <option>Infiltração</option>
-        </select>
+      <div class="bg-white shadow-lg rounded-xl p-6 lg:col-span-2">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Atendimentos por Bairro</h2>
+        <canvas id="graficoBairro"></canvas>
       </div>
-
-      <!-- Potenciais fatores de risco -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Potenciais Fatores de Risco</h5>
-        <select class="form-select" name="fatores_risco" multiple>
-          <option>Acúmulo de água</option>
-          <option>Ausência e/ou deficiência de drenagem</option>
-          <option>Desníveis acentuados no terreno</option>
-          <option>Macro-fissuras em muros, indicando movimentação do solo</option>
-          <option>Ocupações em áreas suscetíveis a alagamento e/ou escorregamento</option>
-        </select>
-      </div>
-
-      <!-- Grau de Risco -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Grau de Risco</label>
-        <select name="grau_risco" class="form-select">
-          <option>MUITO BAIXO</option>
-          <option>BAIXO</option>
-          <option selected>MÉDIO</option>
-          <option>ALTO</option>
-          <option>MUITO ALTO</option>
-        </select>
-      </div>
-
-      <!-- Imagens -->
-      <h5 class="mt-5 mb-3 fw-semibold">Imagens e Descrições</h5>
-      {% for i in range(1, 8) %}
-      <div class="mb-3">
-        <label class="form-label">Imagem {{ i }}</label>
-        <input type="file" name="imagem{{ i }}" class="form-control">
-        <input type="text" name="descricao{{ i }}" class="form-control mt-2" placeholder="Descrição da imagem {{ i }}">
-      </div>
-      {% endfor %}
-
-      <!-- Botões -->
-      <div class="d-grid gap-2 mt-4">
-        <button type="submit" class="btn btn-primary">✅ Gerar Laudo</button>
-        <button type="button" class="btn btn-outline-danger" onclick="confirmarLimpeza()">🗑️ Limpar Tudo</button>
-      </div>
-    </form>
+    </div>
   </div>
 
-  <!-- Geolocalização -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+  <!-- Script -->
   <script>
-    function atualizarLocalizacao() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (pos) {
-            const lat = pos.coords.latitude.toFixed(6);
-            const lon = pos.coords.longitude.toFixed(6);
-            document.getElementById("latitude").value = lat;
-            document.getElementById("longitude").value = lon;
+    async function carregarDashboard() {
+      const res = await fetch("/painel_dados");
+      const atendimentos = await res.json();
 
-            const linkMapa = document.getElementById("link_mapa");
-            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
-            linkMapa.style.display = "inline-block";
-          },
-          err => alert("Erro ao obter localização: " + err.message),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-      } else {
-        alert("Geolocalização não suportada pelo navegador.");
-      }
+      // Totais gerais
+      document.getElementById("totalAtendimentos").textContent = atendimentos.length;
+      document.getElementById("chuvasCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("chuva")).length;
+      document.getElementById("regularizacaoCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("regular")).length;
+      document.getElementById("incendiosCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("incêndio")).length;
+
+      // Distribuição por tipo
+      const tipos = ["Chuvas", "Regularização", "Incêndios"];
+      const dadosTipo = tipos.map(t => atendimentos.filter(a => a.origem?.toLowerCase().includes(t.toLowerCase())).length);
+
+      new Chart(document.getElementById("graficoTipo"), {
+        type: "pie",
+        data: {
+          labels: tipos,
+          datasets: [{
+            data: dadosTipo,
+            backgroundColor: ["#6b7280", "#3b82f6", "#ef4444"]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } }
+        }
+      });
+
+      // Distribuição por risco
+      const riscos = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
+      const coresRisco = ["#86efac", "#22c55e", "#eab308", "#f97316", "#dc2626"];
+      const dadosRisco = riscos.map(r => atendimentos.filter(a => a.grau_risco?.toUpperCase().includes(r)).length);
+
+      new Chart(document.getElementById("graficoRisco"), {
+        type: "doughnut",
+        data: {
+          labels: riscos,
+          datasets: [{
+            data: dadosRisco,
+            backgroundColor: coresRisco
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } }
+        }
+      });
+
+      // Atendimentos por bairro
+      const bairros = {};
+      atendimentos.forEach(a => {
+        const b = a.bairro || "Não informado";
+        bairros[b] = (bairros[b] || 0) + 1;
+      });
+      const labelsBairro = Object.keys(bairros);
+      const valoresBairro = Object.values(bairros);
+
+      new Chart(document.getElementById("graficoBairro"), {
+        type: "bar",
+        data: {
+          labels: labelsBairro,
+          datasets: [{
+            label: "Atendimentos",
+            data: valoresBairro,
+            backgroundColor: "#3b82f6"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } } }
+        }
+      });
     }
 
-    function confirmarLimpeza() {
-      if (confirm("Tem certeza que deseja limpar todos os campos?")) {
-        document.querySelector("form").reset();
-      }
-    }
+    carregarDashboard();
   </script>
-</body>
-</html>
-
 </body>
 </html>
