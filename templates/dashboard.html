@@ -94,25 +94,29 @@
         }
       });
 
-      // Distribuição por risco
-      const riscos = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
-      const coresRisco = ["#86efac", "#22c55e", "#eab308", "#f97316", "#dc2626"];
-      const dadosRisco = riscos.map(r => atendimentos.filter(a => a.grau_risco?.toUpperCase().includes(r)).length);
+ // Distribuição por risco
+const riscos = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
+const coresRisco = ["#86efac", "#22c55e", "#eab308", "#f97316", "#dc2626"];
 
-      new Chart(document.getElementById("graficoRisco"), {
-        type: "doughnut",
-        data: {
-          labels: riscos,
-          datasets: [{
-            data: dadosRisco,
-            backgroundColor: coresRisco
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
-        }
-      });
+const dadosRisco = riscos.map(r => 
+  atendimentos.filter(a => (a.grau_risco || "").toUpperCase().trim() === r).length
+);
+
+new Chart(document.getElementById("graficoRisco"), {
+  type: "doughnut",
+  data: {
+    labels: riscos,
+    datasets: [{
+      data: dadosRisco,
+      backgroundColor: coresRisco
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: "bottom" } }
+  }
+});
+
 
       // Atendimentos por bairro
       const bairros = {};
