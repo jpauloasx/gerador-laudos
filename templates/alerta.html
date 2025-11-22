@@ -28,17 +28,17 @@
         </div>
       {% endif %}
 
-      <form method="POST" class="space-y-3">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alerta</label>
-          <select name="tipo" class="w-full border rounded-lg px-3 py-2 text-sm">
-            <option value="Chuvas">⛈️ Chuvas</option>
-            <option value="Enxurrada">🌊 Enxurrada</option>
-            <option value="Alagamento">💧 Alagamento</option>
-            <option value="Deslizamento">🏞️ Deslizamento</option>
-            <option value="Calor">☀️ Calor e Baixa umidade</option>
-          </select>
-        </div>
+<form method="POST" class="space-y-3">
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alerta</label>
+    <select name="tipo" id="tipoAlerta" class="w-full border rounded-lg px-3 py-2 text-sm">
+      <option value="Chuvas">⛈️ Chuvas</option>
+      <option value="Enxurrada">🌊 Enxurrada</option>
+      <option value="Alagamento">💧 Alagamento</option>
+      <option value="Deslizamento">🏞️ Deslizamento</option>
+      <option value="Onda de Calor">🌡️ Onda de Calor e Baixa umidade</option>
+    </select>
+  </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Título do Alerta</label>
@@ -51,6 +51,25 @@
           <input type="text" name="regiao" class="w-full border rounded-lg px-3 py-2 text-sm"
                  placeholder="Ex: Região Sul de Cuiabá, bairros X e Y">
         </div>
+
+  <!-- Campos para onda de calor -->
+<div id="camposCalor" class="hidden">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Temperatura Máxima (°C)</label>
+      <input type="number" step="0.1" name="temperatura" class="w-full border rounded-lg px-3 py-2 text-sm"
+             placeholder="Ex: 41.5">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Umidade do Ar (%)</label>
+      <input type="number" step="1" name="umidade" class="w-full border rounded-lg px-3 py-2 text-sm"
+             placeholder="Ex: 18">
+    </div>
+
+  </div>
+</div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
@@ -118,5 +137,25 @@
       {% endif %}
     </div>
   </div>
+
+<script>
+  const selectTipo = document.getElementById("tipoAlerta");
+  const camposCalor = document.getElementById("camposCalor");
+
+  function atualizarCampos() {
+    if (selectTipo.value === "Onda de Calor") {
+      camposCalor.classList.remove("hidden");
+    } else {
+      camposCalor.classList.add("hidden");
+    }
+  }
+
+  // Atualiza ao mudar o tipo
+  selectTipo.addEventListener("change", atualizarCampos);
+
+  // Atualiza uma vez ao carregar (útil ao recarregar após POST)
+  atualizarCampos();
+</script>
+  
 </body>
 </html>
