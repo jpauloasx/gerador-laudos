@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Emitir Alerta - Defesa Civil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-4xl mx-auto py-6 px-4">
+    <!-- Topo -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold text-red-600 flex items-center gap-2">
+        🚨 Emitir Alerta
+      </h1>
+      <a href="{{ url_for('home') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded">
+        🏠 Início
+      </a>
+    </div>
+
+    <!-- Formulário de alerta -->
+    <div class="bg-white rounded-xl shadow p-5 mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Novo Alerta</h2>
+
+      {% if alerta_emitido %}
+        <div class="mb-4 px-3 py-2 rounded bg-green-100 text-green-800 text-sm">
+          ✅ Alerta emitido com sucesso! (Backend funcionando, pronto para integrar WhatsApp depois)
+        </div>
+      {% endif %}
+
+      <form method="POST" class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Alerta</label>
+          <select name="tipo" class="w-full border rounded-lg px-3 py-2 text-sm">
+            <option value="Chuvas">⛈️ Chuvas</option>
+            <option value="Enxurrada">🌊 Enxurrada</option>
+            <option value="Alagamento">💧 Alagamento</option>
+            <option value="Deslizamento">🏞️ Deslizamento</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título do Alerta</label>
+          <input type="text" name="titulo" class="w-full border rounded-lg px-3 py-2 text-sm"
+                 placeholder="Ex: Alerta de chuvas intensas para região Sul">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Região / Bairro / Localidade</label>
+          <input type="text" name="regiao" class="w-full border rounded-lg px-3 py-2 text-sm"
+                 placeholder="Ex: Região Sul de Cuiabá, bairros X e Y">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Previsão de chuva (mm)</label>
+            <input type="number" name="chuva_mm" class="w-full border rounded-lg px-3 py-2 text-sm"
+                   placeholder="Ex: 80">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Validade do alerta</label>
+            <input type="datetime-local" name="validade" class="w-full border rounded-lg px-3 py-2 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mensagem do alerta</label>
+          <textarea name="mensagem" rows="4"
+                    class="w-full border rounded-lg px-3 py-2 text-sm"
+                    placeholder="Ex: Defesa Civil de Cuiabá informa: ALERTA DE CHUVA INTENSA para a região..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="reset" class="px-4 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-100">
+            Limpar
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700">
+            🚨 Emitir Alerta
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Últimos alertas emitidos -->
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="text-lg font-semibold text-gray-800 mb-3">Histórico (sessão atual)</h2>
+
+      {% if alertas and alertas|length > 0 %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-gray-700">
+                <th class="px-3 py-2 text-left">Data</th>
+                <th class="px-3 py-2 text-left">Tipo</th>
+                <th class="px-3 py-2 text-left">Título</th>
+                <th class="px-3 py-2 text-left">Região</th>
+                <th class="px-3 py-2 text-left">Chuva (mm)</th>
+                <th class="px-3 py-2 text-left">Validade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in alertas|reverse %}
+              <tr class="border-t">
+                <td class="px-3 py-2">{{ a.data_emissao }}</td>
+                <td class="px-3 py-2">{{ a.tipo }}</td>
+                <td class="px-3 py-2">{{ a.titulo }}</td>
+                <td class="px-3 py-2">{{ a.regiao }}</td>
+                <td class="px-3 py-2">{{ a.chuva_mm or "-" }}</td>
+                <td class="px-3 py-2">{{ a.validade or "-" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-sm text-gray-500">Nenhum alerta emitido nesta sessão ainda.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
