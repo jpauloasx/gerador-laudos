@@ -9,6 +9,9 @@ from github import Github
 import base64
 import os, json
 
+# Lista em memória para armazenar alertas emitidos
+alertas_enviados = []
+
 # ==========================================================
 # CONFIG BÁSICA
 # ==========================================================
@@ -499,6 +502,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
