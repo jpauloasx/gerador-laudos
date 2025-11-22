@@ -336,6 +336,40 @@ def viaturas():
         print(f"🚓 Nova viatura cadastrada: {prefixo} - {placa}")
     return render_template("viaturas.html")
 
+@app.route("/alerta", methods=["GET", "POST"])
+def alerta():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        # Campos básicos do alerta – podemos refinar depois
+        tipo = request.form.get("tipo", "Chuvas")
+        titulo = request.form.get("titulo", "").strip()
+        mensagem = request.form.get("mensagem", "").strip()
+        regiao = request.form.get("regiao", "").strip()
+        chuva_mm = request.form.get("chuva_mm", "").strip()
+        validade = request.form.get("validade", "").strip()  # data/hora fim do alerta
+
+        alerta_data = {
+            "tipo": tipo,
+            "titulo": titulo or f"Alerta de {tipo}",
+            "mensagem": mensagem,
+            "regiao": regiao,
+            "chuva_mm": chuva_mm,
+            "validade": validade,
+            "data_emissao": datetime.now().strftime("%d/%m/%Y %H:%M")
+        }
+
+        # Guarda em memória por enquanto
+        alertas_enviados.append(alerta_data)
+
+        # Depois, quando integrar WhatsApp, é aqui que vamos disparar a mensagem
+        # (ex: chamar função enviar_alerta_whatsapp(alerta_data))
+
+        return render_template("alerta.html", alerta_emitido=True, alertas=alertas_enviados)
+
+    # GET – só mostra a tela de emissão
+    return render_template("alerta.html", alerta_emitido=False, alertas=alertas_enviados)
 
 @app.route("/dashboard")
 def dashboard():
@@ -502,6 +536,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
