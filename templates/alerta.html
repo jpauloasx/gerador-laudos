@@ -116,6 +116,8 @@
                 <th class="px-3 py-2 text-left">Região</th>
                 <th class="px-3 py-2 text-left">Chuva (mm)</th>
                 <th class="px-3 py-2 text-left">Validade</th>
+                <th class="px-3 py-2 text-left">Temp (°C)</th>
+                <th class="px-3 py-2 text-left">Umidade (%)</th>
               </tr>
             </thead>
             <tbody>
@@ -127,6 +129,8 @@
                 <td class="px-3 py-2">{{ a.regiao }}</td>
                 <td class="px-3 py-2">{{ a.chuva_mm or "-" }}</td>
                 <td class="px-3 py-2">{{ a.validade or "-" }}</td>
+                <td class="px-3 py-2">{{ a.temperatura or "-" }}</td>
+                <td class="px-3 py-2">{{ a.umidade or "-" }}</td>
               </tr>
               {% endfor %}
             </tbody>
