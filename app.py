@@ -349,6 +349,8 @@ def alerta():
         regiao = request.form.get("regiao", "").strip()
         chuva_mm = request.form.get("chuva_mm", "").strip()
         validade = request.form.get("validade", "").strip()  # data/hora fim do alerta
+        temperatura = request.form.get("temperatura", "").strip()
+        umidade = request.form.get("umidade", "").strip()
 
         alerta_data = {
             "tipo": tipo,
@@ -356,9 +358,12 @@ def alerta():
             "mensagem": mensagem,
             "regiao": regiao,
             "chuva_mm": chuva_mm,
+            "temperatura": temperatura,
+            "umidade": umidade,
             "validade": validade,
             "data_emissao": datetime.now().strftime("%d/%m/%Y %H:%M")
-        }
+            }
+
 
         # Guarda em memória por enquanto
         alertas_enviados.append(alerta_data)
@@ -536,6 +541,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
