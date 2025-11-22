@@ -75,24 +75,46 @@
       document.getElementById("regularizacaoCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("regular")).length;
       document.getElementById("incendiosCount").textContent = atendimentos.filter(a => a.origem?.toLowerCase().includes("incêndio")).length;
 
-      // Distribuição por tipo
-      const tipos = ["Chuvas", "Regularização", "Incêndios"];
-      const dadosTipo = tipos.map(t => atendimentos.filter(a => a.origem?.toLowerCase().includes(t.toLowerCase())).length);
+    // Função para normalizar texto (minúsculo + sem acento)
+function normalizarTexto(str) {
+  return (str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // remove acentos
+}
 
-      new Chart(document.getElementById("graficoTipo"), {
-        type: "pie",
-        data: {
-          labels: tipos,
-          datasets: [{
-            data: dadosTipo,
-            backgroundColor: ["#6b7280", "#3b82f6", "#ef4444"]
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
-        }
-      });
+// Distribuição por tipo
+const tipos = ["Chuvas", "Regularização", "Incêndios"];
+
+// Regras de agrupamento por tipo, ignorando acento / plural / variações
+const regrasTipo = {
+  "Chuvas":        ["chuva", "chuvas"],
+  "Regularização": ["regularizacao", "regularização", "regularizacao fundiaria", "regularização fundiária"],
+  "Incêndios":     ["incendio", "incêndio", "incendios", "incêndios"]
+};
+
+const dadosTipo = tipos.map(tipo => {
+  const alvos = regrasTipo[tipo].map(normalizarTexto);
+  return atendimentos.filter(a => {
+    const origemNorm = normalizarTexto(a.origem);
+    return alvos.some(alvo => origemNorm.includes(alvo));
+  }).length;
+});
+
+new Chart(document.getElementById("graficoTipo"), {
+  type: "pie",
+  data: {
+    labels: tipos,
+    datasets: [{
+      data: dadosTipo,
+      backgroundColor: ["#6b7280", "#3b82f6", "#ef4444"]
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: "bottom" } }
+  }
+});
 
  // Distribuição por risco
 const riscos = ["MUITO BAIXO", "BAIXO", "MÉDIO", "ALTO", "MUITO ALTO"];
