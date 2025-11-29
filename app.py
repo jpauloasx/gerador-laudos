@@ -194,6 +194,23 @@ def adicionar_atendimento_e_sincronizar(atendimento):
     except Exception as e:
         print(f"❌ Erro ao enviar atendimentos.json: {e}")
 
+def carregar_telefones_alerta():
+    """Lê a lista de telefones que receberão os alertas de WhatsApp."""
+    if not os.path.exists(TELEFONES_ALERTA_FILE):
+        # Se não existir, retorna lista vazia (ou você pode retornar um exemplo)
+        return []
+
+    try:
+        with open(TELEFONES_ALERTA_FILE, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+            # Garante que seja uma lista de strings
+            if isinstance(dados, list):
+                return [str(t).strip() for t in dados if str(t).strip()]
+            return []
+    except Exception as e:
+        print(f"❌ Erro ao ler telefones_alerta.json: {e}")
+        return []
+
 # ==========================================================
 # CAMPOS E PROCESSAMENTO DE LAUDO
 # ==========================================================
@@ -553,6 +570,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
