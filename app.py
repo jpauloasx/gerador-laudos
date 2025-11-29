@@ -211,6 +211,93 @@ def carregar_telefones_alerta():
         print(f"❌ Erro ao ler telefones_alerta.json: {e}")
         return []
 
+def montar_texto_alerta(alerta):
+    """
+    Monta o texto que será enviado no WhatsApp com base nos dados do alerta.
+    'alerta' é um dict com campos tipo, titulo, mensagem, regiao, chuva_mm, temperatura, umidade, validade, data_emissao.
+    """
+    tipo = alerta.get("tipo", "Alerta")
+    titulo = alerta.get("titulo") or f"Alerta de {tipo}"
+    mensagem = alerta.get("mensagem", "")
+    regiao = alerta.get("regiao", "Região não informada")
+    chuva_mm = alerta.get("chuva_mm", "")
+    temperatura = alerta.get("temperatura", "")
+    umidade = alerta.get("umidade", "")
+    validade = alerta.get("validade", "")
+    data_emissao = alerta.get("data_emissao", "")
+
+    linhas = []
+    linhas.append(f"🚨 DEFESA CIVIL DE CUIABÁ 🚨")
+    linhas.append(f"*{titulo.upper()}*")
+    linhas.append("")
+    linhas.append(f"📍 Região/Local: {regiao}")
+
+    if tipo.lower() in ["chuvas", "enxurrada", "alagamento", "deslizamento"] and chuva_mm:
+        linhas.append(f"🌧️ Precipitação prevista: *{chuva_mm} mm*")
+
+    if tipo.lower() == "onda de calor":
+        if temperatura:
+            linhas.append(f"🌡️ Temperatura máxima prevista: *{temperatura}°C*")
+        if umidade:
+            linhas.append(f"💨 Umidade relativa do ar: *{umidade}%*")
+
+    if mensagem:
+        linhas.append("")
+        linhas.append(f"ℹ️ {mensagem}")
+
+    if validade:
+        linhas.append("")
+        linhas.append(f"⏰ Validade do alerta: {validade}")
+
+    if data_emissao:
+        linhas.append(f"📅 Emitido em: {data_emissao}")
+
+    linhas.append("")
+    linhas.append("👉 Em caso de risco, procure abrigo seguro e siga as orientações da Defesa Civil.")
+
+    return "\n".join(linhas)
+
+def enviar_alerta_whatsapp(alerta):
+    """
+    Envia um alerta via WhatsApp Cloud API para todos os números definidos em telefones_alerta.json.
+    """
+    numeros = carregar_telefones_alerta()
+    if not numeros:
+        print("⚠️ Nenhum telefone configurado em telefones_alerta.json")
+        return
+
+    if not WHATSAPP_TOKEN or not WHATSAPP_PHONE_NUMBER_ID:
+        print("⚠️ WHATSAPP_TOKEN ou WHATSAPP_PHONE_NUMBER_ID não configurados.")
+        return
+
+    url = f"https://graph.facebook.com/{WHATSAPP_API_VERSION}/{WHATSAPP_PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    texto = montar_texto_alerta(alerta)
+
+    for numero in numeros:
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": numero,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": texto
+            }
+        }
+
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=10)
+            if resp.status_code == 200 or resp.status_code == 201:
+                print(f"✅ Alerta enviado com sucesso para {numero}")
+            else:
+                print(f"❌ Erro ao enviar para {numero}: {resp.status_code} - {resp.text}")
+        except Exception as e:
+            print(f"❌ Exceção ao enviar WhatsApp para {numero}: {e}")
+
 # ==========================================================
 # CAMPOS E PROCESSAMENTO DE LAUDO
 # ==========================================================
@@ -370,16 +457,17 @@ def alerta():
     if not session.get("logado"):
         return redirect(url_for("login"))
 
+    alertas_enviados = carregar_alertas_enviados()  # se você já tiver isso
+
     if request.method == "POST":
-        # Campos básicos do alerta – podemos refinar depois
-        tipo = request.form.get("tipo", "Chuvas")
+        tipo = request.form.get("tipo", "")
         titulo = request.form.get("titulo", "").strip()
         mensagem = request.form.get("mensagem", "").strip()
         regiao = request.form.get("regiao", "").strip()
         chuva_mm = request.form.get("chuva_mm", "").strip()
-        validade = request.form.get("validade", "").strip()  # data/hora fim do alerta
         temperatura = request.form.get("temperatura", "").strip()
         umidade = request.form.get("umidade", "").strip()
+        validade = request.form.get("validade", "").strip()
 
         alerta_data = {
             "tipo": tipo,
@@ -391,19 +479,19 @@ def alerta():
             "umidade": umidade,
             "validade": validade,
             "data_emissao": datetime.now().strftime("%d/%m/%Y %H:%M")
-            }
+        }
 
+        # 🔹 Aqui você salva em JSON/histórico se estiver usando isso
+        salvar_alerta(alerta_data)  # se já existir no seu código
 
-        # Guarda em memória por enquanto
-        alertas_enviados.append(alerta_data)
+        # 🔹 E AQUI entra o envio via WhatsApp:
+        enviar_alerta_whatsapp(alerta_data)
 
-        # Depois, quando integrar WhatsApp, é aqui que vamos disparar a mensagem
-        # (ex: chamar função enviar_alerta_whatsapp(alerta_data))
+        return redirect(url_for("alerta"))
 
-        return render_template("alerta.html", alerta_emitido=True, alertas=alertas_enviados)
+    # GET
+    return render_template("alerta.html", alertas=alertas_enviados)
 
-    # GET – só mostra a tela de emissão
-    return render_template("alerta.html", alerta_emitido=False, alertas=alertas_enviados)
 
 @app.route("/dashboard")
 def dashboard():
@@ -570,6 +658,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
