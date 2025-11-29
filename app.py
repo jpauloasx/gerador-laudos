@@ -19,6 +19,17 @@ alertas_enviados = []
 app = Flask(__name__)
 app.secret_key = "DC_g&rad0r"
 
+
+# Config WhatsApp Cloud API (Meta)
+WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN", "SEU_TOKEN_AQUI")
+WHATSAPP_PHONE_NUMBER_ID = os.environ.get("WHATSAPP_PHONE_NUMBER_ID", "SEU_PHONE_NUMBER_ID")
+WHATSAPP_API_VERSION = "v21.0"  # ou a versão que você estiver usando
+
+# Arquivo com a lista de números que receberão os alertas
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
+TELEFONES_ALERTA_FILE = os.path.join(DATA_DIR, "telefones_alerta.json")
+
 # Paths efêmeros (Render permite /tmp com escrita)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 TMP_DIR = "/tmp"
@@ -542,6 +553,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
