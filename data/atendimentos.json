@@ -34,5 +34,17 @@
     "arquivo": "Regularizacao_10.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_10.docx",
     "data_registro": "18/10/2025 20:50:31"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "164",
+    "bairro": "Primeiro de Março",
+    "latitude": "-15.546007",
+    "longitude": "-56.028835",
+    "data_vistoria": "29122025",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_164.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_164.docx",
+    "data_registro": "29/12/2025 19:15:23"
   }
 ]
