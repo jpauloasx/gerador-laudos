@@ -58,5 +58,17 @@
     "arquivo": "Regularizacao_165.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_165.docx",
     "data_registro": "29/12/2025 19:29:45"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "01",
+    "bairro": "Vila Nova",
+    "latitude": "-15.620216",
+    "longitude": "-55.997575",
+    "data_vistoria": "14/01/2026",
+    "grau_risco": "MUITO ALTO",
+    "arquivo": "Regularizacao_01.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_01.docx",
+    "data_registro": "14/01/2026 19:03:41"
   }
 ]
