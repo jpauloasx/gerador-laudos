@@ -130,5 +130,17 @@
     "arquivo": "Regularizacao_06.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_06.docx",
     "data_registro": "15/01/2026 14:51:12"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "07",
+    "bairro": "Dom Aquino ",
+    "latitude": "-15.617997",
+    "longitude": "-56.093401",
+    "data_vistoria": "15/01/2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_07.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_07.docx",
+    "data_registro": "15/01/2026 18:39:06"
   }
 ]
