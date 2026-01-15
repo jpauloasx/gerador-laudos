@@ -82,5 +82,17 @@
     "arquivo": "Regularizacao_02.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_02.docx",
     "data_registro": "15/01/2026 13:00:38"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "03",
+    "bairro": "Cohab São Gonçalo ",
+    "latitude": "-15.646262",
+    "longitude": "-56.041388",
+    "data_vistoria": "15/01/2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_03.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_03.docx",
+    "data_registro": "15/01/2026 13:18:25"
   }
 ]
