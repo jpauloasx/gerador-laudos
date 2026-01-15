@@ -70,5 +70,17 @@
     "arquivo": "Regularizacao_01.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_01.docx",
     "data_registro": "14/01/2026 19:03:41"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "02",
+    "bairro": "Jardim Pauliceia",
+    "latitude": "-15.676841",
+    "longitude": "-56.034037",
+    "data_vistoria": "15/01/2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_02.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_02.docx",
+    "data_registro": "15/01/2026 13:00:38"
   }
 ]
