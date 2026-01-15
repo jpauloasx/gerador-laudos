@@ -94,5 +94,17 @@
     "arquivo": "Regularizacao_03.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_03.docx",
     "data_registro": "15/01/2026 13:18:25"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "04",
+    "bairro": "Residencial Vale Verde",
+    "latitude": "-15.575117",
+    "longitude": "-56.007508",
+    "data_vistoria": "15/01/2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_04.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_04.docx",
+    "data_registro": "15/01/2026 13:54:59"
   }
 ]
