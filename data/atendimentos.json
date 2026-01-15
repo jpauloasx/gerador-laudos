@@ -118,5 +118,17 @@
     "arquivo": "Regularizacao_005.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_005.docx",
     "data_registro": "15/01/2026 14:25:10"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "06",
+    "bairro": "Ouro Fino",
+    "latitude": "-15.552119",
+    "longitude": "-56.047039",
+    "data_vistoria": "15/01/2026",
+    "grau_risco": "ALTO",
+    "arquivo": "Regularizacao_06.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_06.docx",
+    "data_registro": "15/01/2026 14:51:12"
   }
 ]
