@@ -250,5 +250,17 @@
     "arquivo": "Regularizacao_008.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_008.docx",
     "data_registro": "26/02/2026 19:36:22"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "009",
+    "bairro": "Novo Paraíso II",
+    "latitude": "-15.544296",
+    "longitude": "-56.059379",
+    "data_vistoria": "26/02/2026",
+    "grau_risco": "ALTO",
+    "arquivo": "Regularizacao_009.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_009.docx",
+    "data_registro": "26/02/2026 19:44:18"
   }
 ]
