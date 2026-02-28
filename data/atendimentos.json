@@ -358,5 +358,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 18:48:02"
+  },
+  {
+    "origem": "Regularização",
+    "numero_laudo": "042/2026",
+    "bairro": "Jardim Ubirajara",
+    "latitude": "-15.558586",
+    "longitude": "-56.089045",
+    "data_vistoria": "2026-02-06",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 19:16:37"
   }
 ]
