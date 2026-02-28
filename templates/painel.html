@@ -138,19 +138,24 @@
     }
 
     // FILTRAR
-    document.getElementById("btnFiltrar").addEventListener("click", () => {
-      const tipo = document.getElementById("filtroTipo").value.toLowerCase();
-      const bairro = document.getElementById("filtroBairro").value.toLowerCase();
-      const risco = document.getElementById("filtroRisco").value.toLowerCase();
+   document.getElementById("btnFiltrar").addEventListener("click", () => {
+  const tipo = document.getElementById("filtroTipo").value.toLowerCase();
+  const bairro = document.getElementById("filtroBairro").value.toLowerCase();
+  const risco = document.getElementById("filtroRisco").value.toLowerCase();
 
-      const filtrados = atendimentos.filter(a => {
-        return (!tipo || (a.origem || "").toLowerCase().includes(tipo)) &&
-               (!bairro || (a.bairro || "").toLowerCase().includes(bairro)) &&
-               (!risco || (a.grau_risco || "").toLowerCase().includes(risco));
-      });
+  const filtrados = atendimentos.filter(a => {
 
-      renderMarkers(filtrados);
-    });
+    const origem = (a.origem || "").toLowerCase();
+    const bairroAt = (a.bairro || "").toLowerCase();
+    const riscoAt = (a.grau_risco || "").toLowerCase();
+
+    return (!tipo || origem === tipo) &&
+           (!bairro || bairroAt.includes(bairro)) &&
+           (!risco || riscoAt === risco);
+  });
+
+  renderMarkers(filtrados);
+});
 
     // LIMPAR FILTROS
     document.getElementById("btnLimpar").addEventListener("click", () => {
