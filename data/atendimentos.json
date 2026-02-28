@@ -274,5 +274,17 @@
     "arquivo": "Regularizacao_010.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_010.docx",
     "data_registro": "26/02/2026 19:50:26"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "011",
+    "bairro": "ILZA PAGOT",
+    "latitude": "-15.536479",
+    "longitude": "-56.030562",
+    "data_vistoria": "28/02/2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_011.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_011.docx",
+    "data_registro": "28/02/2026 12:33:15"
   }
 ]
