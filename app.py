@@ -597,25 +597,23 @@ def download_arquivo(nome_arquivo):
     remote_path = f"{GITHUB_UPLOADS_PATH}/{nome_arquivo}"
     return redirect(github_raw_url(remote_path))
 
-@app.route("/excluir_atendimento/<path:numero_laudo>", methods=["POST"])
+@app.route("/excluir_atendimento/<numero_laudo>", methods=["POST"])
 def excluir_atendimento(numero_laudo):
+    """
+    Remove o atendimento do cache local e do JSON no GitHub.
+    (NÃO remove o DOCX do GitHub para manter histórico — podemos mudar se quiser.)
+    """
     try:
-        numero_laudo = numero_laudo.strip()
-
         lista = carregar_atendimentos()
-
-        nova = [
-            a for a in lista
-            if str(a.get("numero_laudo", "")).strip() != numero_laudo
-        ]
-
+        nova = [a for a in lista if str(a.get("numero_laudo")) != str(numero_laudo)]
         salvar_atendimentos_local(nova)
 
+        # Sincroniza JSON atualizado no GitHub
         repo = _get_github()
         json_bytes = json.dumps(nova, ensure_ascii=False, indent=2).encode("utf-8")
         upload_or_update_github_file(repo, GITHUB_DATA_PATH, json_bytes, f"Remoção {numero_laudo}")
 
-        print(f"🗑️ Atendimento {numero_laudo} removido.")
+        print(f"🗑️ Atendimento {numero_laudo} removido do painel/JSON.")
         return redirect(url_for("atendimentos"))
 
     except Exception as e:
@@ -660,6 +658,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
