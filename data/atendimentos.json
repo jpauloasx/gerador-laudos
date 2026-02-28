@@ -322,5 +322,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 18:27:18"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "013/2026",
+    "bairro": "Tijucal",
+    "latitude": "-15.632138",
+    "longitude": "-56.014768",
+    "data_vistoria": "2026-01-09",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 18:29:26"
   }
 ]
