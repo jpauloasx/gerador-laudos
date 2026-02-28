@@ -1,17 +1,5 @@
 [
   {
-    "origem": "Regularização",
-    "numero_laudo": "125",
-    "bairro": "Novo Paraíso II",
-    "latitude": "-15.597568",
-    "longitude": "-56.111923",
-    "data_vistoria": "2025-10-18",
-    "grau_risco": "MUITO ALTO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "18/10/2025 19:33:36"
-  },
-  {
     "origem": "Regularizacao",
     "numero_laudo": "164",
     "bairro": "Primeiro de Março",
