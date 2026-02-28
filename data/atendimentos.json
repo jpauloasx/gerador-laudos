@@ -394,5 +394,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 19:24:33"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "029/2026",
+    "bairro": "Boa Esperança",
+    "latitude": "-15.61713156",
+    "longitude": "-56.06781919",
+    "data_vistoria": "2026-01-20",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 20:08:51"
   }
 ]
