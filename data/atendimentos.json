@@ -298,5 +298,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 18:14:55"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "009/2026",
+    "bairro": "Morada do Ouro (Setor Centro-Norte)",
+    "latitude": "-15.5679193",
+    "longitude": "-56.0606975",
+    "data_vistoria": "2026-01-09",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 18:18:00"
   }
 ]
