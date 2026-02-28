@@ -349,18 +349,6 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "029/2026",
-    "bairro": "Boa Esperança",
-    "latitude": "-15.6149318S ",
-    "longitude": "-56.0663111",
-    "data_vistoria": "2026-01-20",
-    "grau_risco": "MUITO BAIXO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "28/02/2026 18:48:02"
-  },
-  {
-    "origem": "Chuvas",
     "numero_laudo": "042/2026",
     "bairro": "Jardim Ubirajara",
     "latitude": "-15.558586",
