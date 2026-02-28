@@ -382,5 +382,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 19:19:54"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "065/2026",
+    "bairro": "Paraisópolis",
+    "latitude": "-15.326029",
+    "longitude": "-56.44152",
+    "data_vistoria": "2026-02-23",
+    "grau_risco": "MUITO ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 19:22:22"
   }
 ]
