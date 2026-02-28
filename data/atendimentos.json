@@ -394,5 +394,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 19:22:22"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "058/2026",
+    "bairro": "Ribeirão do Lipa",
+    "latitude": "-15.546111",
+    "longitude": "-56.094451",
+    "data_vistoria": "2026-02-23",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 19:24:33"
   }
 ]
