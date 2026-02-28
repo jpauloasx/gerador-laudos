@@ -286,5 +286,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 17:10:39"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "008/2026",
+    "bairro": "CPA 2",
+    "latitude": "-15.552960",
+    "longitude": "-56.046520",
+    "data_vistoria": "2026-01-08",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 18:08:52"
   }
 ]
