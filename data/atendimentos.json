@@ -370,5 +370,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 19:18:00"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "048/2026",
+    "bairro": "Parque Atalaia",
+    "latitude": "-15.656740",
+    "longitude": "-56.065238",
+    "data_vistoria": "2026-02-10",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 19:19:54"
   }
 ]
