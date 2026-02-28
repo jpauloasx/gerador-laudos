@@ -310,5 +310,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "28/02/2026 18:18:00"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "010/2026",
+    "bairro": "Duque de Caxias",
+    "latitude": "-15.58616602",
+    "longitude": "-56.1061995",
+    "data_vistoria": "2026-01-07",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "28/02/2026 18:27:18"
   }
 ]
