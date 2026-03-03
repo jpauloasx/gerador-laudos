@@ -526,5 +526,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "03/03/2026 18:34:09"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "264/SAEDC/2025",
+    "bairro": "Altos da Glória",
+    "latitude": "-15°32'38\"W",
+    "longitude": " -56°01'22\"S",
+    "data_vistoria": "2025-06-04",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "03/03/2026 18:34:36"
   }
 ]
