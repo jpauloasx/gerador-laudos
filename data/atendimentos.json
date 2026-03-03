@@ -550,5 +550,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "03/03/2026 18:42:14"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "268/SAEDC/2025",
+    "bairro": "Nossa Senhora Aparecida",
+    "latitude": "",
+    "longitude": "",
+    "data_vistoria": "2025-05-27",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "03/03/2026 19:04:10"
   }
 ]
