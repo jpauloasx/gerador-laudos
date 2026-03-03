@@ -598,5 +598,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "03/03/2026 19:41:13"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "306/SAEDC/2025",
+    "bairro": "Parque Geórgia",
+    "latitude": "-15,644303W",
+    "longitude": "-56,057160S",
+    "data_vistoria": "2025-06-16",
+    "grau_risco": "MÉDIO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "03/03/2026 19:50:49"
   }
 ]
