@@ -1582,5 +1582,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 20:37:41"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 101/DIMPDEC/2025",
+    "bairro": "SÃO MATEUS ",
+    "latitude": "-15.623253",
+    "longitude": "-56.090487 ",
+    "data_vistoria": "2025-03-13",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 20:43:32"
   }
 ]
