@@ -625,18 +625,6 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 025/DIMPDEC/2025",
-    "bairro": "SÃO MATEUS ",
-    "latitude": "-15.621158",
-    "longitude": "-56.092651",
-    "data_vistoria": "2025-01-17",
-    "grau_risco": "MÉDIO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "03/03/2026 20:22:31"
-  },
-  {
-    "origem": "Chuvas",
     "numero_laudo": "312/SAEDC/2025",
     "bairro": "Pedregal",
     "latitude": "-15.5983045",
