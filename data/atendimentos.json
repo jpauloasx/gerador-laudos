@@ -1513,18 +1513,6 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 097/DIMPDEC/2025",
-    "bairro": "PEDRA 90",
-    "latitude": "-15.383594",
-    "longitude": "-55.561544",
-    "data_vistoria": "2025-07-28",
-    "grau_risco": "MÉDIO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "04/03/2026 20:16:51"
-  },
-  {
-    "origem": "Chuvas",
     "numero_laudo": "194/SAEDC/2025",
     "bairro": "Pedregal",
     "latitude": "-15.600016666666667",
