@@ -886,5 +886,29 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 17:59:34"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "145/DIMPDEC/2025",
+    "bairro": "Dom Aquino",
+    "latitude": "-15.610016666666668",
+    "longitude": "-56.08738666666667",
+    "data_vistoria": "2025-05-12",
+    "grau_risco": "MÉDIO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 17:59:35"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 050/DIMPDEC/2025",
+    "bairro": "SÃO MATEUS ",
+    "latitude": "-15.620729",
+    "longitude": "-56.092249",
+    "data_vistoria": "2025-02-15",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 18:01:59"
   }
 ]
