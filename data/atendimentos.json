@@ -1678,5 +1678,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 21:01:47"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "204/SAEDC/2025",
+    "bairro": "Pedregal",
+    "latitude": "-15.597346666666665",
+    "longitude": "-56.066990000000004",
+    "data_vistoria": "2025-04-25",
+    "grau_risco": "MÉDIO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 21:05:28"
   }
 ]
