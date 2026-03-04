@@ -1402,5 +1402,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 19:59:30"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "189/SAEDC/2025",
+    "bairro": "Dom Aquino",
+    "latitude": "-15.609815",
+    "longitude": "-56.087532",
+    "data_vistoria": "2025-04-09",
+    "grau_risco": "MUITO ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 20:02:00"
   }
 ]
