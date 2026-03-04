@@ -958,5 +958,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 18:12:48"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 055/DIMPDEC/2025",
+    "bairro": "JARDIM TROPICAL",
+    "latitude": "-15.619123",
+    "longitude": "-56.079082",
+    "data_vistoria": "2025-02-05",
+    "grau_risco": "MÉDIO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 18:15:05"
   }
 ]
