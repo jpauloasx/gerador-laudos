@@ -1438,5 +1438,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 20:04:54"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 092/DIMPDEC/2025",
+    "bairro": "JARDIM UNIÃO",
+    "latitude": "-15.543667",
+    "longitude": "-56.071146",
+    "data_vistoria": "2025-02-14",
+    "grau_risco": "MUITO ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 20:05:41"
   }
 ]
