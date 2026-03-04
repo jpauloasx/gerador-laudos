@@ -1534,5 +1534,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "04/03/2026 20:19:49"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 097/DIMPDEC/2025",
+    "bairro": "PEDRA 90",
+    "latitude": "-15.645999",
+    "longitude": "-55.939637",
+    "data_vistoria": "2025-07-28",
+    "grau_risco": "MÉDIO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "04/03/2026 20:20:09"
   }
 ]
