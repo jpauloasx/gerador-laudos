@@ -649,18 +649,6 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 028/DIMPDEC/2025",
-    "bairro": "SÃO MATEUS ",
-    "latitude": "-15.6216639",
-    "longitude": "-56.09222661",
-    "data_vistoria": "2025-01-14",
-    "grau_risco": "MÉDIO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "03/03/2026 20:58:45"
-  },
-  {
-    "origem": "Chuvas",
     "numero_laudo": "096/DIMPDEC/2025",
     "bairro": "Pedra 90",
     "latitude": "-15.645999",
