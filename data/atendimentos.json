@@ -2254,5 +2254,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "05/03/2026 19:25:32"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 119/DIMPDEC/2025",
+    "bairro": "PORTO",
+    "latitude": "-15.612737",
+    "longitude": "-56.108409",
+    "data_vistoria": "2025-03-18",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "05/03/2026 19:29:17"
   }
 ]
