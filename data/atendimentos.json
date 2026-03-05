@@ -2302,5 +2302,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "05/03/2026 19:58:07"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 137/DIMPDEC/2025",
+    "bairro": "PRAEIRINHO",
+    "latitude": "-15.633237",
+    "longitude": "-56.080227",
+    "data_vistoria": "2025-03-18",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "05/03/2026 20:00:19"
   }
 ]
