@@ -2386,5 +2386,17 @@
     "arquivo": "Regularizacao_50.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_50.docx",
     "data_registro": "05/03/2026 21:24:49"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "51",
+    "bairro": "Pedregal",
+    "latitude": "-15,59512",
+    "longitude": "-56,06996",
+    "data_vistoria": "05/03/2026",
+    "grau_risco": "BAIXO",
+    "arquivo": "Regularizacao_51.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_51.docx",
+    "data_registro": "05/03/2026 21:31:50"
   }
 ]
