@@ -2362,5 +2362,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "05/03/2026 20:23:19"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 244/SAEDC/2025",
+    "bairro": "CAMPO VERDE",
+    "latitude": "-15.584336",
+    "longitude": "-56.055761",
+    "data_vistoria": "2025-04-08",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "05/03/2026 20:35:32"
   }
 ]
