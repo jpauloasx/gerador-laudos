@@ -2278,17 +2278,5 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "05/03/2026 19:31:01"
-  },
-  {
-    "origem": "Chuvas",
-    "numero_laudo": "Nº 123/DIMPDEC/2025",
-    "bairro": "DOM AQUINO",
-    "latitude": "-15.6187096",
-    "longitude": "-56.0877506",
-    "data_vistoria": "2025-03-18",
-    "grau_risco": "MÉDIO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "05/03/2026 19:43:05"
   }
 ]
