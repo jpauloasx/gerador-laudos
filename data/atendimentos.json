@@ -2290,5 +2290,17 @@
     "arquivo": "",
     "arquivo_github": "",
     "data_registro": "05/03/2026 19:45:52"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "Nº 125/DIMPDEC/2025",
+    "bairro": "JARDIM INDEPENDÊNCIA",
+    "latitude": "-15.605162",
+    "longitude": "-56.115556",
+    "data_vistoria": "2025-03-15",
+    "grau_risco": "ALTO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "05/03/2026 19:58:07"
   }
 ]
