@@ -2410,17 +2410,5 @@
     "arquivo": "Regularizacao_52.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_52.docx",
     "data_registro": "05/03/2026 21:36:32"
-  },
-  {
-    "origem": "Chuvas",
-    "numero_laudo": "266/SAEDC/2025",
-    "bairro": "Altos da Glória",
-    "latitude": "-153239.2001",
-    "longitude": "-56122.54914",
-    "data_vistoria": "2025-06-04",
-    "grau_risco": "MÉDIO",
-    "arquivo": "",
-    "arquivo_github": "",
-    "data_registro": "06/03/2026 15:15:02"
   }
 ]
