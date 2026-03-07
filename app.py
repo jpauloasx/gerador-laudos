@@ -687,7 +687,7 @@ def editar_atendimento(numero_laudo):
     if not atendimento:
         return "Atendimento não encontrado", 404
 
-    return render_template("editar_atendimento.html", atendimento=atendimento)
+    return render_template("atendimentos.html", atendimento=atendimento)
 
 @app.route("/salvar_edicao/<numero_laudo>", methods=["POST"])
 def salvar_edicao(numero_laudo):
@@ -727,6 +727,7 @@ def salvar_edicao(numero_laudo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
