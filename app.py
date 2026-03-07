@@ -698,12 +698,13 @@ def salvar_edicao(numero_laudo_antigo):
 
     novo_numero = request.form["numero_laudo"]
 
-    # ✅ valida duplicidade
+    # valida duplicidade
     for item in lista:
         if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
             return "⚠️ Já existe um laudo com esse número.", 400
 
-    # atualiza registro
+    atualizado = False
+
     for a in lista:
         if str(a["numero_laudo"]) == str(numero_laudo_antigo):
 
@@ -714,29 +715,39 @@ def salvar_edicao(numero_laudo_antigo):
             a["data_vistoria"] = request.form["data_vistoria"]
             a["grau_risco"] = request.form["grau_risco"]
 
+            atualizado = True
             break
 
+    if not atualizado:
+        return "Atendimento não encontrado", 404
+
+    # salva local
     salvar_atendimentos_local(lista)
 
+    # envia para GitHub usando a lista atualizada
     repo = _get_github()
 
-    json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
+    try:
+        json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
 
-    upload_or_update_github_file(
-        repo,
-        GITHUB_DATA_PATH,
-        json_bytes,
-        f"Atualiza atendimento {novo_numero}"
-    )
+        upload_or_update_github_file(
+            repo,
+            GITHUB_DATA_PATH,
+            json_bytes,
+            f"Atualiza atendimento {novo_numero}"
+        )
+
+    except Exception as e:
+        print("Erro ao enviar GitHub:", e)
 
     return redirect(url_for("atendimentos"))
-    
 # ==========================================================
 # RUN
 # ==========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
