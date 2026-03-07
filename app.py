@@ -541,6 +541,20 @@ def painel_dados():
         atendimentos = []
     return jsonify(atendimentos)
 
+@app.route("/editar/<numero_laudo>")
+def editar_atendimento(numero_laudo):
+    lista = carregar_atendimentos()
+
+    atendimento = next(
+        (a for a in lista if str(a["numero_laudo"]) == str(numero_laudo)),
+        None
+    )
+
+    if not atendimento:
+        return "Atendimento não encontrado", 404
+
+    return render_template("editar_atendimento.html", atendimento=atendimento)
+
 
 # ==========================================================
 # ROTAS DE LAUDO
@@ -679,6 +693,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
