@@ -174,11 +174,6 @@ def adicionar_atendimento_e_sincronizar(atendimento):
     - Atualiza cache local /tmp/atendimentos.json
     - Sobe o JSON atualizado pro GitHub (data/atendimentos.json)
     """
-    try:
-    adicionar_atendimento_e_sincronizar(atendimento)
-    except ValueError as e:
-    messagebox.showerror("Erro", str(e))
-    return
 
     # 1) lê existente (local ou GitHub)
     lista = carregar_atendimentos()
@@ -675,6 +670,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
