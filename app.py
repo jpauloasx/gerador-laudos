@@ -727,13 +727,13 @@ def salvar_edicao(numero_laudo_antigo):
 
     novo_numero = request.form["numero_laudo"]
 
-for item in lista:
-    if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
-        return "Número de laudo já existe!", 400
 
     return redirect(url_for("atendimentos"))
 
 
+for item in lista:
+    if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
+        return "Número de laudo já existe!", 400
     
 # ==========================================================
 # RUN
@@ -741,6 +741,7 @@ for item in lista:
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
