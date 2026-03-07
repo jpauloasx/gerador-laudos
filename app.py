@@ -689,8 +689,9 @@ def editar_atendimento(numero_laudo):
         return "Atendimento não encontrado", 404
 
     return render_template("editar_atendimento.html", atendimento=atendimento)
+    
 
-@app.route("/salvar_edicao/<numero_laudo>", methods=["POST"])
+@app.route("/salvar_edicao/<path:numero_laudo>", methods=["POST"])
 def salvar_edicao(numero_laudo):
 
     lista = carregar_atendimentos()
@@ -706,10 +707,8 @@ def salvar_edicao(numero_laudo):
 
             break
 
-    # salva local
     salvar_atendimentos_local(lista)
 
-    # envia para GitHub
     repo = _get_github()
 
     json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
@@ -722,12 +721,14 @@ def salvar_edicao(numero_laudo):
     )
 
     return redirect(url_for("atendimentos"))
+    
 # ==========================================================
 # RUN
 # ==========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
