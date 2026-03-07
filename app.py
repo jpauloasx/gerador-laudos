@@ -541,19 +541,6 @@ def painel_dados():
         atendimentos = []
     return jsonify(atendimentos)
 
-@app.route("/editar/<numero_laudo>")
-def editar_atendimento(numero_laudo):
-    lista = carregar_atendimentos()
-
-    atendimento = next(
-        (a for a in lista if str(a["numero_laudo"]) == str(numero_laudo)),
-        None
-    )
-
-    if not atendimento:
-        return "Atendimento não encontrado", 404
-
-    return render_template("editar_atendimento.html", atendimento=atendimento)
 
 
 # ==========================================================
@@ -687,12 +674,60 @@ def inserir_atendimento():
     except Exception as e:
         print(f"❌ Erro ao inserir atendimento manual: {e}")
         return "Erro interno.", 500
+
+@app.route("/editar/<numero_laudo>")
+def editar_atendimento(numero_laudo):
+    lista = carregar_atendimentos()
+
+    atendimento = next(
+        (a for a in lista if str(a["numero_laudo"]) == str(numero_laudo)),
+        None
+    )
+
+    if not atendimento:
+        return "Atendimento não encontrado", 404
+
+    return render_template("editar_atendimento.html", atendimento=atendimento)
+
+@app.route("/salvar_edicao/<numero_laudo>", methods=["POST"])
+def salvar_edicao(numero_laudo):
+
+    lista = carregar_atendimentos()
+
+    for a in lista:
+        if str(a["numero_laudo"]) == str(numero_laudo):
+
+            a["bairro"] = request.form["bairro"]
+            a["latitude"] = request.form["latitude"]
+            a["longitude"] = request.form["longitude"]
+            a["data_vistoria"] = request.form["data_vistoria"]
+            a["grau_risco"] = request.form["grau_risco"]
+
+            break
+
+    # salva local
+    salvar_atendimentos_local(lista)
+
+    # envia para GitHub
+    repo = _get_github()
+
+    json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
+
+    upload_or_update_github_file(
+        repo,
+        GITHUB_DATA_PATH,
+        json_bytes,
+        f"Atualiza atendimento {numero_laudo}"
+    )
+
+    return redirect(url_for("atendimentos"))
 # ==========================================================
 # RUN
 # ==========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
