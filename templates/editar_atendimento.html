@@ -6,7 +6,7 @@
       ✏️ Editar Atendimento
     </h2>
 
-    <form method="POST" action="{{ url_for('salvar_edicao', numero_laudo=atendimento.numero_laudo) }}" class="space-y-6">
+<form method="POST" action="{{ url_for('salvar_edicao', numero_laudo=atendimento.numero_laudo | urlencode) }}">
 
       <div class="grid md:grid-cols-2 gap-6">
 
