@@ -675,7 +675,7 @@ def inserir_atendimento():
         print(f"❌ Erro ao inserir atendimento manual: {e}")
         return "Erro interno.", 500
 
-@@app.route("/editar/<path:numero_laudo>")
+@app.route("/editar/<path:numero_laudo>")
 def editar_atendimento(numero_laudo):
 
     lista = carregar_atendimentos()
@@ -728,6 +728,7 @@ def salvar_edicao(numero_laudo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
