@@ -167,6 +167,12 @@ def carregar_atendimentos():
         salvar_atendimentos_local(lista)  # popula o cache
     return lista
 
+def numero_laudo_existe(numero):
+    """Verifica se já existe um laudo com o mesmo número."""
+    lista = carregar_atendimentos()
+    return any(str(a.get("numero_laudo")).strip() == str(numero).strip() for a in lista)
+
+
 def adicionar_atendimento_e_sincronizar(atendimento):
     """
     Adiciona atendimento:
@@ -175,21 +181,24 @@ def adicionar_atendimento_e_sincronizar(atendimento):
     - Sobe o JSON atualizado pro GitHub (data/atendimentos.json)
     """
 
-    # 1) lê existente (local ou GitHub)
+    numero = atendimento.get("numero_laudo")
+
+    # 1️⃣ valida duplicidade
+    if numero_laudo_existe(numero):
+        raise ValueError(f"Já existe um laudo com o número {numero}")
+
+    # 2️⃣ carrega lista atual
     lista = carregar_atendimentos()
-    num = str(atendimento.get("numero_laudo")).strip()
 
-    # 2) valida duplicidade
-    for a in lista:
-        if str(a.get("numero_laudo")).strip() == num:
-            raise ValueError(f"Já existe um laudo com o número {num}")
-
-    # 3) adiciona e salva local
+    # 3️⃣ adiciona novo atendimento
     lista.append(atendimento)
+
+    # 4️⃣ salva local
     salvar_atendimentos_local(lista)
 
-    # 4) envia JSON pro GitHub
+    # 5️⃣ envia para GitHub
     repo = _get_github()
+
     try:
         json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
 
@@ -197,7 +206,7 @@ def adicionar_atendimento_e_sincronizar(atendimento):
             repo,
             GITHUB_DATA_PATH,
             json_bytes,
-            f"Adiciona atendimento {num}"
+            f"Adiciona atendimento {numero}"
         )
 
         if ok:
@@ -670,6 +679,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
