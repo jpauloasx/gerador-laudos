@@ -572,7 +572,7 @@ def regularizacao():
 
         numero = processar_laudo(contexto, "regularizacao", "modelo_laudo_reg.docx")
         if not numero:
-            return "Erro ao gerar laudo de Regularização.", 500
+            return "Erro ao gerar laudo de Regularização. Verifique o número repetido do laudo.", 500
         return redirect(url_for("atendimentos"))
 
     return render_template("regularizacao.html", campos=campos_base)
@@ -590,7 +590,7 @@ def incendios():
 
         numero = processar_laudo(contexto, "incendios", "modelo_laudo_incendio.docx")
         if not numero:
-            return "Erro ao gerar laudo de Incêndios.", 500
+            return "Erro ao gerar laudo de Incêndios. Verifique o número repetido do laudo.", 500
         return redirect(url_for("atendimentos"))
 
     return render_template("incendios.html")
@@ -679,6 +679,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
