@@ -691,14 +691,19 @@ def editar_atendimento(numero_laudo):
     return render_template("editar_atendimento.html", atendimento=atendimento)
     
 
-@app.route("/salvar_edicao/<path:numero_laudo>", methods=["POST"])
-def salvar_edicao(numero_laudo):
+@app.route("/salvar_edicao/<path:numero_laudo_antigo>", methods=["POST"])
+def salvar_edicao(numero_laudo_antigo):
 
     lista = carregar_atendimentos()
 
     for a in lista:
-        if str(a["numero_laudo"]) == str(numero_laudo):
+        if str(a["numero_laudo"]) == str(numero_laudo_antigo):
 
+            # pega novo numero digitado
+            novo_numero = request.form["numero_laudo"]
+
+            # atualiza campos
+            a["numero_laudo"] = novo_numero
             a["bairro"] = request.form["bairro"]
             a["latitude"] = request.form["latitude"]
             a["longitude"] = request.form["longitude"]
@@ -717,10 +722,18 @@ def salvar_edicao(numero_laudo):
         repo,
         GITHUB_DATA_PATH,
         json_bytes,
-        f"Atualiza atendimento {numero_laudo}"
+        f"Atualiza atendimento {novo_numero}"
     )
 
+    novo_numero = request.form["numero_laudo"]
+
+for item in lista:
+    if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
+        return "Número de laudo já existe!", 400
+
     return redirect(url_for("atendimentos"))
+
+
     
 # ==========================================================
 # RUN
@@ -728,6 +741,7 @@ def salvar_edicao(numero_laudo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
