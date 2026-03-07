@@ -696,13 +696,17 @@ def salvar_edicao(numero_laudo_antigo):
 
     lista = carregar_atendimentos()
 
+    novo_numero = request.form["numero_laudo"]
+
+    # ✅ valida duplicidade
+    for item in lista:
+        if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
+            return "⚠️ Já existe um laudo com esse número.", 400
+
+    # atualiza registro
     for a in lista:
         if str(a["numero_laudo"]) == str(numero_laudo_antigo):
 
-            # pega novo numero digitado
-            novo_numero = request.form["numero_laudo"]
-
-            # atualiza campos
             a["numero_laudo"] = novo_numero
             a["bairro"] = request.form["bairro"]
             a["latitude"] = request.form["latitude"]
@@ -725,15 +729,7 @@ def salvar_edicao(numero_laudo_antigo):
         f"Atualiza atendimento {novo_numero}"
     )
 
-    novo_numero = request.form["numero_laudo"]
-
-
     return redirect(url_for("atendimentos"))
-
-
-for item in lista:
-    if item["numero_laudo"] == novo_numero and item["numero_laudo"] != numero_laudo_antigo:
-        return "Número de laudo já existe!", 400
     
 # ==========================================================
 # RUN
@@ -741,6 +737,7 @@ for item in lista:
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
