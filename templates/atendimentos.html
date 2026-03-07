@@ -1,7 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"><td class="px-4 py-2 text-center flex justify-center space-x-2">
+
+  {% if a.arquivo %}
+    <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}"
+       class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded" target="_blank">
+       ⬇️ Download
+    </a>
+  {% endif %}
+
+  <a href="{{ url_for('editar_atendimento', numero_laudo=a.numero_laudo) }}"
+     class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded">
+     ✏️ Editar
+  </a>
+
+  <form action="{{ url_for('excluir_atendimento', numero_laudo=a.numero_laudo) }}" method="POST"
+        onsubmit="return confirm('Excluir este atendimento?')">
+    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">
+      🗑️ Excluir
+    </button>
+  </form>
+
+</td>
   <title>Atendimentos - Defesa Civil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
