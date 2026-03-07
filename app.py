@@ -170,27 +170,44 @@ def carregar_atendimentos():
 def adicionar_atendimento_e_sincronizar(atendimento):
     """
     Adiciona atendimento:
+    - Valida número do laudo duplicado
     - Atualiza cache local /tmp/atendimentos.json
     - Sobe o JSON atualizado pro GitHub (data/atendimentos.json)
     """
+    try:
+    adicionar_atendimento_e_sincronizar(atendimento)
+    except ValueError as e:
+    messagebox.showerror("Erro", str(e))
+    return
+
     # 1) lê existente (local ou GitHub)
     lista = carregar_atendimentos()
-    num = str(atendimento.get("numero_laudo"))
-    if any(str(a.get("numero_laudo")) == num for a in lista):
-        print(f"⚠️ Atendimento {num} já existe. Ignorando duplicado.")
-        return
+    num = str(atendimento.get("numero_laudo")).strip()
 
-    # 2) adiciona e salva local
+    # 2) valida duplicidade
+    for a in lista:
+        if str(a.get("numero_laudo")).strip() == num:
+            raise ValueError(f"Já existe um laudo com o número {num}")
+
+    # 3) adiciona e salva local
     lista.append(atendimento)
     salvar_atendimentos_local(lista)
 
-    # 3) envia JSON pro GitHub
+    # 4) envia JSON pro GitHub
     repo = _get_github()
     try:
         json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
-        ok = upload_or_update_github_file(repo, GITHUB_DATA_PATH, json_bytes, "Atualização de atendimentos")
+
+        ok = upload_or_update_github_file(
+            repo,
+            GITHUB_DATA_PATH,
+            json_bytes,
+            f"Adiciona atendimento {num}"
+        )
+
         if ok:
             print("✅ atendimentos.json sincronizado no GitHub")
+
     except Exception as e:
         print(f"❌ Erro ao enviar atendimentos.json: {e}")
 
@@ -658,6 +675,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
