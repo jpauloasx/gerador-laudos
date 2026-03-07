@@ -547,7 +547,7 @@ def chuvas():
 
         numero = processar_laudo(contexto, "chuvas", "modelo_laudo_chuvas.docx")
         if not numero:
-            return "Erro ao gerar laudo de Chuvas.", 500
+            return "Erro ao gerar laudo de Chuvas. Verifique o número repetido do laudo.", 500
         return redirect(url_for("atendimentos"))
 
     return render_template("chuvas.html", campos=campos_chuvas)
@@ -670,6 +670,7 @@ def inserir_atendimento():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
