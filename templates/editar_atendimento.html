@@ -6,10 +6,20 @@
       ✏️ Editar Atendimento
     </h2>
 
-<form method="POST" action="{{ url_for('salvar_edicao', numero_laudo=atendimento.numero_laudo | urlencode) }}">
+<form method="POST" action="{{ url_for('salvar_edicao', numero_laudo_antigo=atendimento.numero_laudo | urlencode) }}">
 
-      <div class="grid md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-semibold text-gray-600 mb-1">
+Número do Laudo
+</label>
 
+  <input 
+  type="text"
+  name="numero_laudo"
+  value="{{ atendimento.numero_laudo }}"
+  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+</div>
         <!-- Bairro -->
         <div>
           <label class="block text-sm font-semibold text-gray-600 mb-1">
