@@ -2410,5 +2410,17 @@
     "arquivo": "Regularizacao_52.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_52.docx",
     "data_registro": "05/03/2026 21:36:32"
+  },
+  {
+    "origem": "Chuvas",
+    "numero_laudo": "500/2026",
+    "bairro": "TESTE",
+    "latitude": "-15.587332",
+    "longitude": "-56.092262",
+    "data_vistoria": "2026-03-06",
+    "grau_risco": "MUITO BAIXO",
+    "arquivo": "",
+    "arquivo_github": "",
+    "data_registro": "07/03/2026 17:19:11"
   }
 ]
