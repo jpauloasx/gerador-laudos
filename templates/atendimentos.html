@@ -122,11 +122,11 @@
         <div class="flex space-x-2">
           <div class="flex-1">
             <label class="block text-sm font-medium">Latitude</label>
-            <input type="text" name="latitude" class="w-full border rounded p-2">
+            <input type="text" id="latitude" name="latitude" class="w-full border rounded p-2">
           </div>
           <div class="flex-1">
             <label class="block text-sm font-medium">Longitude</label>
-            <input type="text" name="longitude" class="w-full border rounded p-2">
+            <input type="text" id="longitude" name="longitude" class="w-full border rounded p-2">
           </div>
         </div>
         <div>
@@ -178,6 +178,40 @@
         alert("Erro ao inserir atendimento.");
       }
     });
-  </script>
+
+    function formatarCoordenada(input, prefixo) {
+
+  input.addEventListener("input", () => {
+
+    let valor = input.value.replace(/\D/g, "");
+
+    if (valor.length === 0) {
+      input.value = "";
+      return;
+    }
+
+    // limita tamanho
+    valor = valor.substring(0, 7);
+
+    let parte1 = valor.substring(0, 2);
+    let parte2 = valor.substring(2);
+
+    if (parte2.length > 5) {
+      parte2 = parte2.substring(0, 5);
+    }
+
+    if (parte2.length > 0) {
+      input.value = prefixo + parte1 + "." + parte2;
+    } else {
+      input.value = prefixo + parte1;
+    }
+
+  });
+
+}
+
+formatarCoordenada(document.getElementById("latitude"), "-");
+formatarCoordenada(document.getElementById("longitude"), "-");
+</script>
 </body>
 </html>
