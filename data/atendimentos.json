@@ -26,7 +26,7 @@
   {
     "origem": "Regularizacao",
     "numero_laudo": "01",
-    "bairro": "Vila Nova",
+    "bairro": "Vila va",
     "latitude": "-15.620216",
     "longitude": "-55.997575",
     "data_vistoria": "14/01/2026",
@@ -2389,7 +2389,7 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 015/DIMPDEC/2025",
+    "numero_laudo": "015/DIMPDEC/2025",
     "bairro": "SÃO MATEUS",
     "latitude": "-15.3713",
     "longitude": "-56.539",
@@ -2401,7 +2401,7 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 034/DIMPDEC/2025",
+    "numero_laudo": "034/DIMPDEC/2025",
     "bairro": "SÃO MATEUS",
     "latitude": "-15.37278",
     "longitude": "-56.5531",
@@ -2413,7 +2413,7 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 090/DIMPDEC/2025",
+    "numero_laudo": "090/DIMPDEC/2025",
     "bairro": "DOM AQUINO",
     "latitude": "-15.61315",
     "longitude": "-56.08938",
@@ -2425,7 +2425,7 @@
   },
   {
     "origem": "Chuvas",
-    "numero_laudo": "Nº 097/SAEDC/2025",
+    "numero_laudo": "097/SAEDC/2025",
     "bairro": "PEDRA 90",
     "latitude": "-15.3846",
     "longitude": "-55.5623",
