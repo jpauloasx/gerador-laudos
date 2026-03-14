@@ -596,6 +596,12 @@ def incendios():
 
     return render_template("incendios.html")
 
+
+@app.route("/deslizamentos")
+@app.route("/deslizamentos")
+def deslizamentos():
+    return render_template("deslizamentos.html")
+
 # ==========================================================
 # LISTAGEM / MAPA / DOWNLOAD / EXCLUIR / INSERIR 
 # ==========================================================
