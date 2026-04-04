@@ -484,6 +484,10 @@ def cadastrar_evento():
 
     return render_template('cadastrar_evento.html', tipos_evento=tipos_evento)
 
+@app.route('/historico')
+def historico():
+    return render_template('historico.html')
+
 @app.route("/equipes", methods=["GET", "POST"])
 def equipes():
     if not session.get("logado"):
