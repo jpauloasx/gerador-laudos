@@ -348,7 +348,7 @@ def processar_laudo(contexto, tipo, modelo_docx):
         doc = DocxTemplate(modelo_docx)
 
         numero_laudo = (contexto.get("numero_laudo") or "").strip()
-        numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
+# numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
 
         if not numero_laudo:
             numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
