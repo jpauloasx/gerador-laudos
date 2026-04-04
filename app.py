@@ -350,7 +350,7 @@ def processar_laudo(contexto, tipo, modelo_docx):
 numero_laudo = (contexto.get("numero_laudo") or "").strip()
 
 # Remove barras normais e invertidas
-numero_laudo = numero_laudo.replace('/', '-').replace('\', '-')
+numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
 if not numero_laudo:
     numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
 contexto["numero_laudo"] = numero_laudo
