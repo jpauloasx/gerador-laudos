@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geradores de Laudos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div class="max-w-5xl mx-auto px-4 py-10">
+        <div class="bg-white shadow-xl rounded-2xl p-8 mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                Geradores de Laudos
+            </h1>
+            <p class="text-gray-600">
+                Selecione abaixo o tipo de gerador que deseja utilizar.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <a href="{{ url_for('chuvas') }}"
+               class="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg p-8 text-center transition duration-200">
+                <div class="text-5xl mb-4">🌧️</div>
+                <h2 class="text-xl font-bold mb-2">Chuvas</h2>
+                <p class="text-sm text-blue-100">
+                    Gerador de laudos para alagamentos, enxurradas, inundações e deslizamentos.
+                </p>
+            </a>
+
+            <a href="{{ url_for('regularizacao') }}"
+               class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg p-8 text-center transition duration-200">
+                <div class="text-5xl mb-4">🏠</div>
+                <h2 class="text-xl font-bold mb-2">Regularização Fundiária</h2>
+                <p class="text-sm text-emerald-100">
+                    Gerador de laudos para análise de áreas, ocupações e riscos.
+                </p>
+            </a>
+
+            <a href="{{ url_for('incendios') }}"
+               class="bg-red-600 hover:bg-red-700 text-white rounded-2xl shadow-lg p-8 text-center transition duration-200">
+                <div class="text-5xl mb-4">🔥</div>
+                <h2 class="text-xl font-bold mb-2">Incêndios</h2>
+                <p class="text-sm text-red-100">
+                    Gerador de laudos para incêndios urbanos, vegetação e danos estruturais.
+                </p>
+            </a>
+
+        </div>
+
+        <div class="mt-10 text-center">
+            <a href="{{ url_for('home') }}"
+               class="inline-block bg-gray-700 hover:bg-gray-800 text-white font-semibold px-6 py-3 rounded-lg shadow">
+                Voltar para Página Inicial
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
