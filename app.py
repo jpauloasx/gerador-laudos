@@ -347,15 +347,17 @@ def processar_laudo(contexto, tipo, modelo_docx):
     try:
         doc = DocxTemplate(modelo_docx)
 
-numero_laudo = (contexto.get("numero_laudo") or "").strip()
+        numero_laudo = (contexto.get("numero_laudo") or "").strip()
+        numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
 
-# Remove barras normais e invertidas
-numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
-if not numero_laudo:
-    numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
-contexto["numero_laudo"] = numero_laudo
+        if not numero_laudo:
+            numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
 
+        contexto["numero_laudo"] = numero_laudo
         contexto["ano"] = date.today().year
+
+    except Exception as e:
+        print(f"Erro ao processar laudo: {e}")
 
         # Mapa (imagem1)
         lat, lon = contexto.get("latitude"), contexto.get("longitude")
