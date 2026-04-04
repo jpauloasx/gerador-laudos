@@ -448,6 +448,42 @@ def home():
         return redirect(url_for("login"))
     return render_template("home.html")
 
+@app.route('/cadastrar-evento', methods=['GET', 'POST'])
+def cadastrar_evento():
+    if request.method == 'POST':
+        data_evento = request.form.get('data_evento')
+        tipo_evento = request.form.get('tipo_evento')
+
+        # Converter data para padrão YYYY-MM-DD caso necessário
+        data_formatada = None
+        if data_evento:
+            data_formatada = datetime.strptime(data_evento, '%Y-%m-%d').strftime('%d/%m/%Y')
+
+        # Exemplo de impressão no terminal
+        print('Data do Evento:', data_formatada)
+        print('Tipo do Evento:', tipo_evento)
+
+        # Aqui futuramente você pode salvar no banco
+        # novo_evento = Evento(data=data_evento, tipo=tipo_evento)
+        # db.session.add(novo_evento)
+        # db.session.commit()
+
+        flash('Evento cadastrado com sucesso!', 'success')
+        return redirect(url_for('cadastrar_evento'))
+
+    tipos_evento = [
+        'Hidrológicos',
+        'Geológico/Geotécnico',
+        'Climatológicos',
+        'Meteorológicos',
+        'Incêndios',
+        'Biológicos',
+        'Tecnológicos',
+        'Outros'
+    ]
+
+    return render_template('cadastrar_evento.html', tipos_evento=tipos_evento)
+
 @app.route("/equipes", methods=["GET", "POST"])
 def equipes():
     if not session.get("logado"):
