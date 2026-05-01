@@ -340,24 +340,15 @@ campos_chuvas = [
 ] + campos_base
 
 def processar_laudo(contexto, tipo, modelo_docx):
-    """
-    Gera DOCX em /tmp/uploads, faz upload p/ GitHub (uploads/),
-    registra/atualiza data/atendimentos.json no GitHub.
-    """
     try:
         doc = DocxTemplate(modelo_docx)
 
         numero_laudo = (contexto.get("numero_laudo") or "").strip()
-# numero_laudo = numero_laudo.replace('/', '-').replace('\\', '-')
-
         if not numero_laudo:
             numero_laudo = datetime.now().strftime("%Y%m%d%H%M%S")
 
         contexto["numero_laudo"] = numero_laudo
         contexto["ano"] = date.today().year
-
-    except Exception as e:
-        print(f"Erro ao processar laudo: {e}")
 
         # Mapa (imagem1)
         lat, lon = contexto.get("latitude"), contexto.get("longitude")
@@ -386,28 +377,27 @@ def processar_laudo(contexto, tipo, modelo_docx):
             else:
                 contexto[f"imagem{i}"] = ""
 
-        # Renderiza DOCX local
+        # Renderiza e salva DOCX
         nome_arquivo = f"{tipo.capitalize()}_{numero_laudo}.docx"
         caminho_saida = os.path.join(UPLOAD_FOLDER, nome_arquivo)
         doc.render(contexto)
         doc.save(caminho_saida)
         print(f"✅ Laudo gerado local: {caminho_saida}")
 
-        # === Upload DOCX para GitHub (uploads/) ===
+        # Upload DOCX para GitHub
         repo = _get_github()
+        remote_path = f"{GITHUB_UPLOADS_PATH}/{nome_arquivo}"
         try:
             with open(caminho_saida, "rb") as f:
                 content = f.read()
-            remote_path = f"{GITHUB_UPLOADS_PATH}/{nome_arquivo}"
-            ok = upload_or_update_github_file(
-                repo, remote_path, content, f"Laudo {numero_laudo} - {tipo.capitalize()}"
+            upload_or_update_github_file(
+                repo, remote_path, content,
+                f"Laudo {numero_laudo} - {tipo.capitalize()}"
             )
-            if ok:
-                print(f"✅ DOCX sincronizado no GitHub: {remote_path}")
         except Exception as e:
             print(f"❌ Erro ao enviar DOCX p/ GitHub: {e}")
 
-        # === Registra atendimento e sincroniza JSON no GitHub ===
+        # Registra atendimento
         atendimento = {
             "origem": tipo.capitalize(),
             "numero_laudo": numero_laudo,
