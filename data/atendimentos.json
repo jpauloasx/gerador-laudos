@@ -2494,17 +2494,5 @@
     "arquivo": "Regularizacao_24.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_24.docx",
     "data_registro": "28/03/2026 13:59:14"
-  },
-  {
-    "origem": "Regularizacao",
-    "numero_laudo": "123456",
-    "bairro": "teste",
-    "latitude": "-15.587472",
-    "longitude": "-56.089957",
-    "data_vistoria": "24/09/2025",
-    "grau_risco": "BAIXO",
-    "arquivo": "Regularizacao_123456.docx",
-    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_123456.docx",
-    "data_registro": "01/05/2026 14:36:31"
   }
 ]
