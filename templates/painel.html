@@ -18,7 +18,6 @@
       width: 100%;
       height: 100vh;
     }
-    /* Filtros flutuantes */
     .filtros-flutuantes {
       position: absolute;
       top: 20px;
@@ -44,7 +43,6 @@
 
 <body>
 
-  <!-- FILTROS FLUTUANTES -->
   <div class="filtros-flutuantes space-y-2">
     <div class="flex justify-between items-center">
       <h2 class="font-semibold text-gray-800 text-lg">🗺️ Painel</h2>
@@ -55,9 +53,9 @@
       <label for="filtroTipo">Tipo</label>
       <select id="filtroTipo" class="w-full border rounded p-1 text-sm">
         <option value="">Todos</option>
-        <option>Chuvas</option>
-        <option>Regularização</option>
-        <option>Incêndios</option>
+        <option value="chuvas">Chuvas</option>
+        <option value="regularizacao">Regularização</option>
+        <option value="incendios">Incêndios</option>
       </select>
     </div>
 
@@ -70,11 +68,11 @@
       <label for="filtroRisco">Grau de Risco</label>
       <select id="filtroRisco" class="w-full border rounded p-1 text-sm">
         <option value="">Todos</option>
-        <option>MUITO BAIXO</option>
-        <option>BAIXO</option>
-        <option>MÉDIO</option>
-        <option>ALTO</option>
-        <option>MUITO ALTO</option>
+        <option value="muito baixo">MUITO BAIXO</option>
+        <option value="baixo">BAIXO</option>
+        <option value="médio">MÉDIO</option>
+        <option value="alto">ALTO</option>
+        <option value="muito alto">MUITO ALTO</option>
       </select>
     </div>
 
@@ -86,12 +84,37 @@
     <p id="contador" class="text-xs text-gray-500 mt-2">Exibindo todos os atendimentos</p>
   </div>
 
-  <!-- MAPA -->
   <div id="painelMapa"></div>
 
   <script>
     let atendimentos = {{ atendimentos|tojson }};
     let map, markers = [];
+
+    // FIX 3: normaliza coordenadas para float, trocando vírgula por ponto
+    function parseCoord(val) {
+      if (!val) return null;
+      const n = parseFloat(String(val).replace(",", ".").trim());
+      return isNaN(n) ? null : n;
+    }
+
+    // FIX 1 e 2: normaliza texto removendo acentos e colocando em minúsculo
+    function normalizar(str) {
+      return (str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    function corRisco(risco) {
+      const r = normalizar(risco);
+      if (r.includes("muito alto")) return "red";
+      if (r.includes("alto"))       return "orange";
+      if (r.includes("medio"))      return "yellow";  // acento removido pelo normalizar
+      if (r.includes("muito baixo")) return "#b7f7b7";
+      if (r.includes("baixo"))      return "green";
+      return "gray";
+    }
 
     function initMap() {
       map = L.map("painelMapa").setView([-15.6010, -56.0979], 12);
@@ -106,83 +129,92 @@
       markers = [];
 
       lista.forEach(a => {
-        if (!a.latitude || !a.longitude) return;
+        // FIX 3: usa parseCoord para garantir número válido
+        const lat = parseCoord(a.latitude);
+        const lon = parseCoord(a.longitude);
+        if (lat === null || lon === null) return;
 
-        let color = "gray";
-        const risco = (a.grau_risco || "").toUpperCase();
-        if (risco.includes("MUITO ALTO")) color = "red";
-        else if (risco.includes("ALTO")) color = "orange";
-        else if (risco.includes("MÉDIO")) color = "yellow";
-        else if (risco.includes("BAIXO")) color = "green";
-        else if (risco.includes("MUITO BAIXO")) color = "#b7f7b7";
+        const color = corRisco(a.grau_risco);
 
-        const marker = L.circleMarker([a.latitude, a.longitude], {
+        const marker = L.circleMarker([lat, lon], {
           color,
           radius: 8,
           fillOpacity: 0.9
         }).addTo(map);
 
+        const risco = (a.grau_risco || "-").toUpperCase();
         const popup = `
-          <b>${a.origem}</b><br>
+          <b>${a.origem || "-"}</b><br>
           📍 <b>Bairro:</b> ${a.bairro || "-"}<br>
           🗓️ <b>Data:</b> ${a.data_vistoria || "-"}<br>
           ⚠️ <b>Risco:</b> ${risco}<br>
-          🌐 <b>Coordenadas:</b> ${a.latitude}, ${a.longitude}<br>
-          ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" class="text-blue-600 hover:underline">📥 Baixar Laudo</a>` : ""}
+          🌐 <b>Coordenadas:</b> ${lat}, ${lon}<br>
+          ${a.arquivo ? `<a href="/download/${a.arquivo}" target="_blank" style="color:#2563eb">📥 Baixar Laudo</a>` : ""}
         `;
         marker.bindPopup(popup);
         markers.push(marker);
       });
 
-      document.getElementById("contador").textContent = `Exibindo ${lista.length} atendimentos`;
+      document.getElementById("contador").textContent =
+        `Exibindo ${lista.length} atendimento${lista.length !== 1 ? "s" : ""}`;
     }
 
-    // FILTRAR
-   document.getElementById("btnFiltrar").addEventListener("click", () => {
-  const tipo = document.getElementById("filtroTipo").value.toLowerCase();
-  const bairro = document.getElementById("filtroBairro").value.toLowerCase();
-  const risco = document.getElementById("filtroRisco").value.toLowerCase();
+    // FIX 4: guarda estado dos filtros ativos para reusar na atualização automática
+    let filtrosAtivos = { tipo: "", bairro: "", risco: "" };
 
-  const filtrados = atendimentos.filter(a => {
+    function aplicarFiltros() {
+      filtrosAtivos = {
+        tipo:   normalizar(document.getElementById("filtroTipo").value),
+        bairro: normalizar(document.getElementById("filtroBairro").value),
+        risco:  normalizar(document.getElementById("filtroRisco").value),
+      };
 
-    const origem = (a.origem || "").trim().toLowerCase();
-    const bairroAt = (a.bairro || "").toLowerCase();
-    const riscoAt = (a.grau_risco || "").trim().toLowerCase();
-    
-    
+      const filtrados = atendimentos.filter(a => {
+        // FIX 1: normaliza origem antes de comparar (remove acento, minúsculo)
+        const origem = normalizar(a.origem);
+        const bairroAt = normalizar(a.bairro);
+        // FIX 2: normaliza risco antes de comparar
+        const riscoAt = normalizar(a.grau_risco);
 
-    return (!tipo || origem === tipo) &&
-           (!bairro || bairroAt.includes(bairro)) &&
-           (!risco || riscoAt === risco);
-  });
+        return (!filtrosAtivos.tipo   || origem === filtrosAtivos.tipo) &&
+               (!filtrosAtivos.bairro || bairroAt.includes(filtrosAtivos.bairro)) &&
+               (!filtrosAtivos.risco  || riscoAt === filtrosAtivos.risco);
+      });
 
-  renderMarkers(filtrados);
-});
+      renderMarkers(filtrados);
+    }
 
-    // LIMPAR FILTROS
+    document.getElementById("btnFiltrar").addEventListener("click", aplicarFiltros);
+
     document.getElementById("btnLimpar").addEventListener("click", () => {
       document.getElementById("filtroTipo").value = "";
       document.getElementById("filtroBairro").value = "";
       document.getElementById("filtroRisco").value = "";
+      filtrosAtivos = { tipo: "", bairro: "", risco: "" };
       renderMarkers(atendimentos);
     });
 
     window.onload = initMap;
 
-    // Atualização automática a cada 60 segundos
-setInterval(async () => {
-  try {
-    const res = await fetch("/painel_dados");
-    if (!res.ok) return;
+    // FIX 4: atualização automática respeita os filtros ativos
+    setInterval(async () => {
+      try {
+        const res = await fetch("/painel_dados");
+        if (!res.ok) return;
+        atendimentos = await res.json();
 
-    atendimentos = await res.json(); // 🔥 atualiza a base
-    renderMarkers(atendimentos);
+        const temFiltro = filtrosAtivos.tipo || filtrosAtivos.bairro || filtrosAtivos.risco;
+        if (temFiltro) {
+          aplicarFiltros();  // reaplica os filtros com os dados novos
+        } else {
+          renderMarkers(atendimentos);
+        }
 
-    console.log("🔄 Painel atualizado automaticamente");
-  } catch (e) {
-    console.warn("Falha ao atualizar painel:", e);
-  }
-}, 60000);
+        console.log("🔄 Painel atualizado automaticamente");
+      } catch (e) {
+        console.warn("Falha ao atualizar painel:", e);
+      }
+    }, 60000);
   </script>
 </body>
 </html>
