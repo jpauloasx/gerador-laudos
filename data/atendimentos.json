@@ -2518,5 +2518,17 @@
     "arquivo": "Regularizacao_091.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_091.docx",
     "data_registro": "06/05/2026 14:24:26"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "092",
+    "bairro": "Tres Barras",
+    "latitude": "-15.563612",
+    "longitude": "-56.026106",
+    "data_vistoria": "06.05.2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_092.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_092.docx",
+    "data_registro": "06/05/2026 14:37:32"
   }
 ]
