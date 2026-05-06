@@ -2542,5 +2542,17 @@
     "arquivo": "Regularizacao_093.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_093.docx",
     "data_registro": "06/05/2026 14:48:59"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "094",
+    "bairro": "Jardim Brasil",
+    "latitude": "-15.563892",
+    "longitude": "-56.026363",
+    "data_vistoria": "06.05.2026",
+    "grau_risco": "MUITO ALTO",
+    "arquivo": "Regularizacao_094.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_094.docx",
+    "data_registro": "06/05/2026 18:39:18"
   }
 ]
