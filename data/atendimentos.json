@@ -2554,5 +2554,17 @@
     "arquivo": "Regularizacao_094.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_094.docx",
     "data_registro": "06/05/2026 18:39:18"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "141",
+    "bairro": "CPA II",
+    "latitude": "-15.559992",
+    "longitude": "-56.045944",
+    "data_vistoria": "13-05-2026",
+    "grau_risco": "MÉDIO",
+    "arquivo": "Regularizacao_141.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_141.docx",
+    "data_registro": "13/05/2026 15:50:02"
   }
 ]
