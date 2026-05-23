@@ -464,7 +464,7 @@ def cadastrar_evento():
         # db.session.commit()
 
         flash('Evento cadastrado com sucesso!', 'success')
-        return redirect(url_for('cadastrar_evento'))
+        return redirect(url_for('home'))
 
     tipos_evento = [
         'Hidrológicos',
