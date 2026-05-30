@@ -515,9 +515,13 @@ def cadastrar_evento():
 def listar_eventos():
     if not session.get("logado"):
         return redirect(url_for("login"))
+    tipos_evento = [
+        'Hidrológicos', 'Geológico/Geotécnico', 'Climatológicos',
+        'Meteorológicos', 'Incêndios', 'Biológicos', 'Tecnológicos', 'Outros'
+    ]
     eventos = carregar_eventos()
     eventos_ordenados = sorted(eventos, key=lambda x: x.get("id", ""), reverse=True)
-    return render_template('eventos.html', eventos=eventos_ordenados)
+    return render_template('eventos.html', eventos=eventos_ordenados, tipos_evento=tipos_evento)
 
 @app.route('/excluir-evento/<id_evento>', methods=['POST'])
 def excluir_evento(id_evento):
