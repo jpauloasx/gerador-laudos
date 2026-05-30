@@ -1,1 +1,69 @@
 
+<!-- ATRIBUIÇÃO DE EVENTO -->
+<div class="mb-4" id="bloco_evento">
+  <h5 class="fw-semibold">Atribuir a um Evento</h5>
+
+  <div class="form-check form-switch mb-2">
+    <input class="form-check-input" type="checkbox" id="toggle_evento" onchange="toggleEvento(this)">
+    <label class="form-check-label" for="toggle_evento">Deseja atribuir este laudo a um evento?</label>
+  </div>
+
+  <div id="selecao_evento" style="display:none;">
+    <div class="row g-2 mb-2">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Tipo do Evento</label>
+        <select class="form-select" id="filtro_tipo_evento" onchange="filtrarEventos()">
+          <option value="">Todos os tipos</option>
+          {% for tipo in tipos_evento %}
+            <option value="{{ tipo }}">{{ tipo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Data do Evento</label>
+        <input type="date" class="form-control" id="filtro_data_evento" onchange="filtrarEventos()">
+      </div>
+    </div>
+
+    <label class="form-label fw-semibold">Selecione o Evento</label>
+    <select class="form-select" name="evento_id" id="select_evento">
+      <option value="">-- Selecione --</option>
+    </select>
+    <small class="text-muted">Filtre por tipo e/ou data para encontrar o evento.</small>
+  </div>
+</div>
+
+<script>
+  const todosEventos = {{ eventos | tojson }};
+
+  function toggleEvento(checkbox) {
+    document.getElementById("selecao_evento").style.display =
+      checkbox.checked ? "block" : "none";
+    if (checkbox.checked) filtrarEventos();
+  }
+
+  function filtrarEventos() {
+    const tipo  = document.getElementById("filtro_tipo_evento").value;
+    const data  = document.getElementById("filtro_data_evento").value;
+    const sel   = document.getElementById("select_evento");
+
+    sel.innerHTML = '<option value="">-- Selecione --</option>';
+
+    todosEventos
+      .filter(e => {
+        const tipoOk = !tipo || e.tipo_evento === tipo;
+        // data_evento está em dd/mm/yyyy, converte para comparar
+        const dataEvento = e.data_evento
+          ? e.data_evento.split("/").reverse().join("-")
+          : "";
+        const dataOk = !data || dataEvento === data;
+        return tipoOk && dataOk;
+      })
+      .forEach(e => {
+        const opt = document.createElement("option");
+        opt.value = e.id;
+        opt.textContent = `${e.data_evento} — ${e.tipo_evento}${e.descricao ? " | " + e.descricao : ""}`;
+        sel.appendChild(opt);
+      });
+  }
+</script>
