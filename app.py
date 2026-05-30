@@ -406,6 +406,7 @@ def processar_laudo(contexto, tipo, modelo_docx):
             "longitude": contexto.get("longitude", ""),
             "data_vistoria": contexto.get("data_vistoria", ""),
             "grau_risco": contexto.get("grau_risco", ""),
+            "evento_id": contexto.get("evento_id", ""),
             "arquivo": nome_arquivo,
             "arquivo_github": f"https://github.com/{GITHUB_REPO}/blob/{GITHUB_BRANCH}/{remote_path}",
             "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -643,55 +644,57 @@ def painel_dados():
 # ==========================================================
 # ROTAS DE LAUDO
 # ==========================================================
+# lista de tipos (pode virar variável global se quiser)
+TIPOS_EVENTO = [
+    'Hidrológicos', 'Geológico/Geotécnico', 'Climatológicos',
+    'Meteorológicos', 'Incêndios', 'Biológicos', 'Tecnológicos', 'Outros'
+]
+
 @app.route("/chuvas", methods=["GET", "POST"])
 def chuvas():
     if not session.get("logado"):
         return redirect(url_for("login"))
-
     if request.method == "POST":
         contexto = {campo[1]: request.form.get(campo[1], "") for campo in campos_chuvas}
         contexto["grau_risco"] = request.form.get("grau_risco", "")
-
+        contexto["evento_id"]  = request.form.get("evento_id", "")
         numero = processar_laudo(contexto, "chuvas", "modelo_laudo_chuvas.docx")
         if not numero:
-            return "Erro ao gerar laudo de Chuvas. Verifique o número repetido do laudo.", 500
+            return "Erro ao gerar laudo de Chuvas.", 500
         return redirect(url_for("atendimentos"))
-
-    return render_template("chuvas.html", campos=campos_chuvas)
+    return render_template("chuvas.html", campos=campos_chuvas,
+                           eventos=carregar_eventos(), tipos_evento=TIPOS_EVENTO)
 
 @app.route("/regularizacao", methods=["GET", "POST"])
 def regularizacao():
     if not session.get("logado"):
         return redirect(url_for("login"))
-
     if request.method == "POST":
         contexto = {campo[1]: request.form.get(campo[1], "") for campo in campos_base}
         contexto["grau_risco"] = request.form.get("grau_risco", "")
-
+        contexto["evento_id"]  = request.form.get("evento_id", "")
         numero = processar_laudo(contexto, "regularizacao", "modelo_laudo_reg.docx")
         if not numero:
-            return "Erro ao gerar laudo de Regularização. Verifique o número repetido do laudo.", 500
+            return "Erro ao gerar laudo de Regularização.", 500
         return redirect(url_for("atendimentos"))
-
-    return render_template("regularizacao.html", campos=campos_base)
+    return render_template("regularizacao.html", campos=campos_base,
+                           eventos=carregar_eventos(), tipos_evento=TIPOS_EVENTO)
 
 @app.route("/incendios", methods=["GET", "POST"])
 def incendios():
     if not session.get("logado"):
         return redirect(url_for("login"))
-
     if request.method == "POST":
-        # Para incêndios, leia tudo do form; garanta chaves mínimas:
         contexto = {k: request.form.get(k, "") for k in request.form.keys()}
+        contexto["evento_id"] = request.form.get("evento_id", "")
         for key in ["bairro", "latitude", "longitude", "data_vistoria", "grau_risco"]:
             contexto.setdefault(key, "")
-
         numero = processar_laudo(contexto, "incendios", "modelo_laudo_incendio.docx")
         if not numero:
-            return "Erro ao gerar laudo de Incêndios. Verifique o número repetido do laudo.", 500
+            return "Erro ao gerar laudo de Incêndios.", 500
         return redirect(url_for("atendimentos"))
-
-    return render_template("incendios.html")
+    return render_template("incendios.html",
+                           eventos=carregar_eventos(), tipos_evento=TIPOS_EVENTO)
 
 @app.route("/deslizamentos")
 def deslizamentos():
