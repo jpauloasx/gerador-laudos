@@ -41,9 +41,6 @@
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data" class="space-y-4">
 
-    <!-- ATRIBUIR EVENTO -->
-    {% include 'includes/campo_evento.html' %}
-      
       {% for label, name in campos %}
   <div class="mb-3">
     <label class="form-label">{{ label }}</label>
@@ -184,6 +181,11 @@
         <input type="text" name="descricao{{i}}" placeholder="Descrição da Figura {{i}}" class="w-full border rounded px-3 py-2 mt-2">
       </div>
       {% endfor %}
+
+      
+    <!-- ATRIBUIR EVENTO -->
+    {% include 'includes/campo_evento.html' %}
+      
 
       <!-- BOTÕES -->
       <div class="flex justify-center gap-4 mt-6">
