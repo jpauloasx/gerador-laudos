@@ -479,6 +479,89 @@ def cadastrar_evento():
 
     return render_template('cadastrar_evento.html', tipos_evento=tipos_evento)
 
+GITHUB_EVENTOS_PATH = "data/eventos.json"
+
+def carregar_eventos():
+    lista = []
+    try:
+        if os.path.exists("/tmp/eventos.json"):
+            with open("/tmp/eventos.json", "r", encoding="utf-8") as f:
+                lista = json.load(f)
+        if not lista:
+            lista = fetch_github_json(GITHUB_EVENTOS_PATH)
+            if lista:
+                with open("/tmp/eventos.json", "w", encoding="utf-8") as f:
+                    json.dump(lista, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Erro ao carregar eventos: {e}")
+    return lista
+
+def salvar_eventos(lista):
+    try:
+        with open("/tmp/eventos.json", "w", encoding="utf-8") as f:
+            json.dump(lista, f, ensure_ascii=False, indent=2)
+        repo = _get_github()
+        json_bytes = json.dumps(lista, ensure_ascii=False, indent=2).encode("utf-8")
+        upload_or_update_github_file(repo, GITHUB_EVENTOS_PATH, json_bytes, "Atualiza eventos")
+    except Exception as e:
+        print(f"Erro ao salvar eventos: {e}")
+
+@app.route('/cadastrar-evento', methods=['GET', 'POST'])
+def cadastrar_evento():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    tipos_evento = [
+        'Hidrológicos', 'Geológico/Geotécnico', 'Climatológicos',
+        'Meteorológicos', 'Incêndios', 'Biológicos', 'Tecnológicos', 'Outros'
+    ]
+
+    if request.method == 'POST':
+        data_evento = request.form.get('data_evento', '').strip()
+        tipo_evento = request.form.get('tipo_evento', '').strip()
+        descricao   = request.form.get('descricao', '').strip()
+
+        if not data_evento or not tipo_evento:
+            flash('Preencha todos os campos obrigatórios.', 'danger')
+            return render_template('cadastrar_evento.html', tipos_evento=tipos_evento)
+
+        data_formatada = datetime.strptime(data_evento, '%Y-%m-%d').strftime('%d/%m/%Y')
+
+        evento = {
+            "id": datetime.now().strftime("%Y%m%d%H%M%S"),
+            "data_evento": data_formatada,
+            "tipo_evento": tipo_evento,
+            "descricao": descricao,
+            "data_registro": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        }
+
+        lista = carregar_eventos()
+        lista.append(evento)
+        salvar_eventos(lista)
+
+        flash('Evento cadastrado com sucesso!', 'success')
+        return redirect(url_for('listar_eventos'))
+
+    return render_template('cadastrar_evento.html', tipos_evento=tipos_evento)
+
+@app.route('/eventos')
+def listar_eventos():
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+    eventos = carregar_eventos()
+    eventos_ordenados = sorted(eventos, key=lambda x: x.get("id", ""), reverse=True)
+    return render_template('eventos.html', eventos=eventos_ordenados)
+
+@app.route('/excluir-evento/<id_evento>', methods=['POST'])
+def excluir_evento(id_evento):
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+    lista = carregar_eventos()
+    lista = [e for e in lista if e.get("id") != id_evento]
+    salvar_eventos(lista)
+    flash('Evento excluído.', 'success')
+    return redirect(url_for('listar_eventos'))
+
 @app.route('/historico')
 def historico():
     return render_template('historico.html')
