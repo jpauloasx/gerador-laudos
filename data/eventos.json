@@ -12,5 +12,12 @@
     "tipo_evento": "Hidrológicos",
     "descricao": "",
     "data_registro": "30/05/2026 13:40:49"
+  },
+  {
+    "id": "20260530134140",
+    "data_evento": "29/05/2026",
+    "tipo_evento": "Geológico/Geotécnico",
+    "descricao": "",
+    "data_registro": "30/05/2026 13:41:40"
   }
 ]
