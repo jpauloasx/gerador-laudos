@@ -42,6 +42,9 @@
     <!-- FORMULÁRIO -->
     <form method="POST" enctype="multipart/form-data">
 
+      <!-- ATRIBUIR EVENTO -->
+    {% include 'includes/campo_evento.html' %}
+      
       {% for label, name in campos %}
       <div class="mb-3">
         <label class="form-label fw-semibold">{{ label }}</label>
