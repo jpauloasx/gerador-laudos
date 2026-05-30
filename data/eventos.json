@@ -5,5 +5,12 @@
     "tipo_evento": "Outros",
     "descricao": "TESTE",
     "data_registro": "30/05/2026 13:16:55"
+  },
+  {
+    "id": "20260530134049",
+    "data_evento": "29/05/2026",
+    "tipo_evento": "Hidrológicos",
+    "descricao": "",
+    "data_registro": "30/05/2026 13:40:49"
   }
 ]
