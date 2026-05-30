@@ -40,12 +40,7 @@
     <h3 class="mb-4 text-center text-primary fw-bold">Gerador de Relatório Técnico - Chuvas</h3>
     
     <!-- FORMULÁRIO -->
-    <form method="POST" enctype="multipart/form-data">
-
-      
-    <!-- ATRIBUIR EVENTO -->
-    {% include 'includes/campo_evento.html' %}
-    
+    <form method="POST" enctype="multipart/form-data">  
 
       {% for label, name in campos %}
       <div class="mb-3">
@@ -142,6 +137,10 @@
         <input type="text" name="descricao{{ i }}" class="form-control mt-2" placeholder="Descrição da imagem {{ i }}">
       </div>
       {% endfor %}
+
+           
+    <!-- ATRIBUIR EVENTO -->
+    {% include 'includes/campo_evento.html' %}
 
       <!-- Botões -->
       <div class="d-grid gap-2 mt-4">
