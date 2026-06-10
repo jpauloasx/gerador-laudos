@@ -2578,5 +2578,18 @@
     "arquivo": "Regularizacao_099.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_099.docx",
     "data_registro": "26/05/2026 13:15:07"
+  },
+  {
+    "origem": "Regularizacao",
+    "numero_laudo": "016",
+    "bairro": "Rodoviária parque ",
+    "latitude": "-15.574556",
+    "longitude": "-56.094495",
+    "data_vistoria": "10-06-2026",
+    "grau_risco": "MÉDIO",
+    "evento_id": "",
+    "arquivo": "Regularizacao_016.docx",
+    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_016.docx",
+    "data_registro": "10/06/2026 19:37:12"
   }
 ]
