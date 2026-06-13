@@ -695,10 +695,74 @@ def incendios():
         return redirect(url_for("atendimentos"))
     return render_template("incendios.html",
                            eventos=carregar_eventos(), tipos_evento=TIPOS_EVENTO)
+# ==========================================================
+# ROTA: DESLIZAMENTOS / MOVIMENTAÇÃO DE MASSA
+# Adicionar ao app.py junto com as demais rotas de laudo
+# ==========================================================
 
-@app.route("/deslizamentos")
+# Campos do formulário de deslizamento (para referência e validação)
+campos_deslizamentos = [
+    # Identificação
+    ("Nº do Relatório",         "n_relatorio"),
+    ("Denúncia nº",             "denuncia"),
+    ("OS nº",                   "n_os"),
+    ("Processo SIGED nº",       "n_processo"),
+    # Solicitante
+    ("Nome",                    "nome"),
+    ("CPF",                     "cpf"),
+    ("E-mail",                  "email"),
+    # Localização
+    ("Endereço",                "endereco"),
+    ("Bairro",                  "bairro"),
+    ("Cidade",                  "cidade"),
+    ("Latitude",                "latitude"),
+    ("Longitude",               "longitude"),
+    ("Registro do Imóvel",      "registro_imovel"),
+    # Caracterização
+    ("Tipo de Movimento",       "tipo_movimento"),
+    ("Tipo de Material",        "tipo_material"),
+    ("Grau de Risco",           "grau_risco"),
+    ("Dano Causado",            "dano"),
+    ("Local do Dano",           "local"),
+    ("Referência/Confrontação", "referencia_casa"),
+    ("Comprometimento",         "comprometimento"),
+    ("Agravamento",             "agravamento"),
+    ("Movimentação Constatada", "movimentacao"),
+    ("Quadro Apresentado",      "quadro_apresentado"),
+    # Datas
+    ("Data da Vistoria",        "data_vistoria"),
+    ("Data do Relatório",       "data_relatorio"),
+]
+
+
+@app.route("/deslizamentos", methods=["GET", "POST"])
 def deslizamentos():
-    return render_template("deslizamentos.html")
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        # Coleta todos os campos do formulário
+        contexto = {campo[1]: request.form.get(campo[1], "") for campo in campos_deslizamentos}
+
+        # Campos extras que não estão na lista base mas são usados no template
+        contexto["evento_id"] = request.form.get("evento_id", "")
+
+        # Usa n_relatorio como número do laudo (campo principal de identificação)
+        contexto["numero_laudo"] = contexto.get("n_relatorio", "").strip()
+
+        numero = processar_laudo(contexto, "deslizamentos", "modelo_laudo_massa.docx")
+
+        if not numero:
+            return "Erro ao gerar laudo de Movimentação de Massa.", 500
+
+        return redirect(url_for("atendimentos"))
+
+    # GET → renderiza formulário com lista de eventos
+    return render_template(
+        "deslizamentos.html",
+        eventos=carregar_eventos(),
+        tipos_evento=TIPOS_EVENTO
+    )
 
 # ==========================================================
 # LISTAGEM / MAPA / DOWNLOAD / EXCLUIR / INSERIR 
@@ -851,6 +915,7 @@ def salvar_edicao(numero_laudo_antigo):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 
