@@ -2591,18 +2591,5 @@
     "arquivo": "Regularizacao_016.docx",
     "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Regularizacao_016.docx",
     "data_registro": "10/06/2026 19:37:12"
-  },
-  {
-    "origem": "Deslizamentos",
-    "numero_laudo": "222",
-    "bairro": "Jardim Novo Horizonte",
-    "latitude": "",
-    "longitude": "",
-    "data_vistoria": "2026-06-13",
-    "grau_risco": "Alto",
-    "evento_id": "20260530153132",
-    "arquivo": "Deslizamentos_222.docx",
-    "arquivo_github": "https://github.com/jpauloasx/gerador-laudos/blob/main/uploads/Deslizamentos_222.docx",
-    "data_registro": "13/06/2026 18:49:09"
   }
 ]
