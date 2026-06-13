@@ -1,55 +1,340 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Deslizamentos - Defesa Civil</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Movimentação de Massa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function confirmarLimpar(form) {
+      if (confirm("Tem certeza que deseja limpar todos os campos?")) {
+        form.reset();
+      }
+    }
 
-<style>
-body{
-    background: linear-gradient(135deg,#1e3a8a,#2563eb);
-}
-</style>
+    function atualizarLocalizacao() {
+      if (!navigator.geolocation) {
+        alert("Geolocalização não suportada pelo navegador.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lon;
+        const link = document.getElementById("link_mapa");
+        link.href = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon + "&zoom=17";
+        link.style.display = "inline-block";
+      }, function() {
+        alert("Não foi possível obter a localização.");
+      });
+    }
 
+    function setHoje(id) {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById(id).value = today;
+    }
+  </script>
 </head>
 
-<body class="flex items-center justify-center min-h-screen text-white">
+<body class="bg-gray-100 p-8">
+  <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
 
-<div class="text-center">
-
-    <h1 class="text-4xl font-bold mb-4">
-        🚧 Página em Construção
-    </h1>
-
-    <p class="text-lg mb-6">
-        O módulo de <strong>Monitoramento de Deslizamentos</strong><br>
-        ainda está sendo desenvolvido.
-    </p>
-
-    <div class="bg-white text-gray-800 rounded-lg shadow-lg p-6 inline-block">
-
-        <p class="text-sm text-gray-600 mb-3">
-            Em breve você poderá:
-        </p>
-
-        <ul class="text-sm text-left space-y-1">
-            <li>📍 Mapear áreas de risco</li>
-            <li>📊 Registrar ocorrências de deslizamentos</li>
-            <li>🗺️ Visualizar pontos críticos no mapa</li>
-            <li>📄 Gerar relatórios técnicos</li>
-        </ul>
-
+    <!-- TOPO: Botão Voltar -->
+    <div class="flex justify-end mb-4">
+      <a href="{{ url_for('home') }}" class="text-sm text-gray-600 hover:text-yellow-600">⬅ Voltar</a>
     </div>
 
-    <div class="mt-6">
-        <a href="{{ url_for('home') }}"
-           class="bg-white text-blue-700 px-4 py-2 rounded shadow hover:bg-gray-200">
-           ← Voltar ao Sistema
-        </a>
+    <!-- LOGOS -->
+    <div class="flex justify-center items-center gap-6 mb-6">
+      <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" alt="Defesa Civil" class="h-20">
+      <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" alt="Prefeitura de Cuiabá" class="h-20">
     </div>
 
-</div>
+    <!-- TÍTULO -->
+    <h1 class="text-2xl font-bold text-yellow-600 mb-6 text-center">Laudo de Movimentação de Massa</h1>
 
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+
+      <!-- ── IDENTIFICAÇÃO ─────────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-4">Identificação</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Nº do Relatório <span class="text-red-500">*</span></label>
+            <input type="text" name="n_relatorio" required placeholder="Ex: 042"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Denúncia nº</label>
+            <input type="text" name="denuncia" placeholder="Nº da denúncia (se houver)"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">OS nº</label>
+            <input type="text" name="n_os" placeholder="Nº da Ordem de Serviço"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Processo SIGED nº</label>
+            <input type="text" name="n_processo" placeholder="Nº do processo (se houver)"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Evento vinculado</label>
+            <select name="evento_id"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="">— Nenhum evento —</option>
+              {% for evento in eventos %}
+              <option value="{{ evento.id }}">{{ evento.data_evento }} – {{ evento.tipo_evento }}{% if evento.descricao %}: {{ evento.descricao }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── SOLICITANTE ────────────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-4">Solicitante</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Nome <span class="text-red-500">*</span></label>
+            <input type="text" name="nome" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">CPF</label>
+            <input type="text" name="cpf" placeholder="000.000.000-00" maxlength="14"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">E-mail</label>
+            <input type="email" name="email" placeholder="email@exemplo.com"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── LOCALIZAÇÃO ────────────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-4">Localização</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Endereço (Rua, Quadra, Lote) <span class="text-red-500">*</span></label>
+            <input type="text" name="endereco" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Bairro <span class="text-red-500">*</span></label>
+            <input type="text" name="bairro" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Cidade</label>
+            <input type="text" name="cidade" value="Cuiabá"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Situação do Imóvel</label>
+            <input type="text" name="registro_imovel" placeholder="Ex: regularizado, irregular…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <!-- Latitude com botão GPS -->
+          <div>
+            <label class="font-semibold text-sm">Latitude</label>
+            <div class="flex gap-2 mt-1">
+              <button type="button" onclick="atualizarLocalizacao()"
+                class="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded whitespace-nowrap">
+                📍 GPS
+              </button>
+              <a id="link_mapa" href="#" target="_blank" style="display:none"
+                class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded whitespace-nowrap">
+                🌍 Mapa
+              </a>
+            </div>
+            <input type="text" name="latitude" id="latitude" readonly placeholder="-15.5989"
+              class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Longitude</label>
+            <input type="text" name="longitude" id="longitude" readonly placeholder="-56.0949"
+              class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── CARACTERIZAÇÃO DO EVENTO ───────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-4">Caracterização do Evento</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Tipo de Movimento <span class="text-red-500">*</span></label>
+            <select name="tipo_movimento" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="">— Selecione —</option>
+              <option value="desbarrancamento">Desbarrancamento</option>
+              <option value="deslizamento">Deslizamento</option>
+              <option value="rachadura">Rachadura</option>
+              <option value="escorregamento">Escorregamento</option>
+              <option value="queda de blocos">Queda de Blocos</option>
+              <option value="corrida de massa">Corrida de Massa</option>
+              <option value="rastejo">Rastejo</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Tipo de Material <span class="text-red-500">*</span></label>
+            <select name="tipo_material" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="">— Selecione —</option>
+              <option value="solo">Solo</option>
+              <option value="rocha">Rocha</option>
+              <option value="vegetação">Vegetação</option>
+              <option value="misto (solo e rocha)">Misto (Solo e Rocha)</option>
+              <option value="misto (solo e vegetação)">Misto (Solo e Vegetação)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Grau de Risco</label>
+            <select name="grau_risco"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="">— Selecione —</option>
+              <option value="Baixo">Baixo</option>
+              <option value="Médio">Médio</option>
+              <option value="Alto">Alto</option>
+              <option value="Muito Alto">Muito Alto</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">Dano Causado <span class="text-red-500">*</span></label>
+            <input type="text" name="dano" required
+              placeholder="Ex: colapso parcial, trinca estrutural, soterramento…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Local do Dano</label>
+            <input type="text" name="local"
+              placeholder="Ex: muro lateral, fundos da casa, entrada…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Referência / Confrontação</label>
+            <input type="text" name="referencia_casa"
+              placeholder="Ex: divisa com vizinho, muro de arrimo…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">Comprometimento Estrutural</label>
+            <textarea name="comprometimento" rows="2"
+              placeholder="Descreva se houve comprometimento de outras partes da edificação…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">Agravamento / Fatores Anteriores</label>
+            <textarea name="agravamento" rows="2"
+              placeholder="Ex: chuvas acumuladas, edificação vizinha, evento anterior…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">Movimentação Constatada na Vistoria</label>
+            <textarea name="movimentacao" rows="2"
+              placeholder="Descreva o que foi observado durante a vistoria técnica…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="font-semibold text-sm">Quadro Apresentado (Conclusão)</label>
+            <textarea name="quadro_apresentado" rows="3"
+              placeholder="Ex: risco geotécnico elevado associado à instabilidade de encosta…"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── DATAS ──────────────────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-4">Datas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Data da Vistoria <span class="text-red-500">*</span></label>
+            <input type="date" name="data_vistoria" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Data do Relatório</label>
+            <div class="flex gap-2 mt-1">
+              <input type="date" name="data_relatorio" id="data_relatorio"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <button type="button" onclick="setHoje('data_relatorio')"
+                class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 rounded whitespace-nowrap">
+                Hoje
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── RELATÓRIO FOTOGRÁFICO ──────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-yellow-400 pb-1 mb-1">Relatório Fotográfico</h2>
+        <p class="text-sm text-gray-500 mb-4">A Figura 01 é gerada automaticamente com o mapa da localização.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for i in range(2, 8) %}
+          <div class="border rounded-lg p-4 bg-gray-50">
+            <p class="font-semibold text-sm text-gray-700 mb-2">Figura 0{{ i }}</p>
+            <input type="file" name="imagem{{ i }}" accept="image/*"
+              class="w-full border rounded px-3 py-2 text-sm mb-2">
+            <input type="text" name="descricao{{ i }}"
+              placeholder="Descrição da Figura 0{{ i }}"
+              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- ── BOTÕES ─────────────────────────────────────── -->
+      <div class="flex justify-center gap-4 mt-6">
+        <button type="submit"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-8 py-2 rounded-lg">
+          📄 Gerar Laudo
+        </button>
+        <button type="button" onclick="confirmarLimpar(this.form)"
+          class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg">
+          Limpar Tudo
+        </button>
+      </div>
+
+    </form>
+  </div>
 </body>
 </html>
+
