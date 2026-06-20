@@ -524,6 +524,36 @@ def listar_eventos():
     eventos_ordenados = sorted(eventos, key=lambda x: x.get("id", ""), reverse=True)
     return render_template('eventos.html', eventos=eventos_ordenados, tipos_evento=tipos_evento)
 
+# ==========================================================
+# ROTA: DETALHE DO EVENTO
+# Adicionar ao app.py, logo após a rota listar_eventos()
+# ==========================================================
+
+@app.route('/eventos/<id_evento>')
+def detalhe_evento(id_evento):
+    if not session.get("logado"):
+        return redirect(url_for("login"))
+
+    eventos = carregar_eventos()
+    evento = next((e for e in eventos if str(e.get("id")) == str(id_evento)), None)
+
+    if not evento:
+        flash('Evento não encontrado.', 'danger')
+        return redirect(url_for('listar_eventos'))
+
+    # Filtra os atendimentos (laudos) vinculados a esse evento
+    todos_atendimentos = carregar_atendimentos()
+    atendimentos_evento = [
+        a for a in todos_atendimentos
+        if str(a.get("evento_id", "")).strip() == str(id_evento).strip()
+    ]
+
+    return render_template(
+        'evento_detalhe.html',
+        evento=evento,
+        atendimentos=atendimentos_evento
+    )
+
 @app.route('/excluir-evento/<id_evento>', methods=['POST'])
 def excluir_evento(id_evento):
     if not session.get("logado"):
