@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhe do Evento - Defesa Civil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-4xl mx-auto mt-10 px-4 pb-10">
+
+    <!-- CABEÇALHO -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Detalhe do Evento</h1>
+      <a href="{{ url_for('listar_eventos') }}" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg">
+        ← Voltar para Eventos
+      </a>
+    </div>
+
+    <!-- INFO DO EVENTO -->
+    <div class="bg-white shadow rounded-2xl p-6 mb-8">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
+          {{ evento.tipo_evento }}
+        </span>
+        <span class="text-gray-400 text-sm">Registrado em {{ evento.data_registro }}</span>
+      </div>
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Data do Evento: {{ evento.data_evento }}</h2>
+      {% if evento.descricao %}
+      <p class="text-gray-600 text-sm mt-2">{{ evento.descricao }}</p>
+      {% endif %}
+    </div>
+
+    <!-- LAUDOS VINCULADOS -->
+    <h2 class="text-lg font-semibold text-gray-700 mb-3">
+      Laudos Vinculados a este Evento
+      <span class="text-sm font-normal text-gray-400">({{ atendimentos|length }})</span>
+    </h2>
+
+    {% if atendimentos %}
+    <div class="bg-white shadow rounded-2xl overflow-hidden">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+          <tr>
+            <th class="px-5 py-3">Tipo</th>
+            <th class="px-5 py-3">Nº Laudo</th>
+            <th class="px-5 py-3">Bairro</th>
+            <th class="px-5 py-3">Data Vistoria</th>
+            <th class="px-5 py-3">Grau de Risco</th>
+            <th class="px-5 py-3 text-center">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for a in atendimentos %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 font-medium text-gray-800">{{ a.origem }}</td>
+            <td class="px-5 py-3">{{ a.numero_laudo }}</td>
+            <td class="px-5 py-3">{{ a.bairro }}</td>
+            <td class="px-5 py-3">{{ a.data_vistoria }}</td>
+            <td class="px-5 py-3">
+              {% if a.grau_risco %}
+                {% set risco = a.grau_risco.upper() %}
+                {% if "MUITO ALTO" in risco %}
+                  <span class="px-2 py-1 rounded bg-red-600 text-white text-xs font-semibold">{{ a.grau_risco }}</span>
+                {% elif "ALTO" in risco %}
+                  <span class="px-2 py-1 rounded bg-orange-500 text-white text-xs font-semibold">{{ a.grau_risco }}</span>
+                {% elif "MÉDIO" in risco %}
+                  <span class="px-2 py-1 rounded bg-yellow-400 text-gray-800 text-xs font-semibold">{{ a.grau_risco }}</span>
+                {% elif "MUITO BAIXO" in risco %}
+                  <span class="px-2 py-1 rounded bg-green-300 text-gray-800 text-xs font-semibold">{{ a.grau_risco }}</span>
+                {% elif "BAIXO" in risco %}
+                  <span class="px-2 py-1 rounded bg-green-600 text-white text-xs font-semibold">{{ a.grau_risco }}</span>
+                {% else %}
+                  {{ a.grau_risco }}
+                {% endif %}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+            <td class="px-5 py-3 text-center">
+              {% if a.arquivo %}
+              <a href="{{ url_for('download_arquivo', nome_arquivo=a.arquivo) }}" target="_blank"
+                 class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                 ⬇️ Download
+              </a>
+              {% else %}
+              <span class="text-gray-300 text-xs">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bg-white shadow rounded-2xl p-10 text-center text-gray-400">
+      Nenhum laudo vinculado a este evento ainda.
+    </div>
+    {% endif %}
+
+  </div>
+</body>
+</html>
