@@ -2,176 +2,235 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Gerador de Relatório - Regularização Fundiária</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <style>
-    body {
-      background-color: #f8f9fa;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório Técnico - Regularização Fundiária</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function confirmarLimpar(form) {
+      if (confirm("Tem certeza que deseja limpar todos os campos?")) {
+        form.reset();
+      }
     }
-    .container {
-      max-width: 700px;
+
+    function atualizarLocalizacao() {
+      if (!navigator.geolocation) {
+        alert("Geolocalização não suportada pelo navegador.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lon;
+        const link = document.getElementById("link_mapa");
+        link.href = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon + "&zoom=17";
+        link.style.display = "inline-block";
+      }, function() {
+        alert("Não foi possível obter a localização.");
+      }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
     }
-    select.form-select option {
-      white-space: normal !important;
-      line-height: 1.4em;
+
+    function setHoje(id) {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById(id).value = today;
     }
-  </style>
+  </script>
 </head>
 
-<body>
-  <div class="container py-4 px-3 px-md-5">
+<body class="bg-gray-100 p-8">
+  <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
 
-    <!-- VOLTAR -->
-    <div class="d-flex justify-content-end mb-3">
-      <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">⬅️ Voltar</a>
+    <!-- TOPO -->
+    <div class="flex justify-end mb-4">
+      <a href="{{ url_for('home') }}" class="text-sm text-gray-600 hover:text-green-600">⬅ Voltar</a>
     </div>
 
     <!-- LOGOS -->
-    <div class="row justify-content-center align-items-center mb-4">
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" class="img-fluid" style="max-height: 80px;">
-      </div>
-      <div class="col-auto">
-        <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" class="img-fluid" style="max-height: 80px;">
-      </div>
+    <div class="flex justify-center items-center gap-6 mb-6">
+      <img src="{{ url_for('static', filename='defesa_civil.jpeg') }}" alt="Defesa Civil" class="h-20">
+      <img src="{{ url_for('static', filename='pref_cba.jpeg') }}" alt="Prefeitura de Cuiabá" class="h-20">
     </div>
 
     <!-- TÍTULO -->
-    <h3 class="mb-4 text-center text-primary fw-bold">Gerador de Relatório Técnico - Regularização Fundiária</h3>
+    <h1 class="text-2xl font-bold text-green-700 mb-6 text-center">Relatório Técnico — Regularização Fundiária</h1>
 
-    <!-- FORMULÁRIO -->
-    <form method="POST" enctype="multipart/form-data">
-      
-      {% for label, name in campos %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold">{{ label }}</label>
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
 
-        {% if name == "latitude" %}
-        <div class="input-group mb-2">
-          <button type="button" class="btn btn-sm btn-outline-primary" onclick="atualizarLocalizacao()">📍 Atualizar</button>
-          <input type="text" name="latitude" id="latitude" class="form-control" placeholder="Ex: -15.601234" required>
+      <!-- ── IDENTIFICAÇÃO ─────────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-green-500 pb-1 mb-4">Identificação</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          {% for label, name in campos %}
+
+            {% if name == "latitude" %}
+            <div class="md:col-span-2">
+              <label class="font-semibold text-sm">{{ label }}</label>
+              <div class="flex gap-2 mt-1">
+                <button type="button" onclick="atualizarLocalizacao()"
+                  class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded whitespace-nowrap">
+                  📍 GPS
+                </button>
+                <a id="link_mapa" href="#" target="_blank" style="display:none"
+                  class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded whitespace-nowrap">
+                  🌍 Mapa
+                </a>
+              </div>
+              <input type="text" name="latitude" id="latitude" readonly placeholder="-15.5989"
+                class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400">
+            </div>
+
+            {% elif name == "longitude" %}
+            <div class="md:col-span-2">
+              <label class="font-semibold text-sm">{{ label }}</label>
+              <input type="text" name="longitude" id="longitude" readonly placeholder="-56.0949"
+                class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400">
+            </div>
+
+            {% elif name == "data_vistoria" %}
+            <div>
+              <label class="font-semibold text-sm">{{ label }} <span class="text-red-500">*</span></label>
+              <input type="date" name="data_vistoria" id="data_vistoria" required
+                class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+            </div>
+
+            {% elif name == "data_relatorio" %}
+            <div>
+              <label class="font-semibold text-sm">{{ label }}</label>
+              <div class="flex gap-2 mt-1">
+                <input type="date" name="data_relatorio" id="data_relatorio"
+                  class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+                <button type="button" onclick="setHoje('data_relatorio')"
+                  class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 rounded whitespace-nowrap">
+                  Hoje
+                </button>
+              </div>
+            </div>
+
+            {% else %}
+            <div>
+              <label class="font-semibold text-sm">{{ label }} <span class="text-red-500">*</span></label>
+              <input type="text" name="{{ name }}" required
+                class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+            </div>
+            {% endif %}
+
+          {% endfor %}
+
         </div>
-        <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-          🌍 Ver no Mapa
-        </a>
-
-        {% elif name == "longitude" %}
-        <input type="text" name="longitude" id="longitude" class="form-control" placeholder="Ex: -56.097900" required>
-
-        {% elif name in ["cpf", "telefone", "data_vistoria", "data_relatorio"] %}
-        <input type="text" name="{{ name }}" id="{{ name }}" class="form-control" required>
-
-        {% else %}
-        <input type="text" name="{{ name }}" class="form-control" required>
-        {% endif %}
-      </div>
-      {% endfor %}
-
-      <!-- Presença de cursos d'água -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Presença de cursos d'água</h5>
-        <select class="form-select" name="presenca_cursos" multiple style="height:auto; max-height:150px;">
-          <option>
-            Foi identificado o curso d’água que atravessa parte da quadra, incidindo diretamente sobre áreas de preservação permanente (APP). 
-            Observa-se que algumas edificações encontram-se implantadas em proximidade imediata às margens do córrego. 
-            Ressalta-se que o risco não se estende a toda a quadra, mas se concentra especificamente nas edificações localizadas junto ao leito do córrego.
-          </option>
-          <option>
-            Não foram identificados cursos d’água na quadra em análise, de modo que não se constatam, no momento, 
-            riscos associados à presença de corpos hídricos ou áreas de preservação permanente (APP) dentro de seus limites.
-          </option>
-        </select>
-        <input type="text" name="presenca_cursos_outro" class="form-control mt-2" placeholder="Outro...">
       </div>
 
-      <!-- Sinais de instabilidade -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Sinais de Instabilidade</h5>
-        <select class="form-select" name="sinais_instabilidade" multiple>
-          <option>Trincas e Rachaduras</option>
-          <option>Erosão</option>
-          <option>Inclinação</option>
-          <option>Deslizamento</option>
-          <option>Infiltração</option>
-        </select>
+      <!-- ── AVALIAÇÃO TÉCNICA ───────────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-green-500 pb-1 mb-4">Avaliação Técnica</h2>
+        <div class="grid grid-cols-1 gap-4">
+
+          <!-- Presença de cursos d'água -->
+          <div>
+            <label class="font-semibold text-sm">Presença de Cursos d'água</label>
+            <select name="presenca_cursos" multiple
+              class="w-full border rounded px-3 py-2 mt-1 h-32 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option>Foi identificado o curso d'água que atravessa parte da quadra, incidindo diretamente sobre áreas de preservação permanente (APP). Observa-se que algumas edificações encontram-se implantadas em proximidade imediata às margens do córrego. Ressalta-se que o risco não se estende a toda a quadra, mas se concentra especificamente nas edificações localizadas junto ao leito do córrego.</option>
+              <option>Não foram identificados cursos d'água na quadra em análise, de modo que não se constatam, no momento, riscos associados à presença de corpos hídricos ou áreas de preservação permanente (APP) dentro de seus limites.</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Outro — Cursos d'água</label>
+            <input type="text" name="presenca_cursos_outro" placeholder="Descreva se necessário..."
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+          </div>
+
+          <!-- Sinais de instabilidade -->
+          <div>
+            <label class="font-semibold text-sm">Sinais de Instabilidade</label>
+            <select name="sinais_instabilidade" multiple
+              class="w-full border rounded px-3 py-2 mt-1 h-28 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option>Trincas e Rachaduras</option>
+              <option>Erosão</option>
+              <option>Inclinação</option>
+              <option>Deslizamento</option>
+              <option>Infiltração</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
+          </div>
+
+          <!-- Potenciais fatores de risco -->
+          <div>
+            <label class="font-semibold text-sm">Potenciais Fatores de Risco</label>
+            <select name="fatores_risco" multiple
+              class="w-full border rounded px-3 py-2 mt-1 h-36 focus:outline-none focus:ring-2 focus:ring-green-400">
+              <option>Acúmulo de água</option>
+              <option>Ausência e/ou deficiência de drenagem</option>
+              <option>Desníveis acentuados no terreno</option>
+              <option>Macro-fissuras em muros, indicando movimentação do solo</option>
+              <option>Ocupações em áreas suscetíveis a alagamento e/ou escorregamento</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
+          </div>
+
+          <!-- Grau de Risco + Evento -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="font-semibold text-sm">Grau de Risco</label>
+              <select name="grau_risco"
+                class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+                <option>MUITO BAIXO</option>
+                <option>BAIXO</option>
+                <option selected>MÉDIO</option>
+                <option>ALTO</option>
+                <option>MUITO ALTO</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-semibold text-sm">Evento vinculado</label>
+              <select name="evento_id"
+                class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-400">
+                <option value="">— Nenhum evento —</option>
+                {% for evento in eventos %}
+                <option value="{{ evento.id }}">{{ evento.data_evento }} – {{ evento.tipo_evento }}{% if evento.descricao %}: {{ evento.descricao }}{% endif %}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <!-- Potenciais fatores de risco -->
-      <div class="mb-4">
-        <h5 class="fw-semibold">Potenciais Fatores de Risco</h5>
-        <select class="form-select" name="fatores_risco" multiple>
-          <option>Acúmulo de água</option>
-          <option>Ausência e/ou deficiência de drenagem</option>
-          <option>Desníveis acentuados no terreno</option>
-          <option>Macro-fissuras em muros, indicando movimentação do solo</option>
-          <option>Ocupações em áreas suscetíveis a alagamento e/ou escorregamento</option>
-        </select>
+      <!-- ── RELATÓRIO FOTOGRÁFICO ──────────────────────── -->
+      <div>
+        <h2 class="text-lg font-bold text-gray-700 border-b border-green-500 pb-1 mb-1">Relatório Fotográfico</h2>
+        <p class="text-sm text-gray-500 mb-4">A Figura 01 é gerada automaticamente com o mapa da localização.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for i in range(2, 8) %}
+          <div class="border rounded-lg p-4 bg-gray-50">
+            <p class="font-semibold text-sm text-gray-700 mb-2">Figura 0{{ i }}</p>
+            <input type="file" name="imagem{{ i }}" accept="image/*"
+              class="w-full border rounded px-3 py-2 text-sm mb-2">
+            <input type="text" name="descricao{{ i }}"
+              placeholder="Descrição da Figura 0{{ i }}"
+              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
-      <!-- Grau de Risco -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Grau de Risco</label>
-        <select name="grau_risco" class="form-select">
-          <option>MUITO BAIXO</option>
-          <option>BAIXO</option>
-          <option selected>MÉDIO</option>
-          <option>ALTO</option>
-          <option>MUITO ALTO</option>
-        </select>
+      <!-- ── BOTÕES ─────────────────────────────────────── -->
+      <div class="flex justify-center gap-4 mt-6">
+        <button type="submit"
+          class="bg-green-700 hover:bg-green-800 text-white font-bold px-8 py-2 rounded-lg">
+          ✅ Gerar Laudo
+        </button>
+        <button type="button" onclick="confirmarLimpar(this.form)"
+          class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg">
+          Limpar Tudo
+        </button>
       </div>
 
-      <!-- Imagens -->
-      <h5 class="mt-5 mb-3 fw-semibold">Imagens e Descrições</h5>
-      {% for i in range(1, 8) %}
-      <div class="mb-3">
-        <label class="form-label">Imagem {{ i }}</label>
-        <input type="file" name="imagem{{ i }}" class="form-control">
-        <input type="text" name="descricao{{ i }}" class="form-control mt-2" placeholder="Descrição da imagem {{ i }}">
-      </div>
-      {% endfor %}
-
-    <!-- ATRIBUIR EVENTO -->
-    {% include 'includes/campo_evento.html' %}
-
-      <!-- Botões -->
-      <div class="d-grid gap-2 mt-4">
-        <button type="submit" class="btn btn-primary">✅ Gerar Laudo</button>
-        <button type="button" class="btn btn-outline-danger" onclick="confirmarLimpeza()">🗑️ Limpar Tudo</button>
-      </div>
     </form>
   </div>
-
-  <!-- Geolocalização -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <script>
-    function atualizarLocalizacao() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (pos) {
-            const lat = pos.coords.latitude.toFixed(6);
-            const lon = pos.coords.longitude.toFixed(6);
-            document.getElementById("latitude").value = lat;
-            document.getElementById("longitude").value = lon;
-
-            const linkMapa = document.getElementById("link_mapa");
-            linkMapa.href = `https://www.google.com/maps?q=${lat},${lon}`;
-            linkMapa.style.display = "inline-block";
-          },
-          err => alert("Erro ao obter localização: " + err.message),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
-      } else {
-        alert("Geolocalização não suportada pelo navegador.");
-      }
-    }
-
-    function confirmarLimpeza() {
-      if (confirm("Tem certeza que deseja limpar todos os campos?")) {
-        document.querySelector("form").reset();
-      }
-    }
-  </script>
 </body>
 </html>
