@@ -2,21 +2,43 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Formulário de Incêndios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório Técnico - Incêndios</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Máscara de CEP
-    function mascaraCEP(input) {
-      let v = input.value.replace(/\D/g, "");
-      if (v.length > 5) v = v.slice(0,5) + "-" + v.slice(5,8);
-      input.value = v;
-    }
-
-    // Confirmação para limpar formulário
     function confirmarLimpar(form) {
       if (confirm("Tem certeza que deseja limpar todos os campos?")) {
         form.reset();
       }
+    }
+
+    function mascaraCEP(input) {
+      let v = input.value.replace(/\D/g, "");
+      if (v.length > 5) v = v.slice(0, 5) + "-" + v.slice(5, 8);
+      input.value = v;
+    }
+
+    function atualizarLocalizacao() {
+      if (!navigator.geolocation) {
+        alert("Geolocalização não suportada pelo navegador.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        document.getElementById("latitude").value = lat;
+        document.getElementById("longitude").value = lon;
+        const link = document.getElementById("link_mapa");
+        link.href = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon + "&zoom=17";
+        link.style.display = "inline-block";
+      }, function() {
+        alert("Não foi possível obter a localização.");
+      }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+    }
+
+    function setHoje(id) {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById(id).value = today;
     }
   </script>
 </head>
@@ -24,7 +46,7 @@
 <body class="bg-gray-100 p-8">
   <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
 
-    <!-- TOPO: Botão Voltar -->
+    <!-- TOPO -->
     <div class="flex justify-end mb-4">
       <a href="{{ url_for('home') }}" class="text-sm text-gray-600 hover:text-red-600">⬅ Voltar</a>
     </div>
@@ -36,163 +58,249 @@
     </div>
 
     <!-- TÍTULO -->
-    <h1 class="text-2xl font-bold text-red-600 mb-6 text-center">Registro de Incêndio</h1>
+    <h1 class="text-2xl font-bold text-red-600 mb-6 text-center">Relatório Técnico — Incêndios</h1>
 
-    <!-- FORMULÁRIO -->
-    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
 
-      {% for label, name in campos %}
-  <div class="mb-3">
-    <label class="form-label">{{ label }}</label>
-
-    {% if name == "cpf" %}
-      <input type="text" name="cpf" id="cpf" class="form-control" maxlength="14" required>
-
-    {% elif name == "telefone" %}
-      <input type="text" name="telefone" id="telefone" class="form-control" maxlength="15" required>
-
-    {% elif name == "nome" %}
-      <input type="text" name="nome" id="nome" class="form-control" required>
-
-    {% elif name == "data_vistoria" %}
-      <input type="text" name="data_vistoria" id="data_vistoria" class="form-control" maxlength="10" required>
-
-    {% elif name == "data_relatorio" %}
-      <input type="text" name="data_relatorio" id="data_relatorio" class="form-control" maxlength="10" required>
-
- {% elif name == "latitude" %}
-  <div class="d-flex align-items-center gap-2 mb-2">
-    <button type="button" id="btn-atualizar-localizacao" class="btn btn-sm btn-outline-primary" onclick="atualizarLocalizacao()">
-      📍 Atualizar Localização
-    </button>
-    <a id="link_mapa" class="btn btn-sm btn-outline-secondary" target="_blank" style="display:none;">
-      🌍 Ver no Mapa
-    </a>
-  </div>
-  <input type="text" name="latitude" id="latitude" class="form-control mb-1" readonly>
-
-{% elif name == "longitude" %}
-  <input type="text" name="longitude" id="longitude" class="form-control" readonly>
-
-    {% else %}
-      <input type="text" name="{{ name }}" class="form-control" required>
-    {% endif %}
-  </div>
-{% endfor %}
-
-
+      <!-- ── IDENTIFICAÇÃO DA OCORRÊNCIA ────────────────── -->
       <div>
-        <label class="font-semibold">Data da Ocorrência</label>
-        <input type="date" name="data_ocorrencia" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Identificação da Ocorrência</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Data da Ocorrência <span class="text-red-500">*</span></label>
+            <input type="date" name="data_ocorrencia" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Nº da Ocorrência <span class="text-red-500">*</span></label>
+            <input type="number" name="n_ocorrencia" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Número da OS <span class="text-red-500">*</span></label>
+            <input type="text" name="n_os" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Origem da Ocorrência <span class="text-red-500">*</span></label>
+            <input type="text" name="origem_ocorrencia" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Evento vinculado</label>
+            <select name="evento_id"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+              <option value="">— Nenhum evento —</option>
+              {% for evento in eventos %}
+              <option value="{{ evento.id }}">{{ evento.data_evento }} – {{ evento.tipo_evento }}{% if evento.descricao %}: {{ evento.descricao }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
       </div>
 
+      <!-- ── LOCALIZAÇÃO ────────────────────────────────── -->
       <div>
-        <label class="font-semibold">Número da OS</label>
-        <input type="text" name="n_os" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Localização</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Endereço <span class="text-red-500">*</span></label>
+            <input type="text" name="endereco" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Bairro <span class="text-red-500">*</span></label>
+            <input type="text" name="bairro" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">CEP <span class="text-red-500">*</span></label>
+            <input type="text" name="cep" maxlength="9" oninput="mascaraCEP(this)" required
+              placeholder="00000-000"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <!-- GPS -->
+          <div>
+            <label class="font-semibold text-sm">Latitude</label>
+            <div class="flex gap-2 mt-1">
+              <button type="button" onclick="atualizarLocalizacao()"
+                class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded whitespace-nowrap">
+                📍 GPS
+              </button>
+              <a id="link_mapa" href="#" target="_blank" style="display:none"
+                class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded whitespace-nowrap">
+                🌍 Mapa
+              </a>
+            </div>
+            <input type="text" name="latitude" id="latitude" readonly placeholder="-15.5989"
+              class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Longitude</label>
+            <input type="text" name="longitude" id="longitude" readonly placeholder="-56.0949"
+              class="w-full border rounded px-3 py-2 mt-1 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+        </div>
       </div>
 
+      <!-- ── SOLICITANTE ────────────────────────────────── -->
       <div>
-        <label class="font-semibold">Origem da Ocorrência</label>
-        <input type="text" name="origem_ocorrencia" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Solicitante</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div class="md:col-span-2">
+            <label class="font-semibold text-sm">Nome <span class="text-red-500">*</span></label>
+            <input type="text" name="nome" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">E-mail</label>
+            <input type="email" name="email"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">CPF</label>
+            <input type="text" name="cpf" id="cpf" maxlength="14" placeholder="000.000.000-00"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Telefone</label>
+            <input type="text" name="telefone" id="telefone" maxlength="15" placeholder="(65) 9 0000-0000"
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+        </div>
       </div>
 
+      <!-- ── EQUIPE E VIATURA ───────────────────────────── -->
       <div>
-        <label class="font-semibold">Nº Ocorrência</label>
-        <input type="number" name="n_ocorrencia" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Equipe e Viatura</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Equipe</label>
+            <select name="equipe" multiple
+              class="w-full border rounded px-3 py-2 mt-1 h-32 focus:outline-none focus:ring-2 focus:ring-red-400">
+              <option value="Ozéias Souza De Oliveira">Ozeias</option>
+              <option value="Marcos Vinicius Pereira Pessoa">Marcos Vinicius</option>
+              <option value="Marcos Aurélio Botelho Ferreira">Marcos Aurelio</option>
+              <option value="Luzinete Nércia Vieira da Silva">Luzinete</option>
+              <option value="Everson Sebastião Nascimento de Brito">Everson</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Veículo</label>
+            <select name="veiculo" multiple
+              class="w-full border rounded px-3 py-2 mt-1 h-32 focus:outline-none focus:ring-2 focus:ring-red-400">
+              <option>Veículo 01</option>
+              <option>Veículo 02</option>
+              <option>Veículo 03</option>
+            </select>
+            <p class="text-xs text-gray-400 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
+          </div>
+
+        </div>
       </div>
 
-<div>
-  <label class="font-semibold">Equipe</label>
-  <select name="equipe" multiple required class="w-full border rounded px-3 py-2 h-32">
-    <option value="Ozéias Souza De Oliveira">Ozeias</option>
-    <option value="Marcos Vinicius Pereira Pessoa">Marcos Vinicius</option>
-    <option value="Marcos Aurélio Botelho Ferreira">Marcos Aurelio</option>
-    <option value="Luzinete Nércia Vieira da Silva">Luzinete</option>
-    <option value="Everson Sebastião Nascimento de Brito">Everson</option>
-  </select>
-  <p class="text-sm text-gray-500 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
-</div>
-
-<div>
-  <label class="font-semibold">Veículo</label>
-  <select name="veiculo" multiple required class="w-full border rounded px-3 py-2 h-32">
-    <option>"Veículo 01"</option>
-    <option>"Veículo 02"</option>
-    <option>"Veículo 03"</option>
-  </select>
-  <p class="text-sm text-gray-500 mt-1">Segure CTRL (Windows) ou ⌘ (Mac) para selecionar mais de uma opção.</p>
-</div>
-      
+      <!-- ── RELATO TÉCNICO ─────────────────────────────── -->
       <div>
-        <label class="font-semibold">Endereço</label>
-        <input type="text" name="endereco" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Relato Técnico</h2>
+        <div class="grid grid-cols-1 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Descrição <span class="text-red-500">*</span></label>
+            <textarea name="descricao" maxlength="1000" required rows="3"
+              placeholder="Descreva a ocorrência..."
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Relato <span class="text-red-500">*</span></label>
+            <textarea name="relato" maxlength="1000" required rows="3"
+              placeholder="Relato detalhado da ocorrência..."
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Recomendações <span class="text-red-500">*</span></label>
+            <textarea name="recomendacoes" maxlength="1000" required rows="3"
+              placeholder="Medidas recomendadas..."
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+          </div>
+
+        </div>
       </div>
 
+      <!-- ── DATAS ──────────────────────────────────────── -->
       <div>
-        <label class="font-semibold">Bairro</label>
-        <input type="text" name="bairro" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-4">Datas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label class="font-semibold text-sm">Data da Vistoria <span class="text-red-500">*</span></label>
+            <input type="date" name="data_vistoria" id="data_vistoria" required
+              class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+
+          <div>
+            <label class="font-semibold text-sm">Data de Emissão</label>
+            <div class="flex gap-2 mt-1">
+              <input type="date" name="data_fim" id="data_fim"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+              <button type="button" onclick="setHoje('data_fim')"
+                class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 rounded whitespace-nowrap">
+                Hoje
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
+      <!-- ── RELATÓRIO FOTOGRÁFICO ──────────────────────── -->
       <div>
-        <label class="font-semibold">CEP</label>
-        <input type="text" name="cep" maxlength="9" oninput="mascaraCEP(this)" required class="w-full border rounded px-3 py-2">
+        <h2 class="text-lg font-bold text-gray-700 border-b border-red-400 pb-1 mb-1">Relatório Fotográfico</h2>
+        <p class="text-sm text-gray-500 mb-4">A Figura 01 é gerada automaticamente com o mapa da localização.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for i in range(2, 6) %}
+          <div class="border rounded-lg p-4 bg-gray-50">
+            <p class="font-semibold text-sm text-gray-700 mb-2">Figura 0{{ i }}</p>
+            <input type="file" name="imagem{{ i }}" accept="image/*"
+              class="w-full border rounded px-3 py-2 text-sm mb-2">
+            <input type="text" name="descricao{{ i }}"
+              placeholder="Descrição da Figura 0{{ i }}"
+              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
-      <div>
-        <label class="font-semibold">Descrição</label>
-        <textarea name="descricao" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
-      </div>
-
-      <div>
-        <label class="font-semibold">Data da Vistoria</label>
-        <input type="date" name="data_vistoria" required class="w-full border rounded px-3 py-2">
-      </div>
-
-      <div>
-        <label class="font-semibold">Nome</label>
-        <input type="text" name="nome" required class="w-full border rounded px-3 py-2">
-      </div>
-
-      <div>
-        <label class="font-semibold">E-mail</label>
-        <input type="email" name="email" required class="w-full border rounded px-3 py-2">
-      </div>
-
-      <div>
-        <label class="font-semibold">Relato</label>
-        <textarea name="relato" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
-      </div>
-
-      <div>
-        <label class="font-semibold">Recomendações</label>
-        <textarea name="recomendacoes" maxlength="1000" required class="w-full border rounded px-3 py-2"></textarea>
-      </div>
-
-      <div>
-        <label class="font-semibold">Data de emissão</label>
-        <input type="date" name="data_fim" required class="w-full border rounded px-3 py-2">
-      </div>
-
-      <h2 class="text-lg font-bold mt-6">Imagens</h2>
-      {% for i in range(1,5) %}
-      <div>
-        <label class="font-semibold">Imagem {{i}}</label>
-        <input type="file" name="imagem{{i}}" accept="image/*" class="w-full border rounded px-3 py-2">
-        <input type="text" name="descricao{{i}}" placeholder="Descrição da Figura {{i}}" class="w-full border rounded px-3 py-2 mt-2">
-      </div>
-      {% endfor %}
-
-      
-    <!-- ATRIBUIR EVENTO -->
-    {% include 'includes/campo_evento.html' %}
-      
-
-      <!-- BOTÕES -->
+      <!-- ── BOTÕES ─────────────────────────────────────── -->
       <div class="flex justify-center gap-4 mt-6">
-        <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
-          Gerar Relatório
+        <button type="submit"
+          class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-2 rounded-lg">
+          🔥 Gerar Relatório
         </button>
-        <button type="button" onclick="confirmarLimpar(this.form)" class="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500">
+        <button type="button" onclick="confirmarLimpar(this.form)"
+          class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-lg">
           Limpar Tudo
         </button>
       </div>
@@ -201,11 +309,3 @@
   </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
