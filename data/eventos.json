@@ -5,12 +5,5 @@
     "tipo_evento": "Outros",
     "descricao": "teste",
     "data_registro": "30/05/2026 15:31:32"
-  },
-  {
-    "id": "20260620175304",
-    "data_evento": "20/06/2026",
-    "tipo_evento": "Meteorológicos",
-    "descricao": "frio intenso",
-    "data_registro": "20/06/2026 17:53:04"
   }
 ]
