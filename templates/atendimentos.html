@@ -9,6 +9,18 @@
   
 
 <body class="bg-gray-100">
+<!-- MACRO PARA FORMATAÇÃO DE DATA -->
+  {% macro formatar_data(valor) %}
+  {%- set v = valor | string | trim -%}
+  {%- if "-" in v and v | length == 10 -%}
+    {{ v[8:10] }}/{{ v[5:7] }}/{{ v[0:4] }}
+  {%- elif "." in v -%}
+    {{ v | replace(".", "/") }}
+  {%- else -%}
+    {{ v if v else "–" }}
+  {%- endif -%}
+{% endmacro %}
+  
   <div class="max-w-7xl mx-auto p-6">
     <!-- TOPO -->
     <div class="flex justify-between items-center mb-4">
@@ -48,7 +60,7 @@
             <td class="px-4 py-2">{{ a.bairro }}</td>
             <td class="px-4 py-2">{{ a.latitude }}</td>
             <td class="px-4 py-2">{{ a.longitude }}</td>
-            <td class="px-4 py-2">{{ a.data_vistoria }}</td>
+            <td class="px-4 py-2">{{ formatar_data(a.data_vistoria) }}</td>
 
             <!-- GRAU DE RISCO COLORIDO -->
             <td class="px-4 py-2">
